@@ -1,0 +1,15 @@
+<subject>
+    <span>不同的科目</span><br>
+
+    <div ng-repeat="subject in subjects">
+        <button ng-click="enterSubject(subject.id)">{{ subject.title }}</button>
+    </div>
+    <br><br>
+
+    <span>具体课程内的章节</span><br>
+
+    <div ng-repeat="chapter in chapters">
+        <button ng-click="enterChapter(chapter.id)">{{ chapter.title }}</button>
+    </div>
+
+</subject>

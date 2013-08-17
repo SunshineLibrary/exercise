@@ -1,0 +1,50 @@
+.background-canvas {
+  background-color: #f2f2f2;
+  padding: 80px 0 20px 0;
+  height: 100%;
+  overflow: scroll;
+}
+.ctrlBar {
+  position: fixed;
+  right: 0;
+}
+._progress-bar {
+  background-color: #ffffff;
+}
+._progress {
+  background-color: #00d197;
+  height: 34px;
+}
+.question-content {
+  font-size: 16px;
+}
+/* general layouts for choices */
+.choice-canvas {
+  margin: 0px 0px 20px 0px;
+  padding: 10px 0px 10px 10px;
+  height: 40px;
+}
+.choice-canvas-default {
+  background-color: #ffffff;
+  margin: 0px 0px 20px 0px;
+  padding: 10px 0px 10px 10px;
+  height: 40px;
+}
+.choice-canvas-choose {
+  background-color: #bfbfbf;
+  margin: 0px 0px 20px 0px;
+  padding: 10px 0px 10px 10px;
+  height: 40px;
+}
+.choice-canvas-correct {
+  background-color: #00d197;
+  margin: 0px 0px 20px 0px;
+  padding: 10px 0px 10px 10px;
+  height: 40px;
+}
+.choice-canvas-wrong {
+  background-color: red;
+  margin: 0px 0px 20px 0px;
+  padding: 10px 0px 10px 10px;
+  height: 40px;
+}
