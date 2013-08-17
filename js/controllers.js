@@ -6,7 +6,7 @@
  * To change this template use File | Settings | File Templates.
  */
 
-angular.module('LessonDemo.controllers', [])
+angular.module('SunExercise.controllers', [])
 
     //root controller
     .controller('rootCtrl', function ($location, MaterialProvider) {

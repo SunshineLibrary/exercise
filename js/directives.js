@@ -6,7 +6,7 @@
  * To change this template use File | Settings | File Templates.
  */
 
-angular.module('LessonDemo.directives', [])
+angular.module('SunExercise.directives', [])
 
     .directive("subject", function (SandboxProvider, $routeParams, $location) {
 

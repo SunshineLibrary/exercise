@@ -5,7 +5,7 @@
  * Time: 下午9:27
  * To change this template use File | Settings | File Templates.
  */
-angular.module('LessonDemo.services', [])
+angular.module('SunExercise.services', [])
     //provide lesson data
     .factory("MaterialProvider", function ($http, $q) {
 

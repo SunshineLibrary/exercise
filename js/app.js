@@ -1,5 +1,5 @@
-angular.module("LessonDemo", ['LessonDemo.controllers', 'LessonDemo.directives',
-        'LessonDemo.services', 'LazyLoader'])
+angular.module("SunExercise", ['SunExercise.controllers', 'SunExercise.directives',
+        'SunExercise.services', 'LazyLoader'])
 
     .config(function ($routeProvider) {
         $routeProvider
