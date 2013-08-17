@@ -1,0 +1,17 @@
+<div>
+    <chapter>
+        <div ng-repeat="lesson in lessons">
+            <lesson ng-if="loadLesson(lesson)"></lesson>
+
+            <div ng-hide="loadLesson(lesson)"
+                 style="width:200px;height:40px;background-color: #f0f0f0;border: 1px #a0a0a0 dashed;text-align: center;color:#a0a0a0;margin-top:30px;">
+                <span>{{ lesson.title }}</span><br>
+                <span>尚未开启本课程</span>
+            </div>
+        </div>
+
+        <button style="width:200px;height:40px;background-color: #f0f0f0;border: 1px #a0a0a0 solid;text-align: center;color:black;margin-top:30px;"
+                ng-click="returnToSubject()">返 回
+        </button>
+    </chapter>
+</div>

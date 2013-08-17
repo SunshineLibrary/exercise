@@ -1,0 +1,30 @@
+{
+    "is_complete": false,
+    "current_activity": "",
+    "activities": {
+        "activity1": {
+            "duration": 333
+        },
+        "activity2": {
+            "is_complete": true,
+            "duration": 333,
+            "current_problem": "p1",
+            "problems": {
+                "p1": {
+                    "is_correct": true,
+                    "answer": ["王明阳"]
+                }
+            },
+            "summary": {
+                "correct_count": 3,
+                "badges": []
+            }
+        },
+        "activity3": {
+
+        }
+    },
+    "summary": {
+        "badges": []
+    }
+}

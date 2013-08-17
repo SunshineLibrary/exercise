@@ -1,0 +1,13 @@
+{
+        "lessons": [
+            {
+                "id": "lesson1",
+                "title": "走一步，再走一步"
+            },
+            {
+                "id": "lesson2",
+                "title": "又走一步，摔死了",
+                "requirements": ["lesson1"]
+            }
+        ]
+    }
