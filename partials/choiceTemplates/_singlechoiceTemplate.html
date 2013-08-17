@@ -1,0 +1,32 @@
+<div id='problem{{$index}}'>
+    <div class="col-md-10">
+        <div class="question-content">
+            <span>第&nbsp;{{ $index+1 }}&nbsp;题&nbsp;/&nbsp;共&nbsp;{{ total }}&nbsp;题&nbsp;{{ problem.parent_id }}</span><br>
+            <span>题目：{{ problem.title }}</span><br>
+            <span>题干：{{ problem.body }}</span><br><br>
+        </div>
+
+        <div ng-repeat='choice in problem.choices' choices>
+            <div id='problem{{$parent.$index}}_choice{{$index}}'
+                 class="choice-canvas-{{ checked[$index] }}"
+                 ng-click='chooseOption(choice.id, $index)'>
+                {{choice.body}}
+            </div>
+        </div>
+        <p>
+
+        <div ng-show='showExplanation'>解析：{{ explanation }}</div>
+        </p>
+    </div>
+
+    <div class="col-md-2 ctrlBar">
+        <button ng-show="showHintButton" ng-click="showHint()">显示暗示</button>
+        <span ng-show="showHintBox">{{ hint }}</span>
+        <button ng-hide='hideSubmitButton' class="btn btn-primary"
+                ng-click='submitAnswer()'>提&nbsp;交
+        </button>
+        <button ng-show='showContinueButton' class="btn btn-primary"
+                ng-click='continueProblem()'>继&nbsp;续
+        </button>
+    </div>
+</div>

@@ -1,0 +1,25 @@
+<div id='problem{{$index}}'>
+    <div>
+        <span>第&nbsp;{{ $index+1 }}&nbsp;题&nbsp;/&nbsp;共&nbsp;{{ total }}&nbsp;题&nbsp;{{ problem.parent_id }}</span><br>
+        <span>题目：{{ problem.title }}</span><br>
+        <span>题干：{{ problem.body }}</span><br><br>
+        <button ng-show="showHintButton" ng-click="showHint()">显示暗示</button>
+        <span ng-show="showHintBox">{{ hint }}</span>
+        <label for='problem{{$parent.$index}}'>
+            <input type='text' id='problem{{$parent.$index}}'
+                   name='choices_{{problem.id}}'
+                   ng-model='answer[problem.id]' ng-disabled="$parent.submitted">
+        </label>
+    </div>
+    <p>
+
+    <div ng-show='showExplanation'>解析：{{ explanation }}</div>
+    </p>
+    <button ng-hide='hideSubmitButton' class='pt-touch-button pt-triggers' style='position:absolute;top:300px'
+            ng-click='submitAnswer()'>提&nbsp;交
+    </button>
+    <button ng-show='showContinueButton' class='pt-touch-button pt-triggers' style='position:absolute;top:300px'
+            ng-click='continueProblem()'>继&nbsp;续
+    </button>
+    <br>
+</div>
