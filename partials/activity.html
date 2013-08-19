@@ -2,11 +2,11 @@
     <activity>
         <div class="row">
             <div class="col-md-12 navbar-fixed-top _progress-bar" style="padding-left:0px">
-                <div class="col-md-10" style="padding-left:0px">
+                <div class="_progress-canvas">
                     <div class="_progress" style="width:{{ progressWidth }}%;"></div>
                 </div>
-                <div id="buttonContainer" class="col-md-2 pull-right">
-                    <button class="btn btn-default" ng-click='pauseLearn()'>返&nbsp;回</button>
+                <div id="buttonContainer" class="return-button">
+                    <div ng-click='pauseLearn()'><img src="img/exit.png"/></div>
                 </div>
             </div>
         </div>
@@ -20,9 +20,10 @@
                     <div ng-bind-html-unsafe="body"></div>
                 </div>
                 <div class="col-md-2 ctrlBar">
-                    <button ng-hide="hideContinueButton" class="btn btn-primary"
-                            ng-click='continueActivity()'>继&nbsp;续
-                    </button>
+                    <div ng-hide="hideContinueButton"
+                         ng-click='continueActivity()'>
+                        <img src="img/next.png"/>
+                    </div>
                 </div>
             </div>
 
@@ -37,7 +38,10 @@
 
                 <div ng-show="showQuizSummary">
                     <span>总共答对&nbsp;{{ quizCorrectCount }}&nbsp;题，正确率&nbsp; {{ quizCorrectPercent }}&nbsp;</span>
-                    <button ng-click="nextActivity()">继&nbsp;续</button>
+
+                    <div ng-click="nextActivity()">
+                        <img src="img/next.png"/>
+                    </div>
                 </div>
             </div>
 

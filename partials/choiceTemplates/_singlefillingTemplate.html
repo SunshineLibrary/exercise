@@ -1,9 +1,10 @@
 <div id='problem{{$index}}'>
     <div class="col-md-10">
         <div class="question-content">
-            <span>第&nbsp;{{ $index+1 }}&nbsp;题&nbsp;/&nbsp;共&nbsp;{{ total }}&nbsp;题&nbsp;{{ problem.parent_id }}</span><br>
-            <span>题目：{{ problem.title }}</span><br>
-            <span ng-bind-html-unsafe="body"></span><br><br>
+            <!--<span>第&nbsp;{{ $index+1 }}&nbsp;题&nbsp;/&nbsp;共&nbsp;{{ total }}&nbsp;题&nbsp;{{ problem.parent_id }}</span><br> -->
+            <span>{{ $index+1 }}.&nbsp;{{ problem.title }}</span>
+            <span class="question-type">[{{ type }}]</span><br>
+            <span ng-bind-html-unsafe="body"></span><br>
         </div>
 
         <label for='problem{{$parent.$index}}'>
@@ -19,13 +20,18 @@
     </div>
 
     <div class="col-md-2 ctrlBar">
-        <button ng-show="showHintButton" ng-click="showHint()">显示暗示</button>
+        <div class="hint-btn" ng-show="showHintButton" ng-click="showHint()">
+            <img src="img/hint.png"/>
+        </div>
         <span ng-show="showHintBox">{{ hint }}</span>
-        <button ng-hide='hideSubmitButton' class="btn btn-primary"
-                ng-click='submitAnswer()'>提&nbsp;交
-        </button>
-        <button ng-show='showContinueButton' class="btn btn-primary"
-                ng-click='continueProblem()'>继&nbsp;续
-        </button>
+
+        <div class="continue-btn" ng-hide='hideSubmitButton' class="submit-btn"
+             ng-click='submitAnswer()'>
+            <img src="img/submit.png"/>
+        </div>
+        <div class="continue-btn" ng-show='showContinueButton'
+             ng-click='continueProblem()'>
+            <img src="img/next.png"/>
+        </div>
     </div>
 </div>

@@ -263,7 +263,7 @@ angular.module('SunExercise.directives', [])
                                     }
                                 }
                             } else {
-                                //return to the lesson page;
+                                //set the current_activity to undefined so that the student can review activities
                                 lessonUserdata.current_activity = undefined;
                                 //check if the student has completed the condition to complete the lesson
                                 if ((typeof lessonUserdata.summary.correctPercent == "undefined")) {
@@ -277,6 +277,10 @@ angular.module('SunExercise.directives', [])
                                     } else {
                                         lessonUserdata.is_complete = true;
                                     }
+                                }
+                                //give award videos if qualified
+                                if (lessonUserdata.is_complete) {
+
                                 }
 
                                 //give student badges if qualified
@@ -694,6 +698,13 @@ angular.module('SunExercise.directives', [])
                 } else {
                     $scope.layout = "list";
                     $scope.colNum = "12";
+                }
+                if (currProblem.type == "singlechoice") {
+                    $scope.type = "单选题";
+                } else if (currProblem.type == "multichoice") {
+                    $scope.type = "多选题";
+                } else {
+                    $scope.type = "单填空题";
                 }
                 //compile multimedia resources
                 var multimediaBody = "<div>" + currProblem.body + "</div>";

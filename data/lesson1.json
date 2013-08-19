@@ -11,7 +11,14 @@
     "star1": 50,
     "star2": 60,
     "star3": 80,
-    "badges": [
+    "achievements": [
+        {
+            "id": "unfortunate_bear_video",
+            "type": "award",
+            "title": "倒霉熊的奖励视频",
+            "desc": "这是一个搞笑视频祝你幸福",
+            "condition": [90]
+        }
     ],
     "activities": [
         {
@@ -63,6 +70,7 @@
                     "title": "选出下面加引号多音字的正确读音：",
                     "type": "multichoice",
                     "body": "雨季开始时， 我们预料有“闷热”的天气。",
+                    "hint": "选a就对啦",
                     "level": "easy",
                     "choices": [
                         {
