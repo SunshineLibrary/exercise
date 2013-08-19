@@ -126,6 +126,7 @@ angular.module('SunExercise.directives', [])
                     var lessonMaterialPromise = lessonSandbox.getLessonMaterial($routeParams.lid);
                     var lessonUserdataPromise = lessonSandbox.getLessonUserdata($routeParams.lid);
                 }
+                var userInfo = lessonSandbox.getUserInfo();
 
                 //record lessonMaterial and lessonUserdata into a object
                 var lessonTotalData = {};
@@ -148,13 +149,13 @@ angular.module('SunExercise.directives', [])
                     $scope.activities = lessonData.activities;
                     if (lessonUserdata.is_complete) {
                         $scope.showResult = true;
-                        $scope.lessonResultCount = lessonUserdata.summary.correctCount;
-                        $scope.lessonResultPercent = lessonUserdata.summary.correctPercent;
+                        $scope.lessonResultCount = lessonUserdata.summary.correct_count;
+                        $scope.lessonResultPercent = lessonUserdata.summary.correct_percent;
                         if (typeof lessonUserdata.summary.star != "undefined") {
                             $scope.hasStar = true;
                             $scope.lessonStar = (lessonUserdata.summary.star == 1) ? "铜牌" :
                                 ((lessonUserdata.summary.star == 2) ? "银牌" :
-                                    ((lessonUserdata.summary == 3) ? "金牌" : null));
+                                    ((lessonUserdata.summary.star == 3) ? "金牌" : null));
                         }
                     }
                     if (typeof lessonUserdata.current_activity === "undefined") {
@@ -200,15 +201,15 @@ angular.module('SunExercise.directives', [])
                     //listen to the endOfListen event to end the lesson
                     $scope.$on("endOfLesson", function (event, args) {
                         if ((typeof args !== "undefined") && (typeof args.summary !== "undefined") &&
-                            (typeof args.summary.correctCount !== "undefined")) {
-                            lessonUserdata.summary.correctCount = args.summary.correctCount;
-                            lessonUserdata.summary.correctPercent = args.summary.correctPercent;
+                            (typeof args.summary.correct_count !== "undefined")) {
+                            lessonUserdata.summary.correct_count = args.summary.correct_count;
+                            lessonUserdata.summary.correct_percent = args.summary.correct_percent;
                         }
                         //return to the lesson page;
                         lessonUserdata.current_activity = undefined;
                         //check if the student has completed the condition to complete the lesson
-                        if ((typeof lessonUserdata.summary.correctPercent == "undefined")) {
-                            lessonUserdata.summary.correctPercent = 100;
+                        if ((typeof lessonUserdata.summary.correct_percent == "undefined")) {
+                            lessonUserdata.summary.correct_percent = 100;
                             lessonUserdata.is_complete = true;
                         } else {
                             if (typeof lessonData.pass_score != "undefined") {
@@ -221,14 +222,36 @@ angular.module('SunExercise.directives', [])
                         }
 
                         if (args.should_transition) {
-                            //give student badges if qualified
-                            if (typeof lessonUserdata.summary.correctPercent != "undefined") {
-                                if (lessonUserdata.summary.correctPercent >= lessonData.star3) {
+                            //give student star if qualified
+                            if (typeof lessonUserdata.summary.correct_percent != "undefined") {
+                                if (lessonUserdata.summary.correct_percent >= lessonData.star3) {
                                     lessonUserdata.summary.star = 3;
-                                } else if (lessonUserdata.summary.correctPercent >= lessonData.star2) {
+                                } else if (lessonUserdata.summary.correct_percent >= lessonData.star2) {
                                     lessonUserdata.summary.star = 2;
-                                } else if (lessonUserdata.summary.correctPercent >= lessonData.star1) {
+                                } else if (lessonUserdata.summary.correct_percent >= lessonData.star1) {
                                     lessonUserdata.summary.star = 1;
+                                }
+                            }
+                            //give award videos and badges if qualified
+                            if ((lessonUserdata.is_complete) && (typeof lessonData.achievements != "undefined")) {
+                                for (var i = 0; i < lessonData.achievements.length; i++) {
+                                    //award video logic
+                                    if (lessonData.achievements[i].type == "award") {
+                                        //check if the student has already got the award video
+                                        if (typeof userInfo.achievements.awards[lessonData.achievements[i].id] == "undefined") {
+                                            //parse the award condition
+                                            if ((typeof lessonUserdata.summary.correct_count == "undefined") ?
+                                                (lessonSandbox.conditionParser(lessonData.achievements[i].condition, Infinity, 100)) :
+                                                (lessonSandbox.conditionParser(lessonData.achievements[i].condition,
+                                                    lessonUserdata.summary.correct_count, lessonUserdata.summary.correct_percent))) {
+                                                userInfo.achievements.awards[lessonData.achievements[i].id] = {
+                                                    id: lessonData.achievements[i].id
+                                                }
+                                            }
+                                        }
+                                    } else {
+
+                                    }
                                 }
                             }
 
@@ -243,9 +266,9 @@ angular.module('SunExercise.directives', [])
                         $scope.$on("activityComplete_" + activity.id, function (event, args) {
                             //update summary if received args
                             if ((typeof args !== "undefined") && (typeof args.summary !== "undefined") &&
-                                (typeof args.summary.correctCount !== "undefined")) {
-                                lessonUserdata.summary.correctCount = args.summary.correctCount;
-                                lessonUserdata.summary.correctPercent = args.summary.correctPercent;
+                                (typeof args.summary.correct_count !== "undefined")) {
+                                lessonUserdata.summary.correct_count = args.summary.correct_count;
+                                lessonUserdata.summary.correct_percent = args.summary.correct_percent;
                             }
 
                             //operate jump logic
@@ -263,39 +286,58 @@ angular.module('SunExercise.directives', [])
                                     }
                                 }
                             } else {
-                                //set the current_activity to undefined so that the student can review activities
+                                //set the current_activity to undefined so that the back button can operate as intended
                                 lessonUserdata.current_activity = undefined;
-                                //check if the student has completed the condition to complete the lesson
-                                if ((typeof lessonUserdata.summary.correctPercent == "undefined")) {
-                                    lessonUserdata.summary.correctPercent = 100;
-                                    lessonUserdata.is_complete = true;
-                                } else {
-                                    if (typeof lessonData.pass_score != "undefined") {
-                                        if (lessonSandbox.parseCompleteCondition(lessonData.pass_score, lessonUserdata.summary)) {
-                                            lessonUserdata.is_complete = true;
-                                        }
-                                    } else {
-                                        lessonUserdata.is_complete = true;
-                                    }
-                                }
-                                //give award videos if qualified
-                                if (lessonUserdata.is_complete) {
-
-                                }
-
-                                //give student badges if qualified
-                                if (typeof lessonUserdata.summary.correctPercent != "undefined") {
-                                    if (lessonUserdata.summary.correctPercent >= lessonData.star3) {
-                                        lessonUserdata.summary.star = 3;
-                                    } else if (lessonUserdata.summary.correctPercent >= lessonData.star2) {
-                                        lessonUserdata.summary.star = 2;
-                                    } else if (lessonUserdata.summary.correctPercent >= lessonData.star1) {
-                                        lessonUserdata.summary.star = 1;
-                                    }
-                                }
 
                                 if (args.should_transition) {
+                                    //check if the student has completed the condition to complete the lesson
+                                    if ((typeof lessonUserdata.summary.correct_percent == "undefined")) {
+                                        lessonUserdata.summary.correct_percent = 100;
+                                        lessonUserdata.is_complete = true;
+                                    } else {
+                                        if (typeof lessonData.pass_score != "undefined") {
+                                            if (lessonSandbox.parseCompleteCondition(lessonData.pass_score, lessonUserdata.summary)) {
+                                                lessonUserdata.is_complete = true;
+                                            }
+                                        } else {
+                                            lessonUserdata.is_complete = true;
+                                        }
+                                    }
+
+                                    //give student star if qualified
+                                    if (typeof lessonUserdata.summary.correct_percent != "undefined") {
+                                        if (lessonUserdata.summary.correct_percent >= lessonData.star3) {
+                                            lessonUserdata.summary.star = 3;
+                                        } else if (lessonUserdata.summary.correct_percent >= lessonData.star2) {
+                                            lessonUserdata.summary.star = 2;
+                                        } else if (lessonUserdata.summary.correct_percent >= lessonData.star1) {
+                                            lessonUserdata.summary.star = 1;
+                                        }
+                                    }
+                                    //give award videos and badges if qualified
+                                    if ((lessonUserdata.is_complete) && (typeof lessonData.achievements != "undefined")) {
+                                        for (var i = 0; i < lessonData.achievements.length; i++) {
+                                            //award video logic
+                                            if (lessonData.achievements[i].type == "award") {
+                                                //check if the student has already got the award video
+                                                if (typeof userInfo.achievements.awards[lessonData.achievements[i].id] == "undefined") {
+                                                    //parse the award condition
+                                                    if ((typeof lessonUserdata.summary.correct_count == "undefined") ?
+                                                        (lessonSandbox.conditionParser(lessonData.achievements[i].condition, Infinity, 100)) :
+                                                        (lessonSandbox.conditionParser(lessonData.achievements[i].condition,
+                                                            lessonUserdata.summary.correct_count, lessonUserdata.summary.correct_percent))) {
+                                                        userInfo.achievements.awards[lessonData.achievements[i].id] = {
+                                                            id: lessonData.achievements[i].id
+                                                        }
+                                                    }
+                                                }
+                                            } else {
+
+                                            }
+                                        }
+                                    }
                                     console.log(lessonUserdata);
+                                    console.log(userInfo);
                                     FSM.back();
                                 }
                             }
@@ -400,8 +442,8 @@ angular.module('SunExercise.directives', [])
                                 //if the activity is final quiz, save the userdata to lessonSummary object
                                 var lessonSummary = {};
                                 if ((typeof activityData.is_final !== "undefined") && (activityData.is_final)) {
-                                    lessonSummary.correctCount = correctCount;
-                                    lessonSummary.correctPercent = parseInt(correctCount * 100 / activityData.problems.length);
+                                    lessonSummary.correct_count = correctCount;
+                                    lessonSummary.correct_percent = parseInt(correctCount * 100 / activityData.problems.length);
                                 }
 
                                 //achievements checking
@@ -413,7 +455,7 @@ angular.module('SunExercise.directives', [])
                                     };
                                     for (var i = 0; i < activityData.achievements.length; i++) {
                                         //check if the student has already got this achievement
-                                        if (typeof userInfo.achievements[activityData.achievements[i].id] == "undefined") {
+                                        if (typeof userInfo.achievements.badges[activityData.achievements[i].id] == "undefined") {
                                             //create the custon grader using the grader template
                                             if (typeof activityData.achievements[i].condition != "undefined") {
                                                 var grader = activitySandbox.getGrader(activityData.achievements[i].id,
@@ -425,7 +467,7 @@ angular.module('SunExercise.directives', [])
                                             //apply the userdata using the created grader
                                             if (activitySandbox.createGrader(grader, userDataToGrade)) {
                                                 //write the new badge in userinfo
-                                                userInfo.achievements[activityData.achievements[i].id] = {
+                                                userInfo.achievements.badges[activityData.achievements[i].id] = {
                                                     id: activityData.achievements[i].id
                                                 }
                                             }
@@ -483,7 +525,7 @@ angular.module('SunExercise.directives', [])
                         if (typeof activityData.achievements != "undefined") {
                             for (var i = 0; i < activityData.achievements.length; i++) {
                                 //check if the student has already got this achievement
-                                if (typeof userInfo.achievements[activityData.achievements[i].id] == "undefined") {
+                                if (typeof userInfo.achievements.badges[activityData.achievements[i].id] == "undefined") {
                                     //create the custon grader using the grader template
                                     if (typeof activityData.achievements[i].condition != "undefined") {
                                         var grader = activitySandbox.getGrader(activityData.achievements[i].id,
@@ -495,7 +537,7 @@ angular.module('SunExercise.directives', [])
                                     //apply the userdata using the created grader
                                     if (activitySandbox.createGrader(grader, "")) {
                                         //write the new badge in
-                                        userInfo.achievements[activityData.achievements[i].id] = {
+                                        userInfo.achievements.badges[activityData.achievements[i].id] = {
                                             id: activityData.achievements[i].id
                                         }
                                     }

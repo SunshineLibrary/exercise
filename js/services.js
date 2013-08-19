@@ -88,8 +88,8 @@ angular.module('SunExercise.services', [])
             var deferred = $q.defer();
             var getChapterPromise = deferred.promise;
 
-            var promise = $http.jsonp("http://192.168.3.100:3000/exercise/v1/chapter/" + chapterId + "?callback=JSON_CALLBACK");
-            //var promise = $http.get("data/" + chapterId + ".json");
+            //var promise = $http.jsonp("http://192.168.3.100:3000/exercise/v1/chapter/" + chapterId + "?callback=JSON_CALLBACK");
+            var promise = $http.get("data/" + chapterId + ".json");
             promise.success(function (data) {
                 deferred.resolve(data);
             })
@@ -213,7 +213,10 @@ angular.module('SunExercise.services', [])
 
         var UserInfo = {
             user_name: "张三",
-            achievements: {}
+            achievements: {
+                badges: {},
+                awards: {}
+            }
         };
 
         var getUserInfo = function () {
@@ -503,10 +506,10 @@ angular.module('SunExercise.services', [])
                 var target_score = 0;
                 if (pass_score.slice(pass_score.length - 1) === "%") {
                     target_score = parseInt(pass_score.slice(0, pass_score.length - 1));
-                    return (summary.correctPercent >= target_score);
+                    return (summary.correct_percent >= target_score);
                 } else {
                     target_score = parseInt(pass_score);
-                    return (summary.correctCount >= target_score);
+                    return (summary.correct_count >= target_score);
                 }
             }
 

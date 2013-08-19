@@ -17,7 +17,7 @@
             "type": "award",
             "title": "倒霉熊的奖励视频",
             "desc": "这是一个搞笑视频祝你幸福",
-            "condition": [90]
+            "condition": ">90%"
         }
     ],
     "activities": [
