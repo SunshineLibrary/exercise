@@ -152,9 +152,9 @@ angular.module('SunExercise.directives', [])
                         $scope.lessonResultPercent = lessonUserdata.summary.correctPercent;
                         if (typeof lessonUserdata.summary.star != "undefined") {
                             $scope.hasStar = true;
-                            $scope.lessonStar = (lessonUserdata.summary.star == 1) ? "金牌" :
+                            $scope.lessonStar = (lessonUserdata.summary.star == 1) ? "铜牌" :
                                 ((lessonUserdata.summary.star == 2) ? "银牌" :
-                                    ((lessonUserdata.summary == 3) ? "铜牌" : null));
+                                    ((lessonUserdata.summary == 3) ? "金牌" : null));
                         }
                     }
                     if (typeof lessonUserdata.current_activity === "undefined") {
@@ -223,12 +223,12 @@ angular.module('SunExercise.directives', [])
                         if (args.should_transition) {
                             //give student badges if qualified
                             if (typeof lessonUserdata.summary.correctPercent != "undefined") {
-                                if (lessonUserdata.summary.correctPercent >= lessonData.star1) {
-                                    lessonUserdata.summary.star = 1;
+                                if (lessonUserdata.summary.correctPercent >= lessonData.star3) {
+                                    lessonUserdata.summary.star = 3;
                                 } else if (lessonUserdata.summary.correctPercent >= lessonData.star2) {
                                     lessonUserdata.summary.star = 2;
-                                } else if (lessonUserdata.summary.correctPercent >= lessonData.star3) {
-                                    lessonUserdata.summary.star = 3;
+                                } else if (lessonUserdata.summary.correctPercent >= lessonData.star1) {
+                                    lessonUserdata.summary.star = 1;
                                 }
                             }
 
@@ -285,12 +285,12 @@ angular.module('SunExercise.directives', [])
 
                                 //give student badges if qualified
                                 if (typeof lessonUserdata.summary.correctPercent != "undefined") {
-                                    if (lessonUserdata.summary.correctPercent >= lessonData.star1) {
-                                        lessonUserdata.summary.star = 1;
+                                    if (lessonUserdata.summary.correctPercent >= lessonData.star3) {
+                                        lessonUserdata.summary.star = 3;
                                     } else if (lessonUserdata.summary.correctPercent >= lessonData.star2) {
                                         lessonUserdata.summary.star = 2;
-                                    } else if (lessonUserdata.summary.correctPercent >= lessonData.star3) {
-                                        lessonUserdata.summary.star = 3;
+                                    } else if (lessonUserdata.summary.correctPercent >= lessonData.star1) {
+                                        lessonUserdata.summary.star = 1;
                                     }
                                 }
 
