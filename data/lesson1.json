@@ -91,31 +91,10 @@
                     "id": "a2p2",
                     "parent_id": "activity2",
                     "title": "选出下面加引号多音字的正确读音：",
-                    "type": "singlechoice",
+                    "type": "singlefilling",
+                    "correct_answer": "haha",
                     "body": "士兵在打完子弹之后用石头把敌人击毙。",
-                    "level": "normal",
-                    "choices": [
-                        {
-                            "id": "a2p2c1",
-                            "body": "Dān",
-                            "is_correct": false
-                        },
-                        {
-                            "id": "a2p2c2",
-                            "body": "Dàn",
-                            "is_correct": true
-                        },
-                        {
-                            "id": "a2p2c3",
-                            "body": "Tán",
-                            "is_correct": false
-                        },
-                        {
-                            "id": "a2p2c4",
-                            "body": "Dǎn",
-                            "is_correct": false
-                        }
-                    ]
+                    "level": "normal"
                 },
                 {
                     "id": "a2p3",
@@ -123,26 +102,27 @@
                     "title": "下面哪一个句子的括号里最适合填入‘心惊肉跳’：",
                     "type": "singlechoice",
                     "body": "下面哪一个句子的括号里最适合填入‘心惊肉跳’：",
+                    "layout": "card",
                     "level": "normal",
                     "choices": [
                         {
                             "id": "a2p3c1",
-                            "body": "高速公路上出了车祸，现场十分惨烈，一片()。",
+                            "body": "<jpg src='NatGeo01.jpg'></jpg>",
                             "is_correct": false
                         },
                         {
                             "id": "a2p3c2",
-                            "body": "我并不害怕胆小的鳄鱼，但是饥饿的缅甸蟒蛇使我（）。",
+                            "body": "<jpg src='NatGeo02.jpg'></jpg>",
                             "is_correct": true
                         },
                         {
                             "id": "a2p3c3",
-                            "body": "但这座城市的居民们却远非那么（）。",
+                            "body": "<jpg src='NatGeo03.jpg'></jpg>",
                             "is_correct": false
                         },
                         {
                             "id": "a2p3c4",
-                            "body": "我们听到那间屋子里的小孩在哭的（）。",
+                            "body": "<jpg src='NatGeo04.jpg'></jpg>",
                             "is_correct": false
                         }
                     ]

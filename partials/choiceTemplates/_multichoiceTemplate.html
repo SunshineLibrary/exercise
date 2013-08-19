@@ -3,14 +3,14 @@
         <div class="question-content">
             <span>第&nbsp;{{ $index+1 }}&nbsp;题&nbsp;/&nbsp;共&nbsp;{{ total }}&nbsp;题&nbsp;{{ problem.parent_id }}</span><br>
             <span>题目：{{ problem.title }}</span><br>
-            <span>题干：{{ problem.body }}</span><br><br>
+            <span ng-bind-html-unsafe="body"></span><br><br>
         </div>
 
-        <div ng-repeat='choice in problem.choices' choices>
+        <div ng-repeat='choice in problem.choices' class="col-md-{{ colNum }}" choices>
             <div id='problem{{$parent.$index}}_choice{{$index}}'
-                 class="choice-canvas-{{ checked[$index] }}"
+                 class="choice-layout-{{ layout }}-state-{{ checked[$index] }}"
                  ng-click='chooseOption(choice.id, $index)'>
-                {{choice.body}}
+                <div ng-bind-html-unsafe="choiceBody[choice.id]"></div>
             </div>
         </div>
         <p>

@@ -560,8 +560,9 @@ angular.module('SunExercise.directives', [])
         return {
             restrict: "E",
             link: function ($scope, $element, $attrs) {
-                var template = "<img style='width:300px;' src='http://192.168.3.100:3000/exercise/v1/lesson/" + $routeParams.lid + "/"
-                    + $attrs.src + " />";
+                //var template = "<img style='width:300px;' src='http://192.168.3.100:3000/exercise/v1/lesson/" + $routeParams.lid + "/"
+                //    + $attrs.src + " />";
+                var template = "<img src='data/" + $attrs.src + "' />";
                 $element.html(template);
                 $compile($element.contents())($scope);
             }
@@ -672,6 +673,7 @@ angular.module('SunExercise.directives', [])
 
                 //init ng-models
                 $scope.answer = {};
+                //disable choices after submitted
                 if (problemUserdata.answer.length > 0) {
                     $scope.submitted = true;
                 }
@@ -685,43 +687,62 @@ angular.module('SunExercise.directives', [])
                         $scope.showHintBox = true;
                     }
                 }
-
-                //apply choosing logic
-                $scope.checked = [];
-                for (var i = 0; i < currProblem.choices.length; i++) {
-                    $scope.checked.push("default");
+                //rendering specific layout
+                if ((typeof currProblem.layout != "undefined") && (currProblem.layout == "card")) {
+                    $scope.layout = "card";
+                    $scope.colNum = "6";
+                } else {
+                    $scope.layout = "list";
+                    $scope.colNum = "12";
+                }
+                //compile multimedia resources
+                var multimediaBody = "<div>" + currProblem.body + "</div>";
+                $scope.body = $compile(multimediaBody)($scope);
+                if (currProblem.type != "singlefilling") {
+                    $scope.choiceBody = {};
+                    for (var i = 0; i < currProblem.choices.length; i++) {
+                        var choiceMultimediaBody = "<div>" + currProblem.choices[i].body + "</div>";
+                        $scope.choiceBody[currProblem.choices[i].id] = $compile(choiceMultimediaBody)($scope);
+                    }
                 }
 
-                $scope.lastChecked = -1;
-                var singleChoice = function (choiceId, choiceIndex) {
-                    if (!$scope.submitted) {
-                        if ($scope.lastChecked != -1) {
-                            $scope.checked[$scope.lastChecked] = "default";
-                        }
-                        $scope.checked[choiceIndex] = "choose";
-                        $scope.lastChecked = choiceIndex;
-                        $scope.answer[currProblem.id] = choiceId;
+                //apply choosing logic
+                if (currProblem.type != "singlefilling") {
+                    $scope.checked = [];
+                    for (var i = 0; i < currProblem.choices.length; i++) {
+                        $scope.checked.push("default");
                     }
-                };
 
-                var multiChoice = function (choiceId, choiceIndex) {
-                    if (!$scope.submitted) {
-                        if ($scope.checked[choiceIndex] == "choose") {
-                            $scope.checked[choiceIndex] = "default";
-                            $scope.answer[choiceId] = false;
-                        } else {
+                    //some logic after student choose an option
+                    $scope.lastChecked = -1;
+                    var singleChoice = function (choiceId, choiceIndex) {
+                        if (!$scope.submitted) {
+                            if ($scope.lastChecked != -1) {
+                                $scope.checked[$scope.lastChecked] = "default";
+                            }
                             $scope.checked[choiceIndex] = "choose";
-                            $scope.answer[choiceId] = true;
+                            $scope.lastChecked = choiceIndex;
+                            $scope.answer[currProblem.id] = choiceId;
                         }
+                    };
+
+                    var multiChoice = function (choiceId, choiceIndex) {
+                        if (!$scope.submitted) {
+                            if ($scope.checked[choiceIndex] == "choose") {
+                                $scope.checked[choiceIndex] = "default";
+                                $scope.answer[choiceId] = false;
+                            } else {
+                                $scope.checked[choiceIndex] = "choose";
+                                $scope.answer[choiceId] = true;
+                            }
+                        }
+                    };
+
+                    if (currProblem.type == "singlechoice") {
+                        $scope.chooseOption = singleChoice;
+                    } else if (currProblem.type == "multichoice") {
+                        $scope.chooseOption = multiChoice;
                     }
-                };
-
-                if (currProblem.type == "singlechoice") {
-                    $scope.chooseOption = singleChoice;
-                } else if (currProblem.type == "multichoice") {
-                    $scope.chooseOption = multiChoice;
-                } else {
-
                 }
 
                 //when the student complete the problem

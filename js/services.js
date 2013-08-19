@@ -104,8 +104,8 @@ angular.module('SunExercise.services', [])
             var deferred = $q.defer();
             var getLessonPromise = deferred.promise;
 
-            var promise = $http.jsonp("http://192.168.3.100:3000/exercise/v1/lesson/" + lessonId + ".json?callback=JSON_CALLBACK");
-            //var promise = $http.get("data/" + lessonId + ".json");
+            //var promise = $http.jsonp("http://192.168.3.100:3000/exercise/v1/lesson/" + lessonId + ".json?callback=JSON_CALLBACK");
+            var promise = $http.get("data/" + lessonId + ".json");
 
             promise.success(function (data) {
                 Material = data;
