@@ -88,8 +88,8 @@ angular.module('SunExercise.services', [])
             var deferred = $q.defer();
             var getChapterPromise = deferred.promise;
 
-            //var promise = $http.jsonp("http://192.168.3.100:3000/exercise/v1/chapter/" + chapterId + "?callback=JSON_CALLBACK");
-            var promise = $http.get("data/" + chapterId + ".json");
+            var promise = $http.jsonp("http://192.168.3.100:3000/exercise/v1/chapter/" + chapterId + "?callback=JSON_CALLBACK");
+            //var promise = $http.get("data/" + chapterId + ".json");
             promise.success(function (data) {
                 deferred.resolve(data);
             })
@@ -640,6 +640,11 @@ angular.module('SunExercise.services', [])
                     }
                     return isCorrect;
                 }
+            }
+
+            Sandbox.prototype.playSoundEffects = function (soundUrl) {
+                var soundEffect = new Audio(soundUrl);
+                soundEffect.play();
             }
 
         }

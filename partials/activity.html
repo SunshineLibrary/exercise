@@ -29,7 +29,7 @@
 
             <div id="quiz" ng-hide="lecture">
                 <div switch ng-hide="showQuizSummary">
-                    <problem ng-init="total=problems.length" id="{{ problem.id }}"
+                    <problem id="{{ problem.id }}"
                              class="pt-page pt-page-{{ $index+1 }}"
                              ng-repeat='problem in problems'
                              ng-model="problemShow"

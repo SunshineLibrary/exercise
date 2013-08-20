@@ -2,7 +2,7 @@
     <div class="col-md-10">
         <div class="question-content">
             <!--<span>第&nbsp;{{ $index+1 }}&nbsp;题&nbsp;/&nbsp;共&nbsp;{{ total }}&nbsp;题&nbsp;{{ problem.parent_id }}</span><br> -->
-            <span>{{ $index+1 }}.&nbsp;{{ problem.title }}</span>
+            <span>{{ problemIndex+$index+1 }}.&nbsp;{{ problem.title }}</span>
             <span class="question-type">[{{ type }}]</span><br>
             <span ng-bind-html-unsafe="body"></span><br>
         </div>

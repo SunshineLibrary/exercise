@@ -8,6 +8,7 @@
 
 angular.module('SunExercise.directives', [])
 
+    //subject module
     .directive("subject", function (SandboxProvider, $routeParams, $location) {
 
         //create the subject sandbox
@@ -31,6 +32,7 @@ angular.module('SunExercise.directives', [])
         }
     })
 
+    //chapter module
     .directive("chapter", function (SandboxProvider, $routeParams, $location) {
 
         //create the chapter sandbox
@@ -370,13 +372,15 @@ angular.module('SunExercise.directives', [])
                 var activityData = activitySandbox.getActivityMaterial($routeParams.aid, activityUserdata.seed);
                 var userInfo = activitySandbox.getUserInfo();
 
-                var startTime = Date.now();
-
                 $scope.title = activityData.title;
                 var multimediaBody = "<div>" + activityData.body + "</div>";
                 $scope.body = $compile(multimediaBody)($scope);
+                //init math formula parser queue
+                $scope.mathVisible = false;
+                MathJax.Hub.Queue(function () {
+                    $scope.mathVisible = true;
+                });
                 $scope.activityId = activityData.id;
-
                 //find the previous problem which the student has entered
                 if (activityData.type === 'quiz') {
                     var currProblem = 0;
@@ -388,10 +392,15 @@ angular.module('SunExercise.directives', [])
                         }
                     }
                     $scope.problems = activityData.problems.slice(currProblem);
+                    $scope.problemIndex = currProblem;
                     //update the progress bar
                     $scope.progressWidth = (currProblem + 1) * 100 / activityData.problems.length;
                 }
 
+                //record the activity start time for analysis
+                $scope.$on("activityStart", function (event) {
+                    activityUserdata.start_time = Date.now();
+                })
                 $scope.pauseLearn = function () {
                     //send pause activity event to lesson directive
                     activitySandbox.sendEvent("pauseActivity", $scope);
@@ -403,7 +412,8 @@ angular.module('SunExercise.directives', [])
                 }
 
                 if (activityData.type === "quiz") {
-
+                    //record the activity start time for analysis
+                    activityUserdata.start_time = Date.now();
                     //hide the activity continue button
                     //only wait for receiving the problem complete event
                     $scope.hideContinueButton = true;
@@ -425,8 +435,9 @@ angular.module('SunExercise.directives', [])
 
                                 //record the duration the student spends to finish the activity
                                 var stopTime = Date.now();
-                                var duration = stopTime - startTime;
+                                var duration = stopTime - activityUserdata.start_time;
                                 if (typeof activityUserdata.duration == "undefined") {
+                                    activityUserdata.end_time = stopTime;
                                     activityUserdata.duration = duration;
                                 }
 
@@ -518,9 +529,15 @@ angular.module('SunExercise.directives', [])
                 } else {
                     //show lecture
                     $scope.lecture = true;
+                    //record the activity start time for analysis
+                    activityUserdata.start_time = Date.now();
                     //show the activity continue button
                     //and wait for this button to be clicked
                     $scope.continueActivity = function () {
+                        //record the activity stop time for analysis
+                        activityUserdata.end_time = Date.now();
+
+                        activitySandbox.playSoundEffects("sound-effects/click.wav");
                         //check if the student achieves certain achievements
                         if (typeof activityData.achievements != "undefined") {
                             for (var i = 0; i < activityData.achievements.length; i++) {
@@ -560,32 +577,92 @@ angular.module('SunExercise.directives', [])
         }
     })
 
-    .directive("vid", function ($compile, $routeParams, $route) {
+    .directive("vid", function ($compile, $routeParams) {
+        //enter fullscreen mode
+        var toFullScreen = function (video) {
+            //先全屏
+            if (video.requestFullscreen) {
+                video.requestFullscreen();
+            } else if (video.mozRequestFullScreen) {
+                video.mozRequestFullScreen(); // Firefox
+            } else if (video.webkitRequestFullscreen) {
+                video.webkitRequestFullscreen(); // Chrome and Safari
+            }
+        }
+
+        //exit fullscreen mode
+        var exitFullScreen = function () {
+            if (document.exitFullscreen) {
+                document.exitFullscreen();
+            }
+            else if (document.webkitCancelFullScreen) {
+                document.webkitCancelFullScreen();
+            }
+            else if (document.mozCancelFullScreen) {
+                document.mozCancelFullScreen();
+            }
+        }
+
         return {
             restrict: "E",
             link: function ($scope, $element, $attrs) {
                 var template = "<video id='video' style='width:500px;' src='http://192.168.3.100:3000/exercise/v1/lesson/" + $routeParams.lid + "/"
                     + $attrs.src + "' controls></video>" +
-                    "<button ng-click='playVideo()'>播放视频</button>";
+                    "<button ng-click='playVideo()'>{{ playButtonMsg }}</button>";
                 $element.html(template);
                 $compile($element.contents())($scope);
 
-                //when click the button, the video becomes full-screen and play
+                var start = false;
+                var currentTime = 0;
+                //get video element and control bar elements
                 var video = $element.contents()[0];
-                $scope.playVideo = function () {
-                    video.webkitRequestFullScreen();
-                    video.play();
-                }
-                //ensure that when the student returns to the lecture page from full-screen mode,
-                //the page is reloaded
-                video.addEventListener('webkitfullscreenchange', function () {
-                    if (!document.webkitIsFullScreen) {
-                        //TODO
-                        //console.log("A");
-                        $route.reload();
-                    }
-                }, true);
+                /*var muteButton = document.getElementById("mute");
+                 var seekBar = document.getElementById("seek-bar");
+                 var volumeBar = document.getElementById("volume-bar");*/
 
+                // 在play上添加播放/暂停按钮
+                $scope.playButtonMsg = "播 放";
+                $scope.playVideo = function () {
+                    if (video.paused == true) {
+                        //send the activityStart event to activity to record the start_time
+                        $scope.$emit("activityStart");
+
+                        if (!start) {//第一次进来
+                            toFullScreen(video);
+                            video.play();
+                            $scope.playButtonMsg = "暂 停";
+
+                            start = true;
+                        } else {
+                            video.src = video.currentSrc;
+                            video.load();
+
+                            toFullScreen(video);
+                            video.play();
+
+                            $scope.playButtonMsg = "暂 停";
+                        }
+                    } else {
+                        video.pause();
+                        $scope.playButtonMsg = "播 放";
+                    }
+                };
+
+                video.addEventListener("webkitfullscreenchange", function () {
+                    console.log("响应！" + "wekit:" + document.webkitIsFullScreen);
+                    if (!document.webkitIsFullScreen) {
+                        //退出全屏了
+                        currentTime = video.currentTime;
+                        console.log("退出：" + currentTime);
+                        video.pause();
+                        $scope.playButtonMsg = "播 放";
+                    }
+                });
+
+                video.addEventListener("canplay", function () {
+                    video.currentTime = currentTime;
+                    console.log("start=" + start + "  进来: " + video.currentTime + "cut=" + currentTime);
+                });
             }
         }
     })
@@ -625,6 +702,9 @@ angular.module('SunExercise.directives', [])
                     "<button ng-click='fullscreen()'>全屏模式</button>";
                 $element.html(template);
                 $compile($element.contents())($scope);
+
+                //send the activityStart event to activity to record the start_time
+                $scope.$emit("activityStart");
 
                 PDFJS.disableWorker = true;
                 var pdfDoc = null,
@@ -717,6 +797,9 @@ angular.module('SunExercise.directives', [])
                     $compile($element.contents())($scope);
                 });
 
+                //record the enter time for later analysis
+                problemUserdata.enter_time = Date.now();
+
                 //init ng-models
                 $scope.answer = {};
                 //disable choices after submitted
@@ -727,10 +810,13 @@ angular.module('SunExercise.directives', [])
                     $scope.explanation = currProblem.explanation;
                 }
                 if (typeof currProblem.hint !== "undefined") {
+                    problemUserdata.is_hint_checked = false;
                     $scope.hint = currProblem.hint;
                     $scope.showHintButton = true;
                     $scope.showHint = function () {
                         $scope.showHintBox = true;
+                        //record if the student looks up the hint or not
+                        problemUserdata.is_hint_checked = true;
                     }
                 }
                 //rendering specific layout
@@ -800,6 +886,8 @@ angular.module('SunExercise.directives', [])
 
                 //when the student complete the problem
                 $scope.submitAnswer = function () {
+                    //record the submit time for later analysis
+                    problemUserdata.submit_time = Date.now();
                     //disable the choices inputs
                     $scope.submitted = true;
 
