@@ -1,0 +1,32 @@
+<achievements>
+    <h3>徽章</h3>
+
+    <div ng-repeat="badge in badges">
+        <div class="media">
+            <img class="media-object pull-left" src="img/badge-icon.png"/>
+
+            <div class="media-body">
+                <h4 class="media-heading has-badge-{{ hasBadge[badge.id] }}">{{ badge.title }}</h4>
+
+                <div>{{ badge.desc }}</div>
+            </div>
+        </div>
+        <br>
+    </div>
+
+    <h3>奖励视频</h3>
+
+    <div ng-repeat="award in awards">
+        <div class="media">
+            <img class="media-object pull-left" src="img/badge-icon.png"/>
+
+            <div class="media-body">
+                <h4 class="media-heading has-award-{{ hasAward[award.id] }}">{{ award.title }}</h4>
+                <h5>{{ award.url }}</h5>
+
+                <div>{{ award.desc }}</div>
+            </div>
+        </div>
+        <br>
+    </div>
+</achievements>

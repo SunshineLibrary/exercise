@@ -14,10 +14,17 @@
                 <div ng-bind-html-unsafe="choiceBody[choice.id]"></div>
             </div>
         </div>
-        <p>
 
-        <div ng-show='showExplanation'>解析：{{ explanation }}</div>
-        </p>
+        <div class="col-md-12 explanation-container pull-left" ng-show='showExplanation'>
+            <div class="explanation-title">
+                <img src="img/answer.png"/>&nbsp;&nbsp;&nbsp;正确答案
+            </div>
+            <div class="explanation-content">{{ correct_answers }}</div>
+            <div class="explanation-title">
+                <img src="img/explanation.png"/>&nbsp;&nbsp;&nbsp;题目解析
+            </div>
+            <div class="explanation-content">{{ explanation }}</div>
+        </div>
     </div>
 
     <div class="col-md-2 ctrlBar">
@@ -28,7 +35,7 @@
 
         <div class="continue-btn" ng-hide='hideSubmitButton' class="submit-btn"
              ng-click='submitAnswer()'>
-            <img src="img/submit.png"/>
+            <img src="img/{{ submitIcon }}.png"/>
         </div>
         <div class="continue-btn" ng-show='showContinueButton'
              ng-click='continueProblem()'>

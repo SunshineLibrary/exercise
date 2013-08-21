@@ -19,6 +19,10 @@ angular.module("SunExercise", ['SunExercise.controllers', 'SunExercise.directive
                 controller: 'activityCtrl',
                 templateUrl: 'partials/activity.html'
             })
+            .when('/achievements', {
+                controller: 'achievementsCtrl',
+                templateUrl: 'partials/achievements.html'
+            })
     });
 
 

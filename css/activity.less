@@ -3,10 +3,12 @@
 @background-gray: #f2f2f2;
 @background-white: #ffffff;
 @sea-blue: #64b7e9;
-@grass-green: #00d197;
+@grass-green: #73dcbe;
 @pink-red: #f4a5aa;
 
+@font-size-large: 24px;
 @font-size-big: 18px;
+@font-size-middle: 15px;
 @font-size-small: 12px;
 
 .background-canvas {
@@ -42,6 +44,10 @@
   right: 0;
 }
 
+.question-container {
+  min-height: 150px;
+}
+
 .question-content {
   font-size: @font-size-big;
   margin-left: 15px;
@@ -53,7 +59,7 @@
 
 /* general layouts for list layout choices */
 .choice-layout-list {
-  font-size: 24px;
+  font-size: @font-size-large;
   margin: 0px 0px 15px 0px;
   padding: 15px 0px 15px 15px;
 }
@@ -63,7 +69,7 @@
   width: 100%;
   height: 225px;
   padding: 0px 0px 0px 20%;
-  margin: 10px 10px 0 0;
+  margin: 15px 15px 0 0;
 
   img {
     max-height: 100%;
@@ -84,11 +90,13 @@
 
 .choice-layout-list-state-correct {
   background-color: @grass-green;
+  color: white;
   .choice-layout-list;
 }
 
 .choice-layout-list-state-wrong {
   background-color: @pink-red;
+  color: white;
   .choice-layout-list;
 }
 
@@ -105,12 +113,31 @@
 
 .choice-layout-card-state-correct {
   background-color: @grass-green;
+  color: white;
   .choice-layout-card;
 }
 
 .choice-layout-card-state-wrong {
   background-color: red;
+  color: white;
   .choice-layout-card;
+}
+
+.explanation-container {
+  margin: 60px 0 0 0;
+}
+
+.explanation-title {
+  font-size: @font-size-middle;
+  background-image: url("../img/diagonal-pattern.png");
+  background-repeat: repeat;
+  height: 48px;
+  padding: 15px 0 0 15px;
+}
+
+.explanation-content {
+  font-size: @font-size-middle;
+  margin: 15px 0 15px 15px;
 }
 
 /* button layouts */

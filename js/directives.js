@@ -17,16 +17,42 @@ angular.module('SunExercise.directives', [])
         return {
             restrict: "E",
             link: function ($scope) {
-                var rootMaterial = subjectSandbox.getRoot();
-                var subjectMaterial = subjectSandbox.getSubjectMaterial($routeParams.sid);
+                var rootPromise = subjectSandbox.getRoot();
+                rootPromise.then(function (rootMaterial) {
+                        var subjectMaterial = subjectSandbox.getSubjectMaterial($routeParams.sid);
 
-                $scope.subjects = rootMaterial.subjects;
-                $scope.chapters = subjectMaterial.chapters;
-                $scope.enterSubject = function (subjectId) {
-                    $location.path('/subject/' + subjectId);
-                }
-                $scope.enterChapter = function (chapterId) {
-                    $location.path('/subject/' + $routeParams.sid + '/chapter/' + chapterId);
+                        $scope.subjects = rootMaterial.subjects;
+                        $scope.chapters = subjectMaterial.chapters;
+                        $scope.enterSubject = function (subjectId) {
+                            $location.path('/subject/' + subjectId);
+                        }
+                        $scope.enterChapter = function (chapterId) {
+                            $location.path('/subject/' + $routeParams.sid + '/chapter/' + chapterId);
+                        }
+                        $scope.loadProgress = {};
+                        $scope.isCompleteLoad = {};
+                        $scope.showProgress = {};
+                        for (var i = 0; i < subjectMaterial.chapters.length; i++) {
+                            $scope.isCompleteLoad[subjectMaterial.chapters[i].id] = true;
+                        }
+                    },
+                    function (err) {
+                        console.log("Error occured  while loading root data: " + err);
+                    })
+
+                $scope.downloadResources = function (chapterId) {
+                    $scope.showProgress[chapterId] = true;
+                    var chapterMaterialPromise = subjectSandbox.loadChapterMaterial(chapterId);
+                    chapterMaterialPromise.then(function (data) {
+                            console.log("loading complete");
+                            $scope.isCompleteLoad[chapterId] = false;
+                        },
+                        function (err) {
+                            console.log("Error occured while loading chapter data: " + err);
+                        },
+                        function (progressData) {
+                            $scope.loadProgress[chapterId] = progressData;
+                        })
                 }
             }
         }
@@ -41,10 +67,9 @@ angular.module('SunExercise.directives', [])
         return {
             restrict: "E",
             link: function ($scope, $element) {
-                var chapterDataPromise = chapterSandbox.getChapterMaterial($routeParams.cid);
-                //var chapterUserdata = chapterSandbox.getChapterUserdata();
-
-                chapterDataPromise.then(function (chapterData) {
+                var rootPromise = chapterSandbox.getRoot();
+                rootPromise.then(function () {
+                    var chapterData = chapterSandbox.getChapterMaterial($routeParams.cid);
                     $scope.lessons = chapterData.lessons;
                     var lessonState = {};
                     for (var i = 0; i < chapterData.lessons.length; i++) {
@@ -69,6 +94,9 @@ angular.module('SunExercise.directives', [])
                             }
                             return true;
                         }
+                    }
+                    $scope.enterAchievementCenter = function () {
+                        $location.path('/achievements');
                     }
                 })
 
@@ -802,11 +830,23 @@ angular.module('SunExercise.directives', [])
 
                 //init ng-models
                 $scope.answer = {};
+                $scope.submitIcon = "submitDisable";
                 //disable choices after submitted
                 if (problemUserdata.answer.length > 0) {
                     $scope.submitted = true;
                 }
                 if ((typeof parentActivityData.show_answer !== "undefined") && (parentActivityData.show_answer)) {
+                    if (currProblem.type != "singlefilling") {
+                        $scope.correct_answers = [];
+                        for (var i = 0; i < currProblem.choices.length; i++) {
+                            if (currProblem.choices[i].is_correct) {
+                                $scope.correct_answers.push(String.fromCharCode(65 + i));
+                            }
+                        }
+                        $scope.correct_answers = $scope.correct_answers.join(",");
+                    } else {
+                        $scope.correct_answers = currProblem.correct_answer;
+                    }
                     $scope.explanation = currProblem.explanation;
                 }
                 if (typeof currProblem.hint !== "undefined") {
@@ -856,6 +896,8 @@ angular.module('SunExercise.directives', [])
                     $scope.lastChecked = -1;
                     var singleChoice = function (choiceId, choiceIndex) {
                         if (!$scope.submitted) {
+                            //change submit icon
+                            $scope.submitIcon = "submit";
                             if ($scope.lastChecked != -1) {
                                 $scope.checked[$scope.lastChecked] = "default";
                             }
@@ -865,14 +907,23 @@ angular.module('SunExercise.directives', [])
                         }
                     };
 
+                    $scope.chosenNum = 0;
                     var multiChoice = function (choiceId, choiceIndex) {
                         if (!$scope.submitted) {
+                            //change submit icon
+                            $scope.submitIcon = "submit";
                             if ($scope.checked[choiceIndex] == "choose") {
                                 $scope.checked[choiceIndex] = "default";
                                 $scope.answer[choiceId] = false;
+                                $scope.chosenNum--;
                             } else {
                                 $scope.checked[choiceIndex] = "choose";
                                 $scope.answer[choiceId] = true;
+                                $scope.chosenNum++;
+                            }
+
+                            if ($scope.chosenNum == 0) {
+                                $scope.submitIcon = "submitDisable";
                             }
                         }
                     };
@@ -881,7 +932,20 @@ angular.module('SunExercise.directives', [])
                         $scope.chooseOption = singleChoice;
                     } else if (currProblem.type == "multichoice") {
                         $scope.chooseOption = multiChoice;
+                    } else if (currProblem.type == "singlefilling") {
+                        console.log("hit");
+
                     }
+
+                } else {
+                    var singleFilling = function (answer) {
+                        if ((typeof answer != "undefined") && (answer.length > 0)) {
+                            $scope.submitIcon = "submit";
+                        } else {
+                            $scope.submitIcon = "submitDisable";
+                        }
+                    }
+                    $scope.writeAnswer = singleFilling;
                 }
 
                 //when the student complete the problem
@@ -942,6 +1006,45 @@ angular.module('SunExercise.directives', [])
                     //send problem complete event to activity directive
                     problemSandbox.sendEvent('problemComplete_' + currProblem.id, $scope, {should_transition: true});
                 }
+            }
+        }
+    })
+
+    .directive("achievements", function (SandboxProvider) {
+
+        var achievementSandbox = SandboxProvider.getSandbox();
+
+        return {
+            restrict: "E",
+            link: function ($scope) {
+                var achievementsPromise = achievementSandbox.getAchievementsMaterial();
+                var userInfo = achievementSandbox.getUserInfo();
+
+                achievementsPromise.then(function (data) {
+                        var achievementsPool = data;
+
+                        //init ng-models
+                        $scope.badges = achievementsPool.badges;
+                        $scope.awards = achievementsPool.awards;
+                        $scope.hasBadge = {};
+                        $scope.hasAward = {};
+                        if (typeof userInfo.achievements.badges != "null") {
+                            for (var i = 0; i < $scope.badges.length; i++) {
+                                $scope.hasBadge[$scope.badges[i].id] = (typeof userInfo.achievements.badges[$scope.badges[i].id] != "undefined")
+                            }
+                        }
+                        if (typeof userInfo.achievements.awards != "null") {
+                            for (i = 0; i < $scope.awards.length; i++) {
+                                $scope.hasAward[$scope.awards[i].id] = (typeof userInfo.achievements.awards[$scope.awards[i].id] != "undefined")
+                            }
+                        }
+                    },
+                    function (err) {
+                        console.log(err);
+                    },
+                    function (progressData) {
+                        console.log("Loading:" + progressData[0].url + "; Progress:" + progressData[0].progress);
+                    })
             }
         }
     })

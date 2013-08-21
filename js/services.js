@@ -6,106 +6,155 @@
  * To change this template use File | Settings | File Templates.
  */
 angular.module('SunExercise.services', [])
-    //provide lesson data
-    .factory("MaterialProvider", function ($http, $q) {
 
+    //core services of SunExercise app
+    .factory("ExerciseService", function ($q, $http, $timeout) {
+
+        var emitEvent = function (eventName, scope, args) {
+            scope.$emit(eventName, args);
+        }
+
+        var getLoadingProgress = function (ts, apiUrl) {
+            var deferred = $q.defer();
+            var loadingProgressPromise = deferred.promise;
+
+            //send a request to get the current state
+            var currentStatePromise = $http.jsonp(apiUrl + "?ts=" + ts + "&act=status&callback=JSON_CALLBACK");
+            currentStatePromise.success(function (stateData) {
+                //check turtle server has finished the cache task
+                if (!stateData.is_cached) {
+                    deferred.resolve(stateData.progress);
+                } else {
+                    deferred.resolve("done");
+                }
+            })
+            currentStatePromise.error(function (err) {
+                deferred.reject("Error occured while getting the current status: " + err);
+            })
+
+            return loadingProgressPromise;
+        }
+
+        var getServerResources = function (apiUrl, timeStamp) {
+            var deferred = $q.defer();
+            var getResourcesPromise = deferred.promise;
+
+            //check if turtle server has already cached the resources
+            var statusPromise = $http.jsonp(apiUrl + "?ts=" + timeStamp + "&act=status&callback=JSON_CALLBACK");
+            statusPromise.success(function (status) {
+                if (typeof status.is_cached == "undefined") {
+                    var cachePromise = $http.jsonp(apiUrl + "?ts=" + timeStamp + "&act=cache&callback=JSON_CALLBACK");
+                    cachePromise.success(function (response) {
+                        //check if the turtle server is offline and no cache recorded
+                        if (response == "506") {
+                            deferred.reject("Server Offline");
+                        } else {
+                            //notify the current progress
+                            deferred.notify(response.progress);
+                            //get new downloading progress every 0.5 sec
+                            $timeout(function getNewResources() {
+                                var currentDataPromise = getLoadingProgress(timeStamp, apiUrl);
+                                currentDataPromise.then(function (progressData) {
+                                    if (progressData != "done") {
+                                        //notify the progress and show on the page
+                                        deferred.notify(progressData);
+                                        //recursively loading new status
+                                        $timeout(getNewResources, 500);
+                                        //turtle server has finished downloading resources
+                                    } else {
+                                        deferred.notify(100);
+                                        //send a request to turtle server to get the most current resources
+                                        //var getNewResourcesPromise = $http.jsonp(apiUrl + "?ts=" + timeStamp +
+                                        //    "&callback=JSON_CALLBACK");
+                                        /*getNewResourcesPromise.success(function (newResources) {
+                                         deferred.resolve(newResources);
+                                         });
+                                         getNewResourcesPromise.error(function (err) {
+                                         deferred.reject("Loading cached data error: " + err);
+                                         })*/
+                                        deferred.resolve();
+                                    }
+                                })
+                            }, 500);
+                        }
+                    })
+                }
+            })
+            statusPromise.error(function (err) {
+                deferred.reject("Requesting current resources status error: " + err);
+            })
+
+            return getResourcesPromise;
+        }
+
+        return {
+            emitEvent: emitEvent,
+            getServerResources: getServerResources
+        };
+    })
+
+    //provide material
+    .factory("MaterialProvider", function ($http, $q, $timeout, ExerciseService) {
+
+        var rootMaterial = {};
         var Material = {};
         var materialMap = {};
 
         var getRoot = function () {
-            return {
-                subjects: [
-                    {
-                        id: "chinese",
-                        title: "语文"
-                    },
-                    {
-                        id: "math",
-                        title: "数学"
-                    },
-                    {
-                        id: "english",
-                        title: "英语"
-                    }
-                ]
-            }
-        }
-
-        var getSubjectMaterial = function (subjectId) {
-            if (subjectId == "chinese") {
-                return {
-                    chapters: [
-                        {
-                            id: "chapter1",
-                            title: "走一步，再走一步"
-                        },
-                        {
-                            id: "chapter2",
-                            title: "陈涉世家"
-                        },
-                        {
-                            id: "chapter3",
-                            title: "出师表"
-                        }
-                    ]};
-            } else if (subjectId == "math") {
-                return {
-                    chapters: [
-                        {
-                            id: "chapter4",
-                            title: "导数"
-                        },
-                        {
-                            id: "chapter5",
-                            title: "积分"
-                        },
-                        {
-                            id: "chapter6",
-                            title: "级数"
-                        }
-                    ]};
-            } else if (subjectId == "english") {
-                return {
-                    chapters: [
-                        {
-                            id: "chapter7",
-                            title: "定语从句"
-                        },
-                        {
-                            id: "chapter8",
-                            title: "非谓语动词"
-                        },
-                        {
-                            id: "chapter9",
-                            title: "虚拟语气"
-                        }
-                    ]
-                }
-            }
-        }
-
-        var getChapterMaterial = function (chapterId) {
             var deferred = $q.defer();
-            var getChapterPromise = deferred.promise;
+            var getRootPromise = deferred.promise;
 
-            var promise = $http.jsonp("http://192.168.3.100:3000/exercise/v1/chapter/" + chapterId + "?callback=JSON_CALLBACK");
-            //var promise = $http.get("data/" + chapterId + ".json");
+            var promise = $http.jsonp("http://192.168.3.27:3000/exercise/v1/root?callback=JSON_CALLBACK");
             promise.success(function (data) {
+                rootMaterial = data;
+                for (var i = 0; i < rootMaterial.subjects.length; i++) {
+                    materialMap[rootMaterial.subjects[i].id] = rootMaterial.subjects[i];
+                    for (var j = 0; j < rootMaterial.subjects[i].chapters.length; j++) {
+                        materialMap[rootMaterial.subjects[i].chapters[j].id] = rootMaterial.subjects[i].chapters[j];
+                    }
+                }
                 deferred.resolve(data);
             })
             promise.error(function (data, err) {
-                console.log("Load Chapter Data Error: " + err);
+                deferred.reject("Load Root Data Error: " + err);
+            })
+
+            return getRootPromise;
+        }
+
+        var getSubjectMaterial = function (subjectId) {
+            return materialMap[subjectId];
+        }
+
+        var loadChapterMaterial = function (chapterId) {
+            var deferred = $q.defer();
+            var getChapterPromise = deferred.promise;
+
+            var ts = materialMap[chapterId].ts;
+            var promise = ExerciseService.getServerResources("http://192.168.3.27:3000/exercise/v1/chapters/" + chapterId, ts);
+            //var promise = $http.jsonp("http://192.168.3.100:3000/exercise/v1/chapter/" + chapterId + "?callback=JSON_CALLBACK");
+            //var promise = $http.get("data/" + chapterId + ".json");
+            promise.then(function (data) {
+                deferred.resolve(data);
+            }, function (data, err) {
+                deferred.reject(err);
+            }, function (progressData) {
+                deferred.notify(progressData);
             })
 
             return getChapterPromise;
+        }
+
+        var getChapterMaterial = function (chapterId) {
+            return materialMap[chapterId];
         }
 
         var getLessonMaterial = function (lessonId) {
             var deferred = $q.defer();
             var getLessonPromise = deferred.promise;
 
-            //var promise = $http.jsonp("http://192.168.3.100:3000/exercise/v1/lesson/" + lessonId + ".json?callback=JSON_CALLBACK");
-            var promise = $http.get("data/" + lessonId + ".json");
+            var promise = $http.jsonp("http://192.168.3.100:3000/exercise/v1/lesson/" + lessonId + ".json?callback=JSON_CALLBACK");
+            //var promise = $http.get("data/" + lessonId + ".json");
 
             promise.success(function (data) {
                 Material = data;
@@ -131,7 +180,7 @@ angular.module('SunExercise.services', [])
                 deferred.resolve(Material);
             })
             promise.error(function (data, err) {
-                console.log("Load Lesson Data Error: " + err);
+                deferred.reject("Load Lesson Data Error: " + err);
             })
 
             return getLessonPromise;
@@ -179,7 +228,22 @@ angular.module('SunExercise.services', [])
             }
         }
 
-        //APIs
+        var getAchievementsMaterial = function () {
+            var deferred = $q.defer();
+            var achievementsPromise = deferred.promise;
+
+            var getAchievementsPromise = ExerciseService.getServerResources("http://192.168.3.100:3000/achievements");
+            getAchievementsPromise.then(function (achievements) {
+                    deferred.resolve(achievements);
+                },
+                function (err) {
+                    deferred.reject("Error occurred while loading achievements resources: " + err);
+                })
+
+            return achievementsPromise;
+        }
+
+        //General API
         var getMaterial = function (moduleId) {
             return materialMap[moduleId];
         }
@@ -187,9 +251,11 @@ angular.module('SunExercise.services', [])
         return {
             getRoot: getRoot,
             getSubjectMaterial: getSubjectMaterial,
+            loadChapterMaterial: loadChapterMaterial,
             getChapterMaterial: getChapterMaterial,
             getLessonMaterial: getLessonMaterial,
             getActivityMaterial: getActivityMaterial,
+            getAchievementsMaterial: getAchievementsMaterial,
             getMaterial: getMaterial
         }
     })
@@ -363,7 +429,7 @@ angular.module('SunExercise.services', [])
 
     })
 
-    .factory("GraderProvider", function ($http, $q) {
+    .factory("GraderProvider", function () {
 
         var graderCollection = {
             lecture_finish: function () {
@@ -412,18 +478,7 @@ angular.module('SunExercise.services', [])
         }
     })
 
-    .factory("LessonService", function () {
-
-        var emitEvent = function (eventName, scope, args) {
-            scope.$emit(eventName, args);
-        }
-
-        return {
-            emitEvent: emitEvent
-        };
-    })
-
-    .factory("SandboxProvider", function (MaterialProvider, UserdataProvider, GraderProvider, LessonService) {
+    .factory("SandboxProvider", function (MaterialProvider, UserdataProvider, GraderProvider, ExerciseService) {
 
         function Sandbox() {
 
@@ -433,6 +488,10 @@ angular.module('SunExercise.services', [])
 
             Sandbox.prototype.getSubjectMaterial = function (subjectId) {
                 return MaterialProvider.getSubjectMaterial(subjectId);
+            }
+
+            Sandbox.prototype.loadChapterMaterial = function (chapterId) {
+                return MaterialProvider.loadChapterMaterial(chapterId);
             }
 
             Sandbox.prototype.getChapterMaterial = function (chapterId) {
@@ -445,6 +504,10 @@ angular.module('SunExercise.services', [])
 
             Sandbox.prototype.getActivityMaterial = function (activityId, seed) {
                 return MaterialProvider.getActivityMaterial(activityId, seed);
+            }
+
+            Sandbox.prototype.getAchievementsMaterial = function () {
+                return MaterialProvider.getAchievementsMaterial();
             }
 
             Sandbox.prototype.getUserInfo = function () {
@@ -498,7 +561,7 @@ angular.module('SunExercise.services', [])
 
             //a emitter for communications between modules
             Sandbox.prototype.sendEvent = function (eventName, scope, args) {
-                LessonService.emitEvent(eventName, scope, args);
+                ExerciseService.emitEvent(eventName, scope, args);
             }
 
             //a parser for lesson complete logic

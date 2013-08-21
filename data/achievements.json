@@ -1,0 +1,49 @@
+{
+    "ts": "123",
+    "badges": [
+        {
+            "id": "lecture_finish",
+            "title": "认真听讲",
+            "desc": "这是一个认真听讲badge"
+        },
+        {
+            "id": "practice_finish",
+            "title": "边学边练",
+            "desc": "这是一个边学边练badge"
+        },
+        {
+            "id": "practice_all_correct",
+            "title": "一听就懂",
+            "desc": "这是一个一听就懂badge"
+        },
+        {
+            "id": "practice_fast_and_correct",
+            "title": "又快又准",
+            "desc": "这是一个又快又准badge"
+        },
+        {
+            "id": "golden_cup",
+            "title": "独孤求败",
+            "desc": "这是一个独孤求败badge"
+        },
+        {
+            "id": "final_quiz_failed",
+            "title": "老师在等你",
+            "desc": "这是一个老师在等你badge"
+        }
+    ],
+    "awards": [
+        {
+            "id": "unfortunate_bear_video",
+            "title": "倒霉熊的奖励视频",
+            "url": "material/unfortunate_bear_video.mp4",
+            "desc": "这是一个搞笑视频祝你幸福"
+        },
+        {
+            "id": "unfortunate_bear_video2",
+            "title": "倒霉熊的奖励视频2",
+            "url": "material/unfortunate_bear_video2.mp4",
+            "desc": "这是一个搞笑视频祝你幸福"
+        }
+    ]
+}
