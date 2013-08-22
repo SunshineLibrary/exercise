@@ -63,16 +63,8 @@ angular.module('SunExercise.services', [])
                                         //turtle server has finished downloading resources
                                     } else {
                                         deferred.notify(100);
-                                        //send a request to turtle server to get the most current resources
-                                        //var getNewResourcesPromise = $http.jsonp(apiUrl + "?ts=" + timeStamp +
-                                        //    "&callback=JSON_CALLBACK");
-                                        /*getNewResourcesPromise.success(function (newResources) {
-                                         deferred.resolve(newResources);
-                                         });
-                                         getNewResourcesPromise.error(function (err) {
-                                         deferred.reject("Loading cached data error: " + err);
-                                         })*/
-                                        deferred.resolve();
+                                        //complete downloading
+                                        deferred.resolve("complete");
                                     }
                                 })
                             }, 500);
@@ -111,6 +103,10 @@ angular.module('SunExercise.services', [])
                     materialMap[rootMaterial.subjects[i].id] = rootMaterial.subjects[i];
                     for (var j = 0; j < rootMaterial.subjects[i].chapters.length; j++) {
                         materialMap[rootMaterial.subjects[i].chapters[j].id] = rootMaterial.subjects[i].chapters[j];
+                        for (var k = 0; k < rootMaterial.subjects[i].chapters[j].lessons.length; k++) {
+                            materialMap[rootMaterial.subjects[i].chapters[j].lessons[k].id] =
+                                rootMaterial.subjects[i].chapters[j].lessons[k];
+                        }
                     }
                 }
                 deferred.resolve(data);
@@ -126,13 +122,12 @@ angular.module('SunExercise.services', [])
             return materialMap[subjectId];
         }
 
-        var loadChapterMaterial = function (chapterId) {
+        var loadChapterResources = function (chapterId) {
             var deferred = $q.defer();
             var getChapterPromise = deferred.promise;
 
             var ts = materialMap[chapterId].ts;
             var promise = ExerciseService.getServerResources("http://192.168.3.27:3000/exercise/v1/chapters/" + chapterId, ts);
-            //var promise = $http.jsonp("http://192.168.3.100:3000/exercise/v1/chapter/" + chapterId + "?callback=JSON_CALLBACK");
             //var promise = $http.get("data/" + chapterId + ".json");
             promise.then(function (data) {
                 deferred.resolve(data);
@@ -153,29 +148,28 @@ angular.module('SunExercise.services', [])
             var deferred = $q.defer();
             var getLessonPromise = deferred.promise;
 
-            var promise = $http.jsonp("http://192.168.3.100:3000/exercise/v1/lesson/" + lessonId + ".json?callback=JSON_CALLBACK");
-            //var promise = $http.get("data/" + lessonId + ".json");
+            var ts = materialMap[lessonId].ts;
+            var promise = $http.jsonp("http://192.168.3.27:3000/exercise/v1/lessons/" + lessonId + "?ts=" + ts + "&callback=JSON_CALLBACK");
+            //var promise = $http.jsonp("http://192.168.3.100:3000/exercise/v1/lessons/" + lessonId + "?ts=" + ts + "&callback=JSON_CALLBACK");
 
             promise.success(function (data) {
                 Material = data;
-                if (typeof materialMap[Material.id] == "undefined") {
-                    for (var j = 0; j < Material.activities.length; j++) {
-                        //if randomize problems, shuffle all the problems in all activities
-                        if ((typeof Material.activities[j].randomize_problems != "undefined") &&
-                            (Material.activities[j].randomize_problems)) {
-                            Material.activities[j].problems = _.shuffle(Material.activities[j].problems);
-                        }
-                        //if randomize choices, shuffle all the choices in all problems
-                        if ((typeof Material.activities[j].randomize_choices != "undefined") &&
-                            (Material.activities[j].randomize_choices)) {
-                            for (var k = 0; k < Material.activities[j].problems[k].choices.length; k++) {
-                                Material.activities[j].problems[k].choices = _.shuffle(Material.activities[j].problems[k].choices);
-                            }
-                        }
-                        materialMap[Material.activities[j].id] = Material.activities[j];
+                for (var j = 0; j < Material.activities.length; j++) {
+                    //if randomize problems, shuffle all the problems in all activities
+                    if ((typeof Material.activities[j].randomize_problems != "undefined") &&
+                        (Material.activities[j].randomize_problems)) {
+                        Material.activities[j].problems = _.shuffle(Material.activities[j].problems);
                     }
-                    materialMap[Material.id] = Material;
+                    //if randomize choices, shuffle all the choices in all problems
+                    if ((typeof Material.activities[j].randomize_choices != "undefined") &&
+                        (Material.activities[j].randomize_choices)) {
+                        for (var k = 0; k < Material.activities[j].problems[k].choices.length; k++) {
+                            Material.activities[j].problems[k].choices = _.shuffle(Material.activities[j].problems[k].choices);
+                        }
+                    }
+                    materialMap[Material.activities[j].id] = Material.activities[j];
                 }
+                materialMap[Material.id] = Material;
 
                 deferred.resolve(Material);
             })
@@ -232,13 +226,29 @@ angular.module('SunExercise.services', [])
             var deferred = $q.defer();
             var achievementsPromise = deferred.promise;
 
-            var getAchievementsPromise = ExerciseService.getServerResources("http://192.168.3.100:3000/achievements");
-            getAchievementsPromise.then(function (achievements) {
-                    deferred.resolve(achievements);
-                },
-                function (err) {
-                    deferred.reject("Error occurred while loading achievements resources: " + err);
-                })
+            var promise = $http.jsonp("http://192.168.3.27:3000/achievements");
+            promise.success(function (achievementsJson) {
+                deferred.resolve(achievementsJson)
+            });
+            promise.error(function (err) {
+                deferred.reject("Error occurred while loading achievements json: " + err);
+            })
+
+            return achievementsPromise;
+        }
+
+        var loadAchievementsResources = function (ts) {
+            var deferred = $q.defer();
+            var achievementsPromise = deferred.promise;
+
+            var getAchievementsPromise = ExerciseService.getServerResources("http://192.168.3.27:3000/achievements", ts);
+            getAchievementsPromise.then(function (data) {
+                deferred.resolve(data);
+            }, function (err) {
+                deferred.reject("Error occurred while loading achievements resources: " + err);
+            }, function (progressData) {
+                deferred.notify(progressData);
+            })
 
             return achievementsPromise;
         }
@@ -251,11 +261,12 @@ angular.module('SunExercise.services', [])
         return {
             getRoot: getRoot,
             getSubjectMaterial: getSubjectMaterial,
-            loadChapterMaterial: loadChapterMaterial,
+            loadChapterResources: loadChapterResources,
             getChapterMaterial: getChapterMaterial,
             getLessonMaterial: getLessonMaterial,
             getActivityMaterial: getActivityMaterial,
             getAchievementsMaterial: getAchievementsMaterial,
+            loadAchievementsResources: loadAchievementsResources,
             getMaterial: getMaterial
         }
     })
@@ -309,8 +320,7 @@ angular.module('SunExercise.services', [])
                 userdataMap[lessonId] = USERDATA[lessonId];
 
                 var promise = MaterialProvider.getLessonMaterial(lessonId);
-                promise.then(function (material) {
-                    var lessonData = material;
+                promise.then(function (lessonData) {
                     for (var i = 0; i < lessonData.activities.length; i++) {
                         if (lessonData.activities[i].type === 'quiz') {
                             USERDATA[lessonId].activities[lessonData.activities[i].id] = {
@@ -490,8 +500,8 @@ angular.module('SunExercise.services', [])
                 return MaterialProvider.getSubjectMaterial(subjectId);
             }
 
-            Sandbox.prototype.loadChapterMaterial = function (chapterId) {
-                return MaterialProvider.loadChapterMaterial(chapterId);
+            Sandbox.prototype.loadChapterResources = function (chapterId) {
+                return MaterialProvider.loadChapterResources(chapterId);
             }
 
             Sandbox.prototype.getChapterMaterial = function (chapterId) {
@@ -508,6 +518,10 @@ angular.module('SunExercise.services', [])
 
             Sandbox.prototype.getAchievementsMaterial = function () {
                 return MaterialProvider.getAchievementsMaterial();
+            }
+
+            Sandbox.prototype.loadAchievementsResources = function (ts) {
+                return MaterialProvider.loadAchievementsResources(ts);
             }
 
             Sandbox.prototype.getUserInfo = function () {

@@ -42,7 +42,7 @@ angular.module('SunExercise.directives', [])
 
                 $scope.downloadResources = function (chapterId) {
                     $scope.showProgress[chapterId] = true;
-                    var chapterMaterialPromise = subjectSandbox.loadChapterMaterial(chapterId);
+                    var chapterMaterialPromise = subjectSandbox.loadChapterResources(chapterId);
                     chapterMaterialPromise.then(function (data) {
                             console.log("loading complete");
                             $scope.isCompleteLoad[chapterId] = false;
@@ -634,7 +634,7 @@ angular.module('SunExercise.directives', [])
         return {
             restrict: "E",
             link: function ($scope, $element, $attrs) {
-                var template = "<video id='video' style='width:500px;' src='http://192.168.3.100:3000/exercise/v1/lesson/" + $routeParams.lid + "/"
+                var template = "<video id='video' style='width:500px;' src='http://192.168.3.27:3000/exercise/v1/lessons/" + $routeParams.lid + "/"
                     + $attrs.src + "' controls></video>" +
                     "<button ng-click='playVideo()'>{{ playButtonMsg }}</button>";
                 $element.html(template);
@@ -699,7 +699,7 @@ angular.module('SunExercise.directives', [])
         return {
             restrict: "E",
             link: function ($scope, $element, $attrs) {
-                var template = "<audio style='width:500px;' src='http://192.168.3.100:3000/exercise/v1/lesson/" + $routeParams.lid + "/"
+                var template = "<audio style='width:500px;' src='http://192.168.3.27:3000/exercise/v1/lessons/" + $routeParams.lid + "/"
                     + $attrs.src + "' controls></audio>";
                 $element.html(template);
                 $compile($element.contents())($scope);
@@ -720,7 +720,7 @@ angular.module('SunExercise.directives', [])
         }
     })
 
-    .directive("pdf", function ($compile) {
+    .directive("pdf", function ($compile, $routeParams) {
         return {
             restrict: "E",
             link: function ($scope, $element, $attrs) {
@@ -784,10 +784,11 @@ angular.module('SunExercise.directives', [])
                 }
 
                 // Asynchronously download PDF as an ArrayBuffer
-                PDFJS.getDocument('data/' + $attrs.src).then(function (_pdfDoc) {
-                    pdfDoc = _pdfDoc;
-                    renderPage(pageNum);
-                });
+                PDFJS.getDocument('http://192.168.3.27:3000/exercise/v1/lessons/' + $routeParams.lid + "/"
+                        + $attrs.src).then(function (_pdfDoc) {
+                        pdfDoc = _pdfDoc;
+                        renderPage(pageNum);
+                    });
             }
         }
     })
@@ -1022,28 +1023,35 @@ angular.module('SunExercise.directives', [])
 
                 achievementsPromise.then(function (data) {
                         var achievementsPool = data;
+                        var ts = achievementsPool.ts;
 
-                        //init ng-models
-                        $scope.badges = achievementsPool.badges;
-                        $scope.awards = achievementsPool.awards;
-                        $scope.hasBadge = {};
-                        $scope.hasAward = {};
-                        if (typeof userInfo.achievements.badges != "null") {
-                            for (var i = 0; i < $scope.badges.length; i++) {
-                                $scope.hasBadge[$scope.badges[i].id] = (typeof userInfo.achievements.badges[$scope.badges[i].id] != "undefined")
+                        var resourcesPromise = achievementSandbox.loadAchievementsResources(ts);
+                        resourcesPromise.then(function () {
+                            //init ng-models
+                            $scope.completeDownload = true;
+                            $scope.badges = achievementsPool.badges;
+                            $scope.awards = achievementsPool.awards;
+                            $scope.hasBadge = {};
+                            $scope.hasAward = {};
+                            if (typeof userInfo.achievements.badges != "null") {
+                                for (var i = 0; i < $scope.badges.length; i++) {
+                                    $scope.hasBadge[$scope.badges[i].id] = (typeof userInfo.achievements.badges[$scope.badges[i].id] != "undefined")
+                                }
                             }
-                        }
-                        if (typeof userInfo.achievements.awards != "null") {
-                            for (i = 0; i < $scope.awards.length; i++) {
-                                $scope.hasAward[$scope.awards[i].id] = (typeof userInfo.achievements.awards[$scope.awards[i].id] != "undefined")
+                            if (typeof userInfo.achievements.awards != "null") {
+                                for (i = 0; i < $scope.awards.length; i++) {
+                                    $scope.hasAward[$scope.awards[i].id] = (typeof userInfo.achievements.awards[$scope.awards[i].id] != "undefined")
+                                }
                             }
-                        }
+                        }, function (err) {
+                            console.log(err);
+                        }, function (progressData) {
+                            $scope.progress = progressData;
+                        });
+
                     },
                     function (err) {
                         console.log(err);
-                    },
-                    function (progressData) {
-                        console.log("Loading:" + progressData[0].url + "; Progress:" + progressData[0].progress);
                     })
             }
         }
