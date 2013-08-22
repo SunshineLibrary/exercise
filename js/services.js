@@ -42,7 +42,7 @@ angular.module('SunExercise.services', [])
             //check if turtle server has already cached the resources
             var statusPromise = $http.jsonp(apiUrl + "?ts=" + timeStamp + "&act=status&callback=JSON_CALLBACK");
             statusPromise.success(function (status) {
-                if (typeof status.is_cached == "undefined") {
+                if ((typeof status.is_cached == "undefined") || (typeof status.is_cached != "undefined" && !status.is_cached)) {
                     var cachePromise = $http.jsonp(apiUrl + "?ts=" + timeStamp + "&act=cache&callback=JSON_CALLBACK");
                     cachePromise.success(function (response) {
                         //check if the turtle server is offline and no cache recorded
@@ -70,6 +70,8 @@ angular.module('SunExercise.services', [])
                             }, 500);
                         }
                     })
+                } else if (status.is_cached) {
+                    deferred.resolve("already in cache");
                 }
             })
             statusPromise.error(function (err) {
@@ -302,49 +304,60 @@ angular.module('SunExercise.services', [])
             return UserInfo;
         }
 
-        var getChapterUserdata = function () {
-
-        }
-
         var getLessonUserdata = function (lessonId) {
             var deferred = $q.defer();
             var lessonPromise = deferred.promise;
 
-            if (typeof USERDATA[lessonId] == "undefined") {
-                USERDATA[lessonId] = {
-                    is_complete: false,
-                    activities: {},
-                    summary: { badges: [] }
-                };
-                userdataMap[lessonId] = USERDATA[lessonId];
-
-                var promise = MaterialProvider.getLessonMaterial(lessonId);
-                promise.then(function (lessonData) {
-                    for (var i = 0; i < lessonData.activities.length; i++) {
-                        if (lessonData.activities[i].type === 'quiz') {
-                            USERDATA[lessonId].activities[lessonData.activities[i].id] = {
-                                is_complete: false,
-                                problems: {},
-                                summary: {}
-                            };
-                            if (typeof lessonData.activities[i].pool_count != "undefined") {
-                                USERDATA[lessonId].activities[lessonData.activities[i].id].seed = [];
-                            }
-                            userdataMap[lessonData.activities[i].id] = USERDATA[lessonId].
-                                activities[lessonData.activities[i].id];
-                        } else {
-                            USERDATA[lessonId].activities[lessonData.activities[i].id] = {
-                                summary: {}
-                            };
-                            userdataMap[lessonData.activities[i].id] = USERDATA[lessonId].
-                                activities[lessonData.activities[i].id];
-                        }
-                    }
-                    deferred.resolve(USERDATA[lessonId]);
-                })
-            } else {
-                deferred.resolve(USERDATA[lessonId])
+            //if already in userdatamap
+            if (typeof USERDATA[lessonId] != "undefined") {
+                deferred.resolve(USERDATA[lessonId]);
+                return lessonPromise;
             }
+            //the current userdata has not been cached
+            var userdataPromise = $http.jsonp("http://192.168.3.27:3000/exercise/v1/user_data/lessons/" + lessonId +
+                "?callback=JSON_CALLBACK");
+            userdataPromise.success(function (userdata, status) {
+                if (typeof userdata.summary != "undefined") {
+                    //update the local userdata
+                    USERDATA[lessonId] = userdata;
+                    deferred.resolve(USERDATA[lessonId]);
+                } else if (typeof userdata.summary == "undefined" && status == 200) {
+                    USERDATA[lessonId] = {
+                        is_complete: false,
+                        activities: {},
+                        summary: { badges: [] }
+                    };
+                    userdataMap[lessonId] = USERDATA[lessonId];
+
+                    var promise = MaterialProvider.getLessonMaterial(lessonId);
+                    promise.then(function (lessonData) {
+                        for (var i = 0; i < lessonData.activities.length; i++) {
+                            if (lessonData.activities[i].type === 'quiz') {
+                                USERDATA[lessonId].activities[lessonData.activities[i].id] = {
+                                    is_complete: false,
+                                    problems: {},
+                                    summary: {}
+                                };
+                                if (typeof lessonData.activities[i].pool_count != "undefined") {
+                                    USERDATA[lessonId].activities[lessonData.activities[i].id].seed = [];
+                                }
+                                userdataMap[lessonData.activities[i].id] = USERDATA[lessonId].
+                                    activities[lessonData.activities[i].id];
+                            } else {
+                                USERDATA[lessonId].activities[lessonData.activities[i].id] = {
+                                    summary: {}
+                                };
+                                userdataMap[lessonData.activities[i].id] = USERDATA[lessonId].
+                                    activities[lessonData.activities[i].id];
+                            }
+                        }
+                        deferred.resolve(USERDATA[lessonId]);
+                    })
+                }
+            });
+            userdataPromise.error(function (err) {
+                deferred.reject("Error occurred while loading userdata from turtle server: " + err);
+            });
 
             return lessonPromise;
         }
@@ -427,11 +440,15 @@ angular.module('SunExercise.services', [])
             }
         }
 
+        var flushUserdata = function (lessonId) {
+            $http.post("http://192.168.3.27:3000/exercise/v1/user_data/lessons/" + lessonId, "data=" + JSON.stringify(USERDATA[lessonId]));
+        }
+
         return{
-            getChapterUserdata: getChapterUserdata,
             getLessonUserdata: getLessonUserdata,
             getActivityUserdata: getActivityUserdata,
             getUserdata: getUserdata,
+            flushUserdata: flushUserdata,
             resetUserdata: resetUserdata
         }
 
@@ -526,10 +543,6 @@ angular.module('SunExercise.services', [])
                 return MaterialProvider.loadAchievementsResources(ts);
             }
 
-            Sandbox.prototype.getChapterUserdata = function () {
-                return UserdataProvider.getChapterUserdata();
-            }
-
             Sandbox.prototype.getLessonUserdata = function (lessonId) {
                 return UserdataProvider.getLessonUserdata(lessonId);
             }
@@ -540,6 +553,10 @@ angular.module('SunExercise.services', [])
 
             Sandbox.prototype.getUserdata = function (moduleId) {
                 return UserdataProvider.getUserdata(moduleId);
+            }
+
+            Sandbox.prototype.flushUserdata = function (lessonId, userdata) {
+                return UserdataProvider.flushUserdata(lessonId, userdata);
             }
 
             Sandbox.prototype.resetUserdata = function (moduleName, moduleId) {

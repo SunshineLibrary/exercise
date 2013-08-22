@@ -15,8 +15,8 @@ angular.module("SunExercise", ['SunExercise.controllers', 'SunExercise.directive
 
             //load initial resources
             ExerciseService.getServerResources("http://192.168.3.27:3000/exercise/v1/resources", rootMaterial.resources.ts).
-                then(function () {
-                    deferred.resolve("complete");
+                then(function (msg) {
+                    deferred.resolve(msg);
                 }, function (err) {
                     deferred.reject("Error occurred while loading initial resources: " + err);
                 }, function (progressData) {

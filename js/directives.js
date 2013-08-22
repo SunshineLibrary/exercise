@@ -18,6 +18,8 @@ angular.module('SunExercise.directives', [])
             restrict: "E",
             link: function ($scope) {
                 $scope.initResourcePromise.then(function (msg) {
+                    console.log("Loading initial resources complete: " + msg);
+                    //hide the loading div and show the subject contents
                     $scope.completeLoading = true;
                     var rootPromise = subjectSandbox.getRoot();
                     rootPromise.then(function (rootMaterial) {
@@ -45,8 +47,8 @@ angular.module('SunExercise.directives', [])
                     $scope.downloadResources = function (chapterId) {
                         $scope.showProgress[chapterId] = true;
                         var chapterMaterialPromise = subjectSandbox.loadChapterResources(chapterId);
-                        chapterMaterialPromise.then(function (data) {
-                                console.log("loading complete");
+                        chapterMaterialPromise.then(function (msg) {
+                                console.log("Loading resources complete: " + msg);
                                 $scope.isCompleteLoad[chapterId] = false;
                             },
                             function (err) {
@@ -59,6 +61,7 @@ angular.module('SunExercise.directives', [])
                 }, function (err) {
                     console.log(err);
                 }, function (progressData) {
+                    //notify the loading progress
                     $scope.progress = progressData;
                 })
             }
@@ -175,6 +178,7 @@ angular.module('SunExercise.directives', [])
                 lessonPromise.then(function () {
                     var lessonData = lessonTotalData.material;
                     var lessonUserdata = lessonTotalData.userdata;
+                    console.log(lessonUserdata);
 
                     //initialize ng-models
                     $scope.title = lessonData.title;
@@ -217,7 +221,6 @@ angular.module('SunExercise.directives', [])
                             FSM.enter(id, lessonData.activities[0].id);
                         } else {
                             FSM.resume(id, lessonUserdata.current_activity);
-
                         }
                     }
                     $scope.reviewActivity = function (lessonId, activityId) {
@@ -287,6 +290,9 @@ angular.module('SunExercise.directives', [])
                                     }
                                 }
                             }
+
+                            //userdata analyzing completed, flush the current userdata
+                            lessonSandbox.flushUserdata(lessonData.id);
 
                             FSM.back();
                         }
@@ -369,6 +375,10 @@ angular.module('SunExercise.directives', [])
                                             }
                                         }
                                     }
+
+                                    //userdata analyzing completed, flush the current userdata
+                                    lessonSandbox.flushUserdata(lessonData.id);
+
                                     console.log(lessonUserdata);
                                     console.log(userInfo);
                                     FSM.back();
@@ -519,6 +529,9 @@ angular.module('SunExercise.directives', [])
                             }
 
                             if (args.should_transition) {
+                                //userdata analyzing completed, flush the current userdata
+                                activitySandbox.flushUserdata(activityData.parent_id);
+
                                 //check if the activity has a jump attribute and has reached the final problem
                                 if (index == activityData.problems.length - 1) {
                                     //check if the activity need show the quiz result
@@ -543,7 +556,6 @@ angular.module('SunExercise.directives', [])
                                     //do a page transition and show the next problem
                                     PageTransitions.nextPage(10, $("#buttonContainer"));
                                     //update the progress bar
-                                    console.log
                                     $scope.progressWidth = (index + 2) * 100 / activityData.problems.length;
                                 }
                             } else {
@@ -567,6 +579,11 @@ angular.module('SunExercise.directives', [])
                     $scope.continueActivity = function () {
                         //record the activity stop time for analysis
                         activityUserdata.end_time = Date.now();
+                        //set is_complete to true for later reviewing
+                        activityUserdata.is_complete = true;
+
+                        //userdata analyzing completed, flush the current userdata
+                        activitySandbox.flushUserdata(activityData.parent_id);
 
                         activitySandbox.playSoundEffects("sound-effects/click.wav");
                         //check if the student achieves certain achievements
