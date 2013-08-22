@@ -17,43 +17,50 @@ angular.module('SunExercise.directives', [])
         return {
             restrict: "E",
             link: function ($scope) {
-                var rootPromise = subjectSandbox.getRoot();
-                rootPromise.then(function (rootMaterial) {
-                        var subjectMaterial = subjectSandbox.getSubjectMaterial($routeParams.sid);
+                $scope.initResourcePromise.then(function (msg) {
+                    $scope.completeLoading = true;
+                    var rootPromise = subjectSandbox.getRoot();
+                    rootPromise.then(function (rootMaterial) {
+                            var subjectMaterial = subjectSandbox.getSubjectMaterial($routeParams.sid);
 
-                        $scope.subjects = rootMaterial.subjects;
-                        $scope.chapters = subjectMaterial.chapters;
-                        $scope.enterSubject = function (subjectId) {
-                            $location.path('/subject/' + subjectId);
-                        }
-                        $scope.enterChapter = function (chapterId) {
-                            $location.path('/subject/' + $routeParams.sid + '/chapter/' + chapterId);
-                        }
-                        $scope.loadProgress = {};
-                        $scope.isCompleteLoad = {};
-                        $scope.showProgress = {};
-                        for (var i = 0; i < subjectMaterial.chapters.length; i++) {
-                            $scope.isCompleteLoad[subjectMaterial.chapters[i].id] = true;
-                        }
-                    },
-                    function (err) {
-                        console.log("Error occured  while loading root data: " + err);
-                    })
-
-                $scope.downloadResources = function (chapterId) {
-                    $scope.showProgress[chapterId] = true;
-                    var chapterMaterialPromise = subjectSandbox.loadChapterResources(chapterId);
-                    chapterMaterialPromise.then(function (data) {
-                            console.log("loading complete");
-                            $scope.isCompleteLoad[chapterId] = false;
+                            $scope.subjects = rootMaterial.subjects;
+                            $scope.chapters = subjectMaterial.chapters;
+                            $scope.enterSubject = function (subjectId) {
+                                $location.path('/subject/' + subjectId);
+                            }
+                            $scope.enterChapter = function (chapterId) {
+                                $location.path('/subject/' + $routeParams.sid + '/chapter/' + chapterId);
+                            }
+                            $scope.loadProgress = {};
+                            $scope.isCompleteLoad = {};
+                            $scope.showProgress = {};
+                            for (var i = 0; i < subjectMaterial.chapters.length; i++) {
+                                $scope.isCompleteLoad[subjectMaterial.chapters[i].id] = true;
+                            }
                         },
                         function (err) {
-                            console.log("Error occured while loading chapter data: " + err);
-                        },
-                        function (progressData) {
-                            $scope.loadProgress[chapterId] = progressData;
+                            console.log("Error occured  while loading root data: " + err);
                         })
-                }
+
+                    $scope.downloadResources = function (chapterId) {
+                        $scope.showProgress[chapterId] = true;
+                        var chapterMaterialPromise = subjectSandbox.loadChapterResources(chapterId);
+                        chapterMaterialPromise.then(function (data) {
+                                console.log("loading complete");
+                                $scope.isCompleteLoad[chapterId] = false;
+                            },
+                            function (err) {
+                                console.log("Error occured while loading chapter data: " + err);
+                            },
+                            function (progressData) {
+                                $scope.loadProgress[chapterId] = progressData;
+                            })
+                    }
+                }, function (err) {
+                    console.log(err);
+                }, function (progressData) {
+                    $scope.progress = progressData;
+                })
             }
         }
     })
@@ -67,39 +74,35 @@ angular.module('SunExercise.directives', [])
         return {
             restrict: "E",
             link: function ($scope, $element) {
-                var rootPromise = chapterSandbox.getRoot();
-                rootPromise.then(function () {
-                    var chapterData = chapterSandbox.getChapterMaterial($routeParams.cid);
-                    $scope.lessons = chapterData.lessons;
-                    var lessonState = {};
-                    for (var i = 0; i < chapterData.lessons.length; i++) {
-                        lessonState[chapterData.lessons[i].id] = false;
-                    }
-                    angular.forEach(chapterData.lessons, function (lesson, index) {
-                        chapterSandbox.getLessonUserdata(lesson.id)
-                            .then(function (userdata) {
-                                if (userdata.is_complete) {
-                                    lessonState[lesson.id] = true;
-                                }
-                            });
-                    })
-                    $scope.loadLesson = function (lesson) {
-                        if (typeof lesson.requirements == 'undefined') {
-                            return true;
-                        } else {
-                            for (var i = 0; i < lesson.requirements.length; i++) {
-                                if (!lessonState[lesson.requirements[i]]) {
-                                    return false;
-                                }
+                var chapterData = chapterSandbox.getChapterMaterial($routeParams.cid);
+                $scope.lessons = chapterData.lessons;
+                var lessonState = {};
+                for (var i = 0; i < chapterData.lessons.length; i++) {
+                    lessonState[chapterData.lessons[i].id] = false;
+                }
+                angular.forEach(chapterData.lessons, function (lesson, index) {
+                    chapterSandbox.getLessonUserdata(lesson.id)
+                        .then(function (userdata) {
+                            if (userdata.is_complete) {
+                                lessonState[lesson.id] = true;
                             }
-                            return true;
-                        }
-                    }
-                    $scope.enterAchievementCenter = function () {
-                        $location.path('/achievements');
-                    }
+                        });
                 })
-
+                $scope.loadLesson = function (lesson) {
+                    if (typeof lesson.requirements == 'undefined') {
+                        return true;
+                    } else {
+                        for (var i = 0; i < lesson.requirements.length; i++) {
+                            if (!lessonState[lesson.requirements[i]]) {
+                                return false;
+                            }
+                        }
+                        return true;
+                    }
+                }
+                $scope.enterAchievementCenter = function () {
+                    $location.path('/achievements');
+                }
                 $scope.returnToSubject = function () {
                     $location.path('/subject/' + $routeParams.sid);
                 }

@@ -1,19 +1,23 @@
 <subject>
-    <span>不同的科目</span><br>
+    <div ng-hide="completeLoading">努力加载资源中...{{ progress }}%</div>
+    <div ng-show="completeLoading">
+        <span>不同的科目</span><br>
 
-    <div ng-repeat="subject in subjects">
-        <button ng-click="enterSubject(subject.id)">{{ subject.title }}</button>
-    </div>
-    <br><br>
+        <div ng-repeat="subject in subjects">
+            <button ng-click="enterSubject(subject.id)">{{ subject.title }}</button>
+        </div>
+        <br><br>
 
-    <span>具体课程内的章节</span><br>
+        <span>具体课程内的章节</span><br>
 
-    <div ng-repeat="chapter in chapters">
-        <button class="btn btn-primary" ng-click="enterChapter(chapter.id)" ng-disabled="isCompleteLoad[chapter.id]">{{
-            chapter.title }}
-        </button>
-        <button class="btn btn-default" ng-click="downloadResources(chapter.id)">下载资源</button>
-        <div ng-show="showProgress[chapter.id]">进度：{{ loadProgress[chapter.id] }}</div>
+        <div ng-repeat="chapter in chapters">
+            <button class="btn btn-primary" ng-click="enterChapter(chapter.id)"
+                    ng-disabled="isCompleteLoad[chapter.id]">{{
+                chapter.title }}
+            </button>
+            <button class="btn btn-default" ng-click="downloadResources(chapter.id)">下载资源</button>
+            <div ng-show="showProgress[chapter.id]">进度：{{ loadProgress[chapter.id] }}</div>
+        </div>
     </div>
 
 </subject>

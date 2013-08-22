@@ -1,6 +1,34 @@
 angular.module("SunExercise", ['SunExercise.controllers', 'SunExercise.directives',
         'SunExercise.services', 'LazyLoader'])
 
+    .run(function (MaterialProvider, ExerciseService, $rootScope, $q) {
+        var deferred = $q.defer();
+        var initResourcePromise = deferred.promise;
+
+        MaterialProvider.getRoot().then(function (rootMaterial) {
+            //load user info material
+            MaterialProvider.loadUserInfo(rootMaterial.userinfo.ts).then(function (msg) {
+                console.log(msg);
+            }, function (data, err) {
+                console.log("Error occurred while loading user info material: " + err);
+            })
+
+            //load initial resources
+            ExerciseService.getServerResources("http://192.168.3.27:3000/exercise/v1/resources", rootMaterial.resources.ts).
+                then(function () {
+                    deferred.resolve("complete");
+                }, function (err) {
+                    deferred.reject("Error occurred while loading initial resources: " + err);
+                }, function (progressData) {
+                    deferred.notify(progressData);
+                })
+        }, function (data, err) {
+            console.log("Error occurred while loading root material: " + err);
+        });
+
+        $rootScope.initResourcePromise = initResourcePromise;
+    })
+
     .config(function ($routeProvider) {
         $routeProvider
             .when('/root', {

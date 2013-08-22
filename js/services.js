@@ -89,6 +89,7 @@ angular.module('SunExercise.services', [])
     .factory("MaterialProvider", function ($http, $q, $timeout, ExerciseService) {
 
         var rootMaterial = {};
+        var userinfoMaterial = {};
         var Material = {};
         var materialMap = {};
 
@@ -116,6 +117,26 @@ angular.module('SunExercise.services', [])
             })
 
             return getRootPromise;
+        }
+
+        var loadUserInfo = function (ts) {
+            var deferred = $q.defer();
+            var userInfoPromise = deferred.promise;
+
+            var promise = $http.jsonp("http://192.168.3.27:3000/exercise/v1/user_info?ts=" + ts + "&callback=JSON_CALLBACK");
+            promise.success(function (UserInfo) {
+                userinfoMaterial = UserInfo;
+                deferred.resolve("Loading user info successful!");
+            });
+            promise.error(function (error) {
+                deferred.reject("Error occured while loading userInfo: " + error);
+            });
+
+            return userInfoPromise;
+        }
+
+        var getUserInfo = function () {
+            return userinfoMaterial;
         }
 
         var getSubjectMaterial = function (subjectId) {
@@ -260,6 +281,8 @@ angular.module('SunExercise.services', [])
 
         return {
             getRoot: getRoot,
+            loadUserInfo: loadUserInfo,
+            getUserInfo: getUserInfo,
             getSubjectMaterial: getSubjectMaterial,
             loadChapterResources: loadChapterResources,
             getChapterMaterial: getChapterMaterial,
@@ -271,37 +294,13 @@ angular.module('SunExercise.services', [])
         }
     })
 
-    .
-    factory("UserdataProvider", function (MaterialProvider, $q, $http) {
-
-        /*var deferred = $q.defer();
-         var userInfoPromise = deferred.promise;
-
-         var promise = $http.get("http://192.168.3.100/userinfo");
-         promise.success(function (data) {
-         UserInfo = data;
-         deferred.resolve(UserInfo);
-         });
-         promise.error(function (error) {
-         deferred.reject("An error occured when loading userInfo: " + error);
-         });
-
-         return userInfoPromise;*/
-
-        var UserInfo = {
-            user_name: "张三",
-            achievements: {
-                badges: {},
-                awards: {}
-            }
-        };
-
-        var getUserInfo = function () {
-            return UserInfo;
-        }
-
+    .factory("UserdataProvider", function (MaterialProvider, $q, $http) {
         var USERDATA = {};
         var userdataMap = {};
+
+        var getGeneralUserData = function () {
+            return UserInfo;
+        }
 
         var getChapterUserdata = function () {
 
@@ -429,7 +428,6 @@ angular.module('SunExercise.services', [])
         }
 
         return{
-            getUserInfo: getUserInfo,
             getChapterUserdata: getChapterUserdata,
             getLessonUserdata: getLessonUserdata,
             getActivityUserdata: getActivityUserdata,
@@ -496,6 +494,10 @@ angular.module('SunExercise.services', [])
                 return MaterialProvider.getRoot();
             }
 
+            Sandbox.prototype.getUserInfo = function () {
+                return MaterialProvider.getUserInfo();
+            }
+
             Sandbox.prototype.getSubjectMaterial = function (subjectId) {
                 return MaterialProvider.getSubjectMaterial(subjectId);
             }
@@ -522,10 +524,6 @@ angular.module('SunExercise.services', [])
 
             Sandbox.prototype.loadAchievementsResources = function (ts) {
                 return MaterialProvider.loadAchievementsResources(ts);
-            }
-
-            Sandbox.prototype.getUserInfo = function () {
-                return UserdataProvider.getUserInfo();
             }
 
             Sandbox.prototype.getChapterUserdata = function () {
