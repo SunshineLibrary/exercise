@@ -2,17 +2,21 @@
     <div class="col-md-10">
         <div class="question-content">
             <!--<span>第&nbsp;{{ $index+1 }}&nbsp;题&nbsp;/&nbsp;共&nbsp;{{ total }}&nbsp;题&nbsp;{{ problem.parent_id }}</span><br> -->
-            <span>{{ problemIndex+$index+1 }}.&nbsp;{{ problem.title }}</span>
-            <span class="question-type">[{{ type }}]</span><br>
+            <span>{{ problemIndex+$index+1 }}.&nbsp;<span class="question-type">({{ type }})</span></span>
+            <span>{{ problem.title }}</span><br>
             <span ng-bind-html-unsafe="body"></span><br>
         </div>
 
-        <label for='problem{{$parent.$index}}'>
-            <input type='text' id='problem{{$parent.$index}}' class="form-control"
-                   name='choices_{{problem.id}}'
-                   ng-model='answer[problem.id]'
-                   ng-change="writeAnswer(answer[problem.id])">
-        </label>
+        <div class="has-{{ problemResult }} singlefilling-text-{{ problemResult }}">
+            <label for='problem{{ problem.id }}'>
+                <input type='text' id='problem{{ problem.id }}'
+                       class="form-control"
+                       name='choices_{{problem.id}}'
+                       placeholder="填写答案"
+                       ng-model='answer[problem.id]'
+                       ng-change="writeAnswer(answer[problem.id])"/>
+            </label>
+        </div>
 
         <div class="col-md-12 explanation-container pull-left" ng-show='showExplanation'>
             <div class="explanation-title">
@@ -27,11 +31,6 @@
     </div>
 
     <div class="col-md-2 ctrlBar">
-        <div class="hint-btn" ng-show="showHintButton" ng-click="showHint()">
-            <img src="img/hint.png"/>
-        </div>
-        <span ng-show="showHintBox">{{ hint }}</span>
-
         <div class="continue-btn" ng-hide='hideSubmitButton' class="submit-btn"
              ng-click='submitAnswer()'>
             <img src="img/{{ submitIcon }}.png"/>
@@ -40,5 +39,10 @@
              ng-click='continueProblem()'>
             <img src="img/next.png"/>
         </div>
+
+        <div class="hint-btn" ng-show="showHintButton" ng-click="showHint()">
+            <img src="img/hint.png"/>
+        </div>
+        <span ng-show="showHintBox">{{ hint }}</span>
     </div>
 </div>

@@ -1,7 +1,7 @@
 angular.module("SunExercise", ['SunExercise.controllers', 'SunExercise.directives',
         'SunExercise.services', 'LazyLoader'])
 
-    .run(function (MaterialProvider, ExerciseService, $rootScope, $q) {
+    .run(function (APIProvider, MaterialProvider, ExerciseService, $rootScope, $q) {
         var deferred = $q.defer();
         var initResourcePromise = deferred.promise;
 
@@ -14,7 +14,7 @@ angular.module("SunExercise", ['SunExercise.controllers', 'SunExercise.directive
             })
 
             //load initial resources
-            ExerciseService.getServerResources("http://192.168.3.27:3000/exercise/v1/resources", rootMaterial.resources.ts).
+            ExerciseService.getServerResources(APIProvider.getAPI("getInitResources", "", ""), rootMaterial.resources.ts).
                 then(function (msg) {
                     deferred.resolve(msg);
                 }, function (err) {

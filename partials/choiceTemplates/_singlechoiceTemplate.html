@@ -2,8 +2,8 @@
     <div class="col-md-10">
         <div class="question-content">
             <!--<span>第&nbsp;{{ $index+1 }}&nbsp;题&nbsp;/&nbsp;共&nbsp;{{ total }}&nbsp;题&nbsp;{{ problem.parent_id }}</span><br> -->
-            <span>{{ problemIndex+$index+1 }}.&nbsp;{{ problem.title }}</span>
-            <span class="question-type">[{{ type }}]</span><br>
+            <span>{{ problemIndex+$index+1 }}.&nbsp;<span class="question-type">({{ type }})</span></span>
+            <span>{{ problem.title }}</span><br>
             <span ng-bind-html-unsafe="body"></span><br>
         </div>
 
@@ -28,11 +28,6 @@
     </div>
 
     <div class="col-md-2 ctrlBar">
-        <div class="hint-btn" ng-show="showHintButton" ng-click="showHint()">
-            <img src="img/hint.png"/>
-        </div>
-        <span ng-show="showHintBox">{{ hint }}</span>
-
         <div class="continue-btn" ng-hide='hideSubmitButton' class="submit-btn"
              ng-click='submitAnswer()'>
             <img src="img/{{ submitIcon }}.png"/>
@@ -41,5 +36,10 @@
              ng-click='continueProblem()'>
             <img src="img/next.png"/>
         </div>
+
+        <div class="hint-btn" ng-show="showHintButton" ng-click="showHint()">
+            <img src="img/hint.png"/>
+        </div>
+        <span ng-show="showHintBox">{{ hint }}</span>
     </div>
 </div>

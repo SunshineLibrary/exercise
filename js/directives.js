@@ -23,40 +23,38 @@ angular.module('SunExercise.directives', [])
                     $scope.completeLoading = true;
                     var rootPromise = subjectSandbox.getRoot();
                     rootPromise.then(function (rootMaterial) {
-                            var subjectMaterial = subjectSandbox.getSubjectMaterial($routeParams.sid);
+                        var subjectMaterial = subjectSandbox.getSubjectMaterial($routeParams.sid);
 
-                            $scope.subjects = rootMaterial.subjects;
-                            $scope.chapters = subjectMaterial.chapters;
-                            $scope.enterSubject = function (subjectId) {
-                                $location.path('/subject/' + subjectId);
-                            }
-                            $scope.enterChapter = function (chapterId) {
-                                $location.path('/subject/' + $routeParams.sid + '/chapter/' + chapterId);
-                            }
-                            $scope.loadProgress = {};
-                            $scope.isCompleteLoad = {};
-                            $scope.showProgress = {};
-                            for (var i = 0; i < subjectMaterial.chapters.length; i++) {
-                                $scope.isCompleteLoad[subjectMaterial.chapters[i].id] = true;
-                            }
-                        },
-                        function (err) {
-                            console.log("Error occured  while loading root data: " + err);
-                        })
+                        $scope.subjects = rootMaterial.subjects;
+                        $scope.chapters = subjectMaterial.chapters;
+                        $scope.enterSubject = function (subjectId) {
+                            $location.path('/subject/' + subjectId);
+                        }
+                        $scope.enterChapter = function (chapterId) {
+                            $location.path('/subject/' + $routeParams.sid + '/chapter/' + chapterId);
+                        }
+                        $scope.loadProgress = {};
+                        $scope.isCompleteLoad = {};
+                        $scope.showProgress = {};
+                        for (var i = 0; i < subjectMaterial.chapters.length; i++) {
+                            $scope.isCompleteLoad[subjectMaterial.chapters[i].id] = true;
+                        }
+                    }, function (err) {
+                        console.log("Error occured  while loading root data: " + err);
+                    })
 
+                    //TODO: progress UI need to be changed
                     $scope.downloadResources = function (chapterId) {
                         $scope.showProgress[chapterId] = true;
                         var chapterMaterialPromise = subjectSandbox.loadChapterResources(chapterId);
                         chapterMaterialPromise.then(function (msg) {
-                                console.log("Loading resources complete: " + msg);
-                                $scope.isCompleteLoad[chapterId] = false;
-                            },
-                            function (err) {
-                                console.log("Error occured while loading chapter data: " + err);
-                            },
-                            function (progressData) {
-                                $scope.loadProgress[chapterId] = progressData;
-                            })
+                            console.log("Loading resources complete: " + msg);
+                            $scope.isCompleteLoad[chapterId] = false;
+                        }, function (err) {
+                            console.log("Error occured while loading chapter data: " + err);
+                        }, function (progressData) {
+                            $scope.loadProgress[chapterId] = progressData;
+                        })
                     }
                 }, function (err) {
                     console.log(err);
@@ -162,7 +160,6 @@ angular.module('SunExercise.directives', [])
                     var lessonMaterialPromise = lessonSandbox.getLessonMaterial($routeParams.lid);
                     var lessonUserdataPromise = lessonSandbox.getLessonUserdata($routeParams.lid);
                 }
-                var userInfo = lessonSandbox.getUserInfo();
 
                 //record lessonMaterial and lessonUserdata into a object
                 var lessonTotalData = {};
@@ -173,12 +170,12 @@ angular.module('SunExercise.directives', [])
                     lessonTotalData.userdata = userdata;
                 })
 
-                //continue logic after both lessonMaterial and lessonUserdata have been loaded
-                var lessonPromise = $q.all([lessonMaterialPromise, lessonUserdataPromise]);
+                //continue logic after initResourcePromise, lessonMaterial and lessonUserdata have been loaded
+                var lessonPromise = $q.all([$scope.initResourcePromise, lessonMaterialPromise, lessonUserdataPromise]);
                 lessonPromise.then(function () {
                     var lessonData = lessonTotalData.material;
                     var lessonUserdata = lessonTotalData.userdata;
-                    console.log(lessonUserdata);
+                    var userinfoData = lessonSandbox.getUserInfo();
 
                     //initialize ng-models
                     $scope.title = lessonData.title;
@@ -274,19 +271,17 @@ angular.module('SunExercise.directives', [])
                                     //award video logic
                                     if (lessonData.achievements[i].type == "award") {
                                         //check if the student has already got the award video
-                                        if (typeof userInfo.achievements.awards[lessonData.achievements[i].id] == "undefined") {
+                                        if (typeof userinfoData.achievements.awards[lessonData.achievements[i].id] == "undefined") {
                                             //parse the award condition
                                             if ((typeof lessonUserdata.summary.correct_count == "undefined") ?
                                                 (lessonSandbox.conditionParser(lessonData.achievements[i].condition, Infinity, 100)) :
                                                 (lessonSandbox.conditionParser(lessonData.achievements[i].condition,
                                                     lessonUserdata.summary.correct_count, lessonUserdata.summary.correct_percent))) {
-                                                userInfo.achievements.awards[lessonData.achievements[i].id] = {
-                                                    id: lessonData.achievements[i].id
-                                                }
+                                                lessonSandbox.addAchievements("awards", lessonData.achievements[i].id, Date.now());
                                             }
                                         }
                                     } else {
-
+                                        //TODO: global badges
                                     }
                                 }
                             }
@@ -324,6 +319,9 @@ angular.module('SunExercise.directives', [])
                                         continueLesson(lessonData.id, lessonData.activities[index + 1].id);
                                     }
                                 }
+
+                                //userdata analyzing completed, flush the current userdata
+                                lessonSandbox.flushUserdata(lessonData.id);
                             } else {
                                 //set the current_activity to undefined so that the back button can operate as intended
                                 lessonUserdata.current_activity = undefined;
@@ -359,28 +357,24 @@ angular.module('SunExercise.directives', [])
                                             //award video logic
                                             if (lessonData.achievements[i].type == "award") {
                                                 //check if the student has already got the award video
-                                                if (typeof userInfo.achievements.awards[lessonData.achievements[i].id] == "undefined") {
+                                                if (typeof userinfoData.achievements.awards[lessonData.achievements[i].id] == "undefined") {
                                                     //parse the award condition
                                                     if ((typeof lessonUserdata.summary.correct_count == "undefined") ?
                                                         (lessonSandbox.conditionParser(lessonData.achievements[i].condition, Infinity, 100)) :
                                                         (lessonSandbox.conditionParser(lessonData.achievements[i].condition,
                                                             lessonUserdata.summary.correct_count, lessonUserdata.summary.correct_percent))) {
-                                                        userInfo.achievements.awards[lessonData.achievements[i].id] = {
-                                                            id: lessonData.achievements[i].id
-                                                        }
+                                                        lessonSandbox.addAchievements("awards", lessonData.achievements[i].id, Date.now());
                                                     }
                                                 }
                                             } else {
-
+                                                //TODO: global badges
                                             }
                                         }
                                     }
 
                                     //userdata analyzing completed, flush the current userdata
                                     lessonSandbox.flushUserdata(lessonData.id);
-
                                     console.log(lessonUserdata);
-                                    console.log(userInfo);
                                     FSM.back();
                                 }
                             }
@@ -411,7 +405,7 @@ angular.module('SunExercise.directives', [])
             link: function ($scope, $element) {
                 var activityUserdata = activitySandbox.getActivityUserdata($routeParams.aid);
                 var activityData = activitySandbox.getActivityMaterial($routeParams.aid, activityUserdata.seed);
-                var userInfo = activitySandbox.getUserInfo();
+                var userinfoData = activitySandbox.getUserInfo();
 
                 $scope.title = activityData.title;
                 var multimediaBody = "<div>" + activityData.body + "</div>";
@@ -507,7 +501,7 @@ angular.module('SunExercise.directives', [])
                                     };
                                     for (var i = 0; i < activityData.achievements.length; i++) {
                                         //check if the student has already got this achievement
-                                        if (typeof userInfo.achievements.badges[activityData.achievements[i].id] == "undefined") {
+                                        if (typeof userinfoData.achievements.badges[activityData.achievements[i].id] == "undefined") {
                                             //create the custon grader using the grader template
                                             if (typeof activityData.achievements[i].condition != "undefined") {
                                                 var grader = activitySandbox.getGrader(activityData.achievements[i].id,
@@ -519,9 +513,7 @@ angular.module('SunExercise.directives', [])
                                             //apply the userdata using the created grader
                                             if (activitySandbox.createGrader(grader, userDataToGrade)) {
                                                 //write the new badge in userinfo
-                                                userInfo.achievements.badges[activityData.achievements[i].id] = {
-                                                    id: activityData.achievements[i].id
-                                                }
+                                                activitySandbox.addAchievements("badges", activityData.achievements[i].id);
                                             }
                                         }
                                     }
@@ -529,9 +521,6 @@ angular.module('SunExercise.directives', [])
                             }
 
                             if (args.should_transition) {
-                                //userdata analyzing completed, flush the current userdata
-                                activitySandbox.flushUserdata(activityData.parent_id);
-
                                 //check if the activity has a jump attribute and has reached the final problem
                                 if (index == activityData.problems.length - 1) {
                                     //check if the activity need show the quiz result
@@ -582,15 +571,12 @@ angular.module('SunExercise.directives', [])
                         //set is_complete to true for later reviewing
                         activityUserdata.is_complete = true;
 
-                        //userdata analyzing completed, flush the current userdata
-                        activitySandbox.flushUserdata(activityData.parent_id);
-
                         activitySandbox.playSoundEffects("sound-effects/click.wav");
                         //check if the student achieves certain achievements
                         if (typeof activityData.achievements != "undefined") {
                             for (var i = 0; i < activityData.achievements.length; i++) {
                                 //check if the student has already got this achievement
-                                if (typeof userInfo.achievements.badges[activityData.achievements[i].id] == "undefined") {
+                                if (typeof userinfoData.achievements.badges[activityData.achievements[i].id] == "undefined") {
                                     //create the custon grader using the grader template
                                     if (typeof activityData.achievements[i].condition != "undefined") {
                                         var grader = activitySandbox.getGrader(activityData.achievements[i].id,
@@ -601,10 +587,8 @@ angular.module('SunExercise.directives', [])
 
                                     //apply the userdata using the created grader
                                     if (activitySandbox.createGrader(grader, "")) {
-                                        //write the new badge in
-                                        userInfo.achievements.badges[activityData.achievements[i].id] = {
-                                            id: activityData.achievements[i].id
-                                        }
+                                        //write the new badge in userinfo
+                                        activitySandbox.addAchievements("badges", activityData.achievements[i].id, Date.now());
                                     }
                                 }
                             }
@@ -625,6 +609,12 @@ angular.module('SunExercise.directives', [])
         }
     })
 
+/**
+ * multimedia directives
+ * <video></video> -> <vid>
+ * <audio></audio> -> <music>
+ * pdf loading -> <pdf>
+ */
     .directive("vid", function ($compile, $routeParams) {
         //enter fullscreen mode
         var toFullScreen = function (video) {
@@ -1012,6 +1002,12 @@ angular.module('SunExercise.directives', [])
                                     $scope.checked[i] = "wrong";
                                 }
                             }
+                        } else {
+                            if (problemUserdata.is_correct) {
+                                $scope.problemResult = "success";
+                            } else {
+                                $scope.problemResult = "error";
+                            }
                         }
 
                         //problemSandbox.sendEvent("showAnswerBeforeContinue", $scope);
@@ -1031,48 +1027,56 @@ angular.module('SunExercise.directives', [])
         }
     })
 
-    .directive("achievements", function (SandboxProvider) {
+    .directive("achievements", function (SandboxProvider, $q) {
 
         var achievementSandbox = SandboxProvider.getSandbox();
 
         return {
             restrict: "E",
             link: function ($scope) {
-                var achievementsPromise = achievementSandbox.getAchievementsMaterial();
-                var userInfo = achievementSandbox.getUserInfo();
+                var achievementsJsonPromise = achievementSandbox.getAchievementsMaterial();
+                achievementsJsonPromise.then(function (data) {
+                    var achievementsPool = data;
+                    var ts = achievementsPool.ts;
 
-                achievementsPromise.then(function (data) {
-                        var achievementsPool = data;
-                        var ts = achievementsPool.ts;
-
-                        var resourcesPromise = achievementSandbox.loadAchievementsResources(ts);
-                        resourcesPromise.then(function () {
-                            //init ng-models
-                            $scope.completeDownload = true;
-                            $scope.badges = achievementsPool.badges;
-                            $scope.awards = achievementsPool.awards;
-                            $scope.hasBadge = {};
-                            $scope.hasAward = {};
-                            if (typeof userInfo.achievements.badges != "null") {
-                                for (var i = 0; i < $scope.badges.length; i++) {
-                                    $scope.hasBadge[$scope.badges[i].id] = (typeof userInfo.achievements.badges[$scope.badges[i].id] != "undefined")
-                                }
-                            }
-                            if (typeof userInfo.achievements.awards != "null") {
-                                for (i = 0; i < $scope.awards.length; i++) {
-                                    $scope.hasAward[$scope.awards[i].id] = (typeof userInfo.achievements.awards[$scope.awards[i].id] != "undefined")
-                                }
-                            }
-                        }, function (err) {
-                            console.log(err);
-                        }, function (progressData) {
-                            $scope.progress = progressData;
-                        });
-
-                    },
-                    function (err) {
+                    var resourcesPromise = achievementSandbox.loadAchievementsResources(ts);
+                    resourcesPromise.then(function (msg) {
+                        console.log(msg);
+                    }, function (err) {
                         console.log(err);
+                    }, function (progressData) {
+                        $scope.progress = progressData;
                     })
+
+                    var achievementsResourcePromise = $q.all([$scope.initResourcePromise, resourcesPromise])
+                    achievementsResourcePromise.then(function () {
+                        var userinfoData = achievementSandbox.getUserInfo();
+
+                        //init ng-models
+                        $scope.completeDownload = true;
+                        $scope.badges = achievementsPool.badges;
+                        $scope.awards = achievementsPool.awards;
+                        $scope.hasBadge = {};
+                        $scope.hasAward = {};
+                        if (typeof userinfoData.achievements.badges != "null") {
+                            for (var i = 0; i < $scope.badges.length; i++) {
+                                $scope.hasBadge[$scope.badges[i].id] = (typeof userinfoData.achievements.
+                                    badges[$scope.badges[i].id] != "undefined")
+                            }
+                        }
+                        if (typeof userinfoData.achievements.awards != "null") {
+                            for (i = 0; i < $scope.awards.length; i++) {
+                                $scope.hasAward[$scope.awards[i].id] = (typeof userinfoData.achievements.
+                                    awards[$scope.awards[i].id] != "undefined")
+                            }
+                        }
+                    }, function (err) {
+                        console.log("Error occurred while loading initial resources: " + err);
+                    });
+
+                }, function (err) {
+                    console.log(err);
+                })
             }
         }
     })

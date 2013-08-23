@@ -7,8 +7,50 @@
  */
 angular.module('SunExercise.services', [])
 
+    .factory("APIProvider", function () {
+        var HOST = "http://192.168.3.27:3000";
+        var getAPI = function (type, id, ts) {
+            switch (type) {
+                case "getRoot" :
+                    return HOST + "/exercise/v1/root?callback=JSON_CALLBACK";
+                    break;
+                case "getInitResources" :
+                    return HOST + "/exercise/v1/resources";
+                    break;
+                case "getChapterResources" :
+                    return HOST + "/exercise/v1/chapters/" + id;
+                    break;
+                case "getLessonJson" :
+                    return HOST + "/exercise/v1/lessons/" + id + "?ts=" + ts + "&callback=JSON_CALLBACK";
+                    break;
+                case "getAchievementsJson" :
+                    return HOST + "/exercise/v1/achievements?callback=JSON_CALLBACK";
+                    break;
+                case "getAchievementsResources" :
+                    return HOST + "/exercise/v1/achievements";
+                    break;
+                case "getLessonUserdata" :
+                    return HOST + "/exercise/v1/user_data/lessons/" + id + "?callback=JSON_CALLBACK";
+                    break;
+                case "postLessonUserdata" :
+                    return HOST + "/exercise/v1/user_data/lessons/" + id;
+                    break;
+                case "getUserInfo" :
+                    return HOST + "/exercise/v1/user_info?ts=" + ts + "&callback=JSON_CALLBACK";
+                    break;
+                case "postUserInfoUserdata" :
+                    return HOST + "/exercise/v1/user_data/user_info";
+                    break;
+            }
+        }
+
+        return {
+            getAPI: getAPI
+        }
+    })
+
     //core services of SunExercise app
-    .factory("ExerciseService", function ($q, $http, $timeout) {
+    .factory("ExerciseService", function ($q, $http, $timeout, APIProvider) {
 
         var emitEvent = function (eventName, scope, args) {
             scope.$emit(eventName, args);
@@ -88,7 +130,7 @@ angular.module('SunExercise.services', [])
     })
 
     //provide material
-    .factory("MaterialProvider", function ($http, $q, $timeout, ExerciseService) {
+    .factory("MaterialProvider", function ($http, $q, $timeout, ExerciseService, APIProvider) {
 
         var rootMaterial = {};
         var userinfoMaterial = {};
@@ -99,7 +141,7 @@ angular.module('SunExercise.services', [])
             var deferred = $q.defer();
             var getRootPromise = deferred.promise;
 
-            var promise = $http.jsonp("http://192.168.3.27:3000/exercise/v1/root?callback=JSON_CALLBACK");
+            var promise = $http.jsonp(APIProvider.getAPI("getRoot", "", ""));
             promise.success(function (data) {
                 rootMaterial = data;
                 for (var i = 0; i < rootMaterial.subjects.length; i++) {
@@ -125,7 +167,7 @@ angular.module('SunExercise.services', [])
             var deferred = $q.defer();
             var userInfoPromise = deferred.promise;
 
-            var promise = $http.jsonp("http://192.168.3.27:3000/exercise/v1/user_info?ts=" + ts + "&callback=JSON_CALLBACK");
+            var promise = $http.jsonp(APIProvider.getAPI("getUserInfo", "", ts));
             promise.success(function (UserInfo) {
                 userinfoMaterial = UserInfo;
                 deferred.resolve("Loading user info successful!");
@@ -150,8 +192,7 @@ angular.module('SunExercise.services', [])
             var getChapterPromise = deferred.promise;
 
             var ts = materialMap[chapterId].ts;
-            var promise = ExerciseService.getServerResources("http://192.168.3.27:3000/exercise/v1/chapters/" + chapterId, ts);
-            //var promise = $http.get("data/" + chapterId + ".json");
+            var promise = ExerciseService.getServerResources(APIProvider.getAPI("getChapterResources", chapterId, ""), ts);
             promise.then(function (data) {
                 deferred.resolve(data);
             }, function (data, err) {
@@ -172,15 +213,14 @@ angular.module('SunExercise.services', [])
             var getLessonPromise = deferred.promise;
 
             var ts = materialMap[lessonId].ts;
-            var promise = $http.jsonp("http://192.168.3.27:3000/exercise/v1/lessons/" + lessonId + "?ts=" + ts + "&callback=JSON_CALLBACK");
-            //var promise = $http.jsonp("http://192.168.3.100:3000/exercise/v1/lessons/" + lessonId + "?ts=" + ts + "&callback=JSON_CALLBACK");
+            var promise = $http.jsonp(APIProvider.getAPI("getLessonJson", lessonId, ts));
 
             promise.success(function (data) {
                 Material = data;
                 for (var j = 0; j < Material.activities.length; j++) {
                     //if randomize problems, shuffle all the problems in all activities
                     if ((typeof Material.activities[j].randomize_problems != "undefined") &&
-                        (Material.activities[j].randomize_problems)) {
+                        (Material.activities[j].randomize_problems) && (typeof Material.activities[j].pool_count == "undefined")) {
                         Material.activities[j].problems = _.shuffle(Material.activities[j].problems);
                     }
                     //if randomize choices, shuffle all the choices in all problems
@@ -249,7 +289,7 @@ angular.module('SunExercise.services', [])
             var deferred = $q.defer();
             var achievementsPromise = deferred.promise;
 
-            var promise = $http.jsonp("http://192.168.3.27:3000/achievements");
+            var promise = $http.jsonp(APIProvider.getAPI("getAchievementsJson", "", ""));
             promise.success(function (achievementsJson) {
                 deferred.resolve(achievementsJson)
             });
@@ -264,7 +304,7 @@ angular.module('SunExercise.services', [])
             var deferred = $q.defer();
             var achievementsPromise = deferred.promise;
 
-            var getAchievementsPromise = ExerciseService.getServerResources("http://192.168.3.27:3000/achievements", ts);
+            var getAchievementsPromise = ExerciseService.getServerResources(APIProvider.getAPI("getAchievementsResources", "", ""), ts);
             getAchievementsPromise.then(function (data) {
                 deferred.resolve(data);
             }, function (err) {
@@ -296,62 +336,67 @@ angular.module('SunExercise.services', [])
         }
     })
 
-    .factory("UserdataProvider", function (MaterialProvider, $q, $http) {
-        var USERDATA = {};
+    .factory("UserdataProvider", function (MaterialProvider, $q, $http, APIProvider) {
         var userdataMap = {};
-
-        var getGeneralUserData = function () {
-            return UserInfo;
-        }
 
         var getLessonUserdata = function (lessonId) {
             var deferred = $q.defer();
             var lessonPromise = deferred.promise;
 
-            //if already in userdatamap
-            if (typeof USERDATA[lessonId] != "undefined") {
-                deferred.resolve(USERDATA[lessonId]);
+            //if userdata already in userdata map
+            if (typeof userdataMap[lessonId] != "undefined") {
+                deferred.resolve(userdataMap[lessonId]);
                 return lessonPromise;
             }
             //the current userdata has not been cached
-            var userdataPromise = $http.jsonp("http://192.168.3.27:3000/exercise/v1/user_data/lessons/" + lessonId +
-                "?callback=JSON_CALLBACK");
+            var userdataPromise = $http.jsonp(APIProvider.getAPI("getLessonUserdata", lessonId, ""));
             userdataPromise.success(function (userdata, status) {
                 if (typeof userdata.summary != "undefined") {
-                    //update the local userdata
-                    USERDATA[lessonId] = userdata;
-                    deferred.resolve(USERDATA[lessonId]);
+                    //update the local userdata ans re-write the userdata map
+                    userdataMap[lessonId] = userdata;
+                    var promise = MaterialProvider.getLessonMaterial(lessonId);
+                    promise.then(function (lessonData) {
+                        for (var i = 0; i < lessonData.activities.length; i++) {
+                            userdataMap[lessonData.activities[i].id] = userdata.activities[lessonData.activities[i].id];
+                            if (userdata.activities[lessonData.activities[i].id].type == "quiz") {
+                                for (var j = 0; j < lessonData.activities[i].problems.length; j++) {
+                                    userdataMap[lessonData.activities[i].problems[j].id] =
+                                        userdata.activities[lessonData.activities[i].id].
+                                            problems[lessonData.activities[i].problems[j].id];
+                                }
+                            }
+                        }
+                    });
+                    deferred.resolve(userdataMap[lessonId]);
                 } else if (typeof userdata.summary == "undefined" && status == 200) {
-                    USERDATA[lessonId] = {
+                    userdataMap[lessonId] = {
                         is_complete: false,
                         activities: {},
                         summary: { badges: [] }
                     };
-                    userdataMap[lessonId] = USERDATA[lessonId];
 
                     var promise = MaterialProvider.getLessonMaterial(lessonId);
                     promise.then(function (lessonData) {
                         for (var i = 0; i < lessonData.activities.length; i++) {
                             if (lessonData.activities[i].type === 'quiz') {
-                                USERDATA[lessonId].activities[lessonData.activities[i].id] = {
-                                    is_complete: false,
-                                    problems: {},
-                                    summary: {}
-                                };
+                                userdataMap[lessonId].activities[lessonData.activities[i].id] =
+                                    userdataMap[lessonData.activities[i].id] = {
+                                        is_complete: false,
+                                        problems: {},
+                                        summary: {}
+                                    };
                                 if (typeof lessonData.activities[i].pool_count != "undefined") {
-                                    USERDATA[lessonId].activities[lessonData.activities[i].id].seed = [];
+                                    userdataMap[lessonId].activities[lessonData.activities[i].id].seed =
+                                        userdataMap[lessonData.activities[i].id].seed = [];
                                 }
-                                userdataMap[lessonData.activities[i].id] = USERDATA[lessonId].
-                                    activities[lessonData.activities[i].id];
                             } else {
-                                USERDATA[lessonId].activities[lessonData.activities[i].id] = {
-                                    summary: {}
-                                };
-                                userdataMap[lessonData.activities[i].id] = USERDATA[lessonId].
-                                    activities[lessonData.activities[i].id];
+                                userdataMap[lessonId].activities[lessonData.activities[i].id] =
+                                    userdataMap[lessonData.activities[i].id] = {
+                                        summary: {}
+                                    };
                             }
                         }
-                        deferred.resolve(USERDATA[lessonId]);
+                        deferred.resolve(userdataMap[lessonId]);
                     })
                 }
             });
@@ -370,12 +415,11 @@ angular.module('SunExercise.services', [])
                     activityData = MaterialProvider.getActivityMaterial(activityId);
                     userdataMap[activityId].seed = activityData.seed;
                     for (var i = 0; i < activityData.problems.length; i++) {
-                        userdataMap[activityId].problems[activityData.problems[i].id] = {
-                            is_correct: false,
-                            answer: []
-                        };
-                        userdataMap[activityData.problems[i].id] =
-                            userdataMap[activityId].problems[activityData.problems[i].id];
+                        userdataMap[activityId].problems[activityData.problems[i].id] =
+                            userdataMap[activityData.problems[i].id] = {
+                                is_correct: false,
+                                answer: []
+                            };
                     }
                     return userdataMap[activityId];
                     //resume activity, userdataMap has already recorded the chosen problems
@@ -384,12 +428,11 @@ angular.module('SunExercise.services', [])
                 }
             } else if ((activityData.type === "quiz") && (typeof userdataMap[activityData.problems[0].id] == "undefined")) {
                 for (var i = 0; i < activityData.problems.length; i++) {
-                    userdataMap[activityId].problems[activityData.problems[i].id] = {
-                        is_correct: false,
-                        answer: []
-                    };
                     userdataMap[activityData.problems[i].id] =
-                        userdataMap[activityId].problems[activityData.problems[i].id];
+                        userdataMap[activityId].problems[activityData.problems[i].id] = {
+                            is_correct: false,
+                            answer: []
+                        };
                 }
                 return userdataMap[activityId];
                 //activity is a lecture
@@ -441,15 +484,46 @@ angular.module('SunExercise.services', [])
         }
 
         var flushUserdata = function (lessonId) {
-            $http.post("http://192.168.3.27:3000/exercise/v1/user_data/lessons/" + lessonId, "data=" + JSON.stringify(USERDATA[lessonId]));
+            $http.post(APIProvider.getAPI("postLessonUserdata", lessonId, ""), "data=" + JSON.stringify(userdataMap[lessonId]));
+        }
+
+        //userinfo interfaces
+        var getUserinfoUserdata = function () {
+            if (typeof userdataMap['user_info'] != "undefined") {
+                return userdataMap['user_info'];
+            }
+            //initialize user_info in userdata
+            userdataMap['user_info'] = {
+                achievements: {
+                    badges: {},
+                    awards: {}
+                }
+            }
+            return userdataMap['user_info'];
+        }
+
+        var flushUserinfoUserdata = function () {
+            $http.post(APIProvider.getAPI("postUserInfoUserdata", "", ""), "data=" + JSON.stringify(userdataMap['user_info']));
+        }
+
+        var addAchievements = function (achievementType, achievementContent, getTime) {
+            var userinfoUserdata = getUserinfoUserdata();
+            var is_new = (typeof userinfoUserdata.achievements[achievementType][achievementContent] == "undefined");
+            userinfoUserdata.achievements[achievementType][achievementContent] = {
+                time: Date.now()
+            };
+            if (is_new) {
+                flushUserinfoUserdata();
+            }
         }
 
         return{
             getLessonUserdata: getLessonUserdata,
             getActivityUserdata: getActivityUserdata,
             getUserdata: getUserdata,
+            resetUserdata: resetUserdata,
             flushUserdata: flushUserdata,
-            resetUserdata: resetUserdata
+            addAchievements: addAchievements
         }
 
     })
@@ -543,6 +617,10 @@ angular.module('SunExercise.services', [])
                 return MaterialProvider.loadAchievementsResources(ts);
             }
 
+            Sandbox.prototype.addAchievements = function (achievementType, achievementContent) {
+                return UserdataProvider.addAchievements(achievementType, achievementContent);
+            }
+
             Sandbox.prototype.getLessonUserdata = function (lessonId) {
                 return UserdataProvider.getLessonUserdata(lessonId);
             }
@@ -555,8 +633,8 @@ angular.module('SunExercise.services', [])
                 return UserdataProvider.getUserdata(moduleId);
             }
 
-            Sandbox.prototype.flushUserdata = function (lessonId, userdata) {
-                return UserdataProvider.flushUserdata(lessonId, userdata);
+            Sandbox.prototype.flushUserdata = function (lessonId) {
+                return UserdataProvider.flushUserdata(lessonId);
             }
 
             Sandbox.prototype.resetUserdata = function (moduleName, moduleId) {
