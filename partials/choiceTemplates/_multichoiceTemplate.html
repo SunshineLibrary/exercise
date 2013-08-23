@@ -20,12 +20,7 @@
         </p>
     </div>
 
-    <div class="col-md-2 ctrlBar">
-        <div class="hint-btn" ng-show="showHintButton" ng-click="showHint()">
-            <img src="img/hint.png"/>
-        </div>
-        <span ng-show="showHintBox">{{ hint }}</span>
-
+    <div class="col-md-2 ctrlBar">       
         <div class="continue-btn" ng-hide='hideSubmitButton' class="submit-btn"
              ng-click='submitAnswer()'>
             <img src="img/submit.png"/>
@@ -34,5 +29,11 @@
              ng-click='continueProblem()'>
             <img src="img/next.png"/>
         </div>
+        
+        <div class="hint-btn" ng-show="showHintButton" ng-click="showHint()">
+            <img src="img/hint.png"/>
+        </div>
+        <span ng-show="showHintBox">{{ hint }}</span>
+
     </div>
 </div>

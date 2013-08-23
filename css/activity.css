@@ -6,7 +6,7 @@
 }
 
 .ctrlBar {
-    position: fixed;
+    /*position: fixed;*/
     right: 0;
 }
 
@@ -32,7 +32,7 @@
 }
 
 .question-content {
-    font-size: 18px;
+    font-size: 24px;
     margin-left: 15px;
 }
 
@@ -149,9 +149,9 @@
 
 .hint-btn {
     margin-left: 14px;
-    margin-top: 125px;
+    margin-top: 36px;
 }
 
 .continue-btn {
-    margin-top: 36px;
+    margin-top: 233px;
 }
