@@ -6,12 +6,14 @@
  * To change this template use File | Settings | File Templates.
  */
 
-angular.module('LessonDemo.controllers', [])
+angular.module('SunExercise.controllers', [])
 
     //root controller
     .controller('rootCtrl', function ($location, MaterialProvider) {
-        var subjects = MaterialProvider.getRoot()['subjects'];
-        $location.path('/subject/' + subjects[0].id);
+        var rootPromise = MaterialProvider.getRoot();
+        rootPromise.then(function (rootData) {
+            $location.path('/subject/' + rootData.subjects[0].id);
+        })
     })
 
     //subject controller
@@ -31,5 +33,10 @@ angular.module('LessonDemo.controllers', [])
 
     //activity controller
     .controller('activityCtrl', function () {
+
+    })
+
+    //achievements controller
+    .controller('achievementsCtrl', function () {
 
     });

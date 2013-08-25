@@ -2,11 +2,11 @@
     <activity>
         <div class="row">
             <div class="col-md-12 navbar-fixed-top _progress-bar" style="padding-left:0px">
-                <div class="col-md-10" style="padding-left:0px">
+                <div class="_progress-canvas">
                     <div class="_progress" style="width:{{ progressWidth }}%;"></div>
                 </div>
-                <div id="buttonContainer" class="col-md-2 pull-right">
-                    <button class="btn btn-default" ng-click='pauseLearn()'>返&nbsp;回</button>
+                <div id="buttonContainer" class="return-button">
+                    <div ng-click='pauseLearn()'><img src="img/exit.png"/></div>
                 </div>
             </div>
         </div>
@@ -20,16 +20,17 @@
                     <div ng-bind-html-unsafe="body"></div>
                 </div>
                 <div class="col-md-2 ctrlBar">
-                    <button ng-hide="hideContinueButton" class="btn btn-primary"
-                            ng-click='continueActivity()'>继&nbsp;续
-                    </button>
+                    <div ng-hide="hideContinueButton"
+                         ng-click='continueActivity()'>
+                        <img src="img/next.png"/>
+                    </div>
                 </div>
             </div>
 
             <div id="quiz" ng-hide="lecture">
                 <div switch ng-hide="showQuizSummary">
-                    <problem ng-init="total=problems.length" id="{{ problem.id }}"
-                             class="pt-page pt-page-{{ $index+1 }}"
+                    <problem id="{{ problem.id }}"
+                             class="question-container pt-page pt-page-{{ $index+1 }}"
                              ng-repeat='problem in problems'
                              ng-model="problemShow"
                              activity=true></problem>
@@ -37,12 +38,47 @@
 
                 <div ng-show="showQuizSummary">
                     <span>总共答对&nbsp;{{ quizCorrectCount }}&nbsp;题，正确率&nbsp; {{ quizCorrectPercent }}&nbsp;</span>
-                    <button ng-click="nextActivity()">继&nbsp;续</button>
+
+                    <div ng-click="nextActivity()">
+                        <img src="img/next.png"/>
+                    </div>
                 </div>
             </div>
 
         </div>
 
     </activity>
+
+    <!--<div ng-show="show-summary">
+        <div class="lesson-summary-header">
+
+        </div>
+        <div class="lesson-summary-body">
+            <h3>赞，你完成了本课学习</h3>
+            <h4></h4>
+
+            <div class="media">
+                <h4></h4>
+                <div class="lesson-achievements" ng-repeat="award in awards">
+                    <img class="media-object pull-left" src="" />
+                    <div class="media-body">
+                        <h4 class="media-heading">{{ award.title }}</h4>
+                        <div>{{ award.desc }}</div>
+                    </div>
+                </div>
+                <h4></h4>
+                <div class="lesson-achievements" ng-repeat="badge in badges">
+                    <img class="media-object pull-left" src="" />
+                    <div class="media-body">
+                        <h4 class="media-heading">{{ badge.title }}</h4>
+                        <div>{{ badge.desc }}</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="lesson-summary-footer">
+            <button class="back-button">结束学习</button>
+        </div>
+    </div>-->
 </lesson>
-<script src="js/pagetransitions.js"></script>
+
