@@ -231,6 +231,31 @@ angular.module('SunExercise.directives', [])
                     $scope.$on("pauseActivity", function (event) {
                         FSM.back();
                     })
+
+                    //check global badges after each lesson is finished
+                    $scope.$on("lesson.complete", function (event) {
+                        var incompleteBadgesPromise = lessonSandbox.getIncompleteGlobalBadges(event);
+                        incompleteBadgesPromise.then(function (globalBadges) {
+                            var userDataToGrade = {
+                                correct_percent: lessonUserdata.summary.correct_percent
+                            };
+                            for (var i = 0; i < globalBadges.length; i++) {
+                                //create the custon grader using the grader template
+                                if (typeof globalBadges[i].condition != "undefined") {
+                                    var grader = lessonSandbox.getGrader(globalBadges[i].id, globalBadges[i].condition);
+                                } else {
+                                    var grader = lessonSandbox.getGrader(globalBadges[i].id, "");
+                                }
+
+                                //apply the userdata using the created grader
+                                if (lessonSandbox.createGrader(grader, userDataToGrade)) {
+                                    //write the new badge in userinfo
+                                    lessonSandbox.addAchievements("badges", globalBadges[i].id);
+                                }
+                            }
+                        })
+                    })
+
                     //listen to the endOfListen event to end the lesson
                     $scope.$on("endOfLesson", function (event, args) {
                         if ((typeof args !== "undefined") && (typeof args.summary !== "undefined") &&
@@ -280,15 +305,13 @@ angular.module('SunExercise.directives', [])
                                                 lessonSandbox.addAchievements("awards", lessonData.achievements[i].id, Date.now());
                                             }
                                         }
-                                    } else {
-                                        //TODO: global badges
                                     }
                                 }
                             }
-
+                            //send an event to check the global badges
+                            lessonSandbox.sendEvent("lesson.complete", $scope);
                             //userdata analyzing completed, flush the current userdata
                             lessonSandbox.flushUserdata(lessonData.id);
-
                             FSM.back();
                         }
                     })
@@ -366,12 +389,11 @@ angular.module('SunExercise.directives', [])
                                                         lessonSandbox.addAchievements("awards", lessonData.achievements[i].id, Date.now());
                                                     }
                                                 }
-                                            } else {
-                                                //TODO: global badges
                                             }
                                         }
                                     }
-
+                                    //send an event to check the global badges
+                                    lessonSandbox.sendEvent("lesson.complete", $scope);
                                     //userdata analyzing completed, flush the current userdata
                                     lessonSandbox.flushUserdata(lessonData.id);
                                     console.log(lessonUserdata);
@@ -615,7 +637,7 @@ angular.module('SunExercise.directives', [])
  * <audio></audio> -> <music>
  * pdf loading -> <pdf>
  */
-    .directive("vid", function ($compile, $routeParams) {
+    .directive("vid", function (APIProvider, $compile, $routeParams) {
         //enter fullscreen mode
         var toFullScreen = function (video) {
             //先全屏
@@ -644,7 +666,7 @@ angular.module('SunExercise.directives', [])
         return {
             restrict: "E",
             link: function ($scope, $element, $attrs) {
-                var template = "<video id='video' style='width:500px;' src='http://192.168.3.27:3000/exercise/v1/lessons/" + $routeParams.lid + "/"
+                var template = "<video id='video' style='width:500px;' src='" + APIProvider.getAPI("getFileResources", $routeParams.lid, "")
                     + $attrs.src + "' controls></video>" +
                     "<button ng-click='playVideo()'>{{ playButtonMsg }}</button>";
                 $element.html(template);
@@ -705,11 +727,11 @@ angular.module('SunExercise.directives', [])
         }
     })
 
-    .directive("music", function ($compile, $routeParams) {
+    .directive("music", function (APIProvider, $compile, $routeParams) {
         return {
             restrict: "E",
             link: function ($scope, $element, $attrs) {
-                var template = "<audio style='width:500px;' src='http://192.168.3.27:3000/exercise/v1/lessons/" + $routeParams.lid + "/"
+                var template = "<audio style='width:500px;' src='" + APIProvider.getAPI("getFileResources", $routeParams.lid, "")
                     + $attrs.src + "' controls></audio>";
                 $element.html(template);
                 $compile($element.contents())($scope);
@@ -717,20 +739,19 @@ angular.module('SunExercise.directives', [])
         }
     })
 
-    .directive("jpg", function ($compile, $routeParams) {
+    .directive("jpg", function (APIProvider, $compile, $routeParams) {
         return {
             restrict: "E",
             link: function ($scope, $element, $attrs) {
-                //var template = "<img style='width:300px;' src='http://192.168.3.100:3000/exercise/v1/lesson/" + $routeParams.lid + "/"
-                //    + $attrs.src + " />";
-                var template = "<img src='data/" + $attrs.src + "' />";
+                var template = "<img style='width:300px;' src='" + APIProvider.getAPI("getFileResources", $routeParams.lid, "")
+                    + $attrs.src + " />";
                 $element.html(template);
                 $compile($element.contents())($scope);
             }
         }
     })
 
-    .directive("pdf", function ($compile, $routeParams) {
+    .directive("pdf", function (APIProvider, $compile, $routeParams) {
         return {
             restrict: "E",
             link: function ($scope, $element, $attrs) {
@@ -794,8 +815,8 @@ angular.module('SunExercise.directives', [])
                 }
 
                 // Asynchronously download PDF as an ArrayBuffer
-                PDFJS.getDocument('http://192.168.3.27:3000/exercise/v1/lessons/' + $routeParams.lid + "/"
-                        + $attrs.src).then(function (_pdfDoc) {
+                PDFJS.getDocument(APIProvider.getAPI("getFileResources", $routeParams.lid, "") + $attrs.src).
+                    then(function (_pdfDoc) {
                         pdfDoc = _pdfDoc;
                         renderPage(pageNum);
                     });

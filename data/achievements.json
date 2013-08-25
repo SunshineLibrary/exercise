@@ -2,6 +2,13 @@
     "ts": "1",
     "badges": [
         {
+            "id": "first_golden_cup",
+            "title": "金杯奖",
+            "desc": "恭喜获得金杯",
+            "condition": [80],
+            "scope": "lesson.complete"
+        },
+        {
             "id": "lecture_finish",
             "title": "认真听讲",
             "desc": "这是一个认真听讲badge"

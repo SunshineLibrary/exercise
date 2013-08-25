@@ -8,40 +8,43 @@
 angular.module('SunExercise.services', [])
 
     .factory("APIProvider", function () {
-        var HOST = "http://192.168.3.27:3000";
+        var HOST = "http://192.168.3.23:3000";
         var getAPI = function (type, id, ts) {
             switch (type) {
                 case "getRoot" :
                     return HOST + "/exercise/v1/root?callback=JSON_CALLBACK";
-                    break;
+
                 case "getInitResources" :
                     return HOST + "/exercise/v1/resources";
-                    break;
+
                 case "getChapterResources" :
                     return HOST + "/exercise/v1/chapters/" + id;
-                    break;
+
                 case "getLessonJson" :
                     return HOST + "/exercise/v1/lessons/" + id + "?ts=" + ts + "&callback=JSON_CALLBACK";
-                    break;
+
+                case "getFileResources" :
+                    return HOST + "/exercise/v1/lessons/" + id + "/";
+
                 case "getAchievementsJson" :
-                    return HOST + "/exercise/v1/achievements?callback=JSON_CALLBACK";
-                    break;
+                    return HOST + "/exercise/v1/achievements?ts=" + ts + "&callback=JSON_CALLBACK";
+
                 case "getAchievementsResources" :
                     return HOST + "/exercise/v1/achievements";
-                    break;
+
                 case "getLessonUserdata" :
                     return HOST + "/exercise/v1/user_data/lessons/" + id + "?callback=JSON_CALLBACK";
-                    break;
+
                 case "postLessonUserdata" :
                     return HOST + "/exercise/v1/user_data/lessons/" + id;
-                    break;
+
                 case "getUserInfo" :
                     return HOST + "/exercise/v1/user_info?ts=" + ts + "&callback=JSON_CALLBACK";
-                    break;
+
                 case "postUserInfoUserdata" :
                     return HOST + "/exercise/v1/user_data/user_info";
-                    break;
             }
+            return false;
         }
 
         return {
@@ -289,7 +292,7 @@ angular.module('SunExercise.services', [])
             var deferred = $q.defer();
             var achievementsPromise = deferred.promise;
 
-            var promise = $http.jsonp(APIProvider.getAPI("getAchievementsJson", "", ""));
+            var promise = $http.jsonp(APIProvider.getAPI("getAchievementsJson", "", rootMaterial.achievements.ts));
             promise.success(function (achievementsJson) {
                 deferred.resolve(achievementsJson)
             });
@@ -316,6 +319,28 @@ angular.module('SunExercise.services', [])
             return achievementsPromise;
         }
 
+        var getIncompleteGlobalBadges = function (event) {
+            var deferred = $q.defer();
+            var globalBadgesPromise = deferred.promise;
+
+            var userinfo = getUserInfo();
+            var incompleteGlobalBadges = [];
+            var achievementsMaterialPromise = getAchievementsMaterial();
+            achievementsMaterialPromise.then(function (achievements) {
+                for (var i = 0; i < achievements.badges.length; i++) {
+                    if ((typeof achievements.badges[i].scope != "undefined") && (achievements.badges[i].scope == event.name) &&
+                        (typeof userinfo.achievements.badges[achievements.badges[i].id] == "undefined")) {
+                        incompleteGlobalBadges.push(achievements.badges[i]);
+                    }
+                }
+                deferred.resolve(incompleteGlobalBadges);
+            }, function (err) {
+                deferred.reject(err);
+            })
+
+            return globalBadgesPromise;
+        }
+
         //General API
         var getMaterial = function (moduleId) {
             return materialMap[moduleId];
@@ -332,6 +357,7 @@ angular.module('SunExercise.services', [])
             getActivityMaterial: getActivityMaterial,
             getAchievementsMaterial: getAchievementsMaterial,
             loadAchievementsResources: loadAchievementsResources,
+            getIncompleteGlobalBadges: getIncompleteGlobalBadges,
             getMaterial: getMaterial
         }
     })
@@ -531,6 +557,15 @@ angular.module('SunExercise.services', [])
     .factory("GraderProvider", function () {
 
         var graderCollection = {
+
+            /*global badges*/
+            first_golden_cup: function (condition) {
+                return function (userdata) {
+                    return (userdata.correct_percent >= condition[0]);
+                }
+            },
+
+            /*local badges*/
             lecture_finish: function () {
                 return function () {
                     return true;
@@ -615,6 +650,10 @@ angular.module('SunExercise.services', [])
 
             Sandbox.prototype.loadAchievementsResources = function (ts) {
                 return MaterialProvider.loadAchievementsResources(ts);
+            }
+
+            Sandbox.prototype.getIncompleteGlobalBadges = function (eventName) {
+                return MaterialProvider.getIncompleteGlobalBadges(eventName);
             }
 
             Sandbox.prototype.addAchievements = function (achievementType, achievementContent) {
