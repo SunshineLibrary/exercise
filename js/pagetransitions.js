@@ -23,6 +23,7 @@ var PageTransitions = (function () {
         $main = main;
         $pages = $main.children();
         pagesCount = $pages.length;
+        current = 0;
 
         $pages.each(function () {
             var $page = $(this);

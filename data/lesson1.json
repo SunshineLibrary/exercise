@@ -11,7 +11,14 @@
     "star1": 50,
     "star2": 60,
     "star3": 80,
-    "badges": [
+    "achievements": [
+        {
+            "id": "unfortunate_bear_video",
+            "type": "award",
+            "title": "倒霉熊的奖励视频",
+            "desc": "这是一个搞笑视频祝你幸福",
+            "condition": ">90%"
+        }
     ],
     "activities": [
         {
@@ -20,7 +27,7 @@
             "title": "字词讲解第一部分",
             "type": "lecture",
             "redoable": true,
-            "body": "走一步，再走一步字词讲解<jpg src='test.jpg'></jpg><pdf src='freeculture.pdf'></pdf>",
+            "body": "走一步，再走一步字词讲解<pdf src='freeculture.pdf'></pdf>",
             "level": "easy",
             "achievements": [
                 {
@@ -63,6 +70,8 @@
                     "title": "选出下面加引号多音字的正确读音：",
                     "type": "multichoice",
                     "body": "雨季开始时， 我们预料有“闷热”的天气。",
+                    "explanation": "这是题目解析这是题目解析这是题目解析这是题目解析这是题目解析这是题目解析这是题目解析这是题目解析这是题目解析这是题目解析这是题目解析这是题目解析这是题目解析这是题目解析这是题目解析这是题目解析这是题目解析这是题目解析这是题目解析这是题目解析这是题目解析这是题目解析这是题目解析这是题目解析这是题目解析这是题目解析这是题目解析这是题目解析这是题目解析",
+                    "hint": "选a就对啦",
                     "level": "easy",
                     "choices": [
                         {
@@ -91,31 +100,10 @@
                     "id": "a2p2",
                     "parent_id": "activity2",
                     "title": "选出下面加引号多音字的正确读音：",
-                    "type": "singlechoice",
+                    "type": "singlefilling",
+                    "correct_answer": "haha",
                     "body": "士兵在打完子弹之后用石头把敌人击毙。",
-                    "level": "normal",
-                    "choices": [
-                        {
-                            "id": "a2p2c1",
-                            "body": "Dān",
-                            "is_correct": false
-                        },
-                        {
-                            "id": "a2p2c2",
-                            "body": "Dàn",
-                            "is_correct": true
-                        },
-                        {
-                            "id": "a2p2c3",
-                            "body": "Tán",
-                            "is_correct": false
-                        },
-                        {
-                            "id": "a2p2c4",
-                            "body": "Dǎn",
-                            "is_correct": false
-                        }
-                    ]
+                    "level": "normal"
                 },
                 {
                     "id": "a2p3",
@@ -123,26 +111,27 @@
                     "title": "下面哪一个句子的括号里最适合填入‘心惊肉跳’：",
                     "type": "singlechoice",
                     "body": "下面哪一个句子的括号里最适合填入‘心惊肉跳’：",
+                    "layout": "card",
                     "level": "normal",
                     "choices": [
                         {
                             "id": "a2p3c1",
-                            "body": "高速公路上出了车祸，现场十分惨烈，一片()。",
+                            "body": "<jpg src='NatGeo01.jpg'></jpg>",
                             "is_correct": false
                         },
                         {
                             "id": "a2p3c2",
-                            "body": "我并不害怕胆小的鳄鱼，但是饥饿的缅甸蟒蛇使我（）。",
+                            "body": "<jpg src='NatGeo02.jpg'></jpg>",
                             "is_correct": true
                         },
                         {
                             "id": "a2p3c3",
-                            "body": "但这座城市的居民们却远非那么（）。",
+                            "body": "<jpg src='NatGeo03.jpg'></jpg>",
                             "is_correct": false
                         },
                         {
                             "id": "a2p3c4",
-                            "body": "我们听到那间屋子里的小孩在哭的（）。",
+                            "body": "<jpg src='NatGeo04.jpg'></jpg>",
                             "is_correct": false
                         }
                     ]
@@ -155,7 +144,7 @@
             "title": "字词讲解第二部分",
             "type": "lecture",
             "redoable": true,
-            "body": "走一步，再走一步字词讲解<video src='走一步，再走一步-2.mp4'></video>",
+            "body": "走一步，再走一步字词讲解<vid src='走一步，再走一步-1.mp4'></vid>",
             "level": "easy",
             "achievements": [
                 {

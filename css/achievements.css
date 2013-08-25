@@ -1,0 +1,15 @@
+.has-badge-true {
+    color: red;
+}
+
+.has-badge-false {
+    color: black;
+}
+
+.has-award-true {
+    color: red;
+}
+
+.has-award-false {
+    color: black;
+}

@@ -5,133 +5,242 @@
  * Time: 下午9:27
  * To change this template use File | Settings | File Templates.
  */
-angular.module('LessonDemo.services', [])
-    //provide lesson data
-    .factory("MaterialProvider", function ($http, $q) {
+angular.module('SunExercise.services', [])
 
+    .factory("APIProvider", function () {
+        var HOST = "http://192.168.3.23:3000";
+        var getAPI = function (type, id, ts) {
+            switch (type) {
+                case "getRoot" :
+                    return HOST + "/exercise/v1/root?callback=JSON_CALLBACK";
+
+                case "getInitResources" :
+                    return HOST + "/exercise/v1/resources";
+
+                case "getChapterResources" :
+                    return HOST + "/exercise/v1/chapters/" + id;
+
+                case "getLessonJson" :
+                    return HOST + "/exercise/v1/lessons/" + id + "?ts=" + ts + "&callback=JSON_CALLBACK";
+
+                case "getFileResources" :
+                    return HOST + "/exercise/v1/lessons/" + id + "/";
+
+                case "getAchievementsJson" :
+                    return HOST + "/exercise/v1/achievements?ts=" + ts + "&callback=JSON_CALLBACK";
+
+                case "getAchievementsResources" :
+                    return HOST + "/exercise/v1/achievements";
+
+                case "getLessonUserdata" :
+                    return HOST + "/exercise/v1/user_data/lessons/" + id + "?callback=JSON_CALLBACK";
+
+                case "postLessonUserdata" :
+                    return HOST + "/exercise/v1/user_data/lessons/" + id;
+
+                case "getUserInfo" :
+                    return HOST + "/exercise/v1/user_info?ts=" + ts + "&callback=JSON_CALLBACK";
+
+                case "postUserInfoUserdata" :
+                    return HOST + "/exercise/v1/user_data/user_info";
+            }
+            return false;
+        }
+
+        return {
+            getAPI: getAPI
+        }
+    })
+
+    //core services of SunExercise app
+    .factory("ExerciseService", function ($q, $http, $timeout, APIProvider) {
+
+        var emitEvent = function (eventName, scope, args) {
+            scope.$emit(eventName, args);
+        }
+
+        var getLoadingProgress = function (ts, apiUrl) {
+            var deferred = $q.defer();
+            var loadingProgressPromise = deferred.promise;
+
+            //send a request to get the current state
+            var currentStatePromise = $http.jsonp(apiUrl + "?ts=" + ts + "&act=status&callback=JSON_CALLBACK");
+            currentStatePromise.success(function (stateData) {
+                //check turtle server has finished the cache task
+                if (!stateData.is_cached) {
+                    deferred.resolve(stateData.progress);
+                } else {
+                    deferred.resolve("done");
+                }
+            })
+            currentStatePromise.error(function (err) {
+                deferred.reject("Error occured while getting the current status: " + err);
+            })
+
+            return loadingProgressPromise;
+        }
+
+        var getServerResources = function (apiUrl, timeStamp) {
+            var deferred = $q.defer();
+            var getResourcesPromise = deferred.promise;
+
+            //check if turtle server has already cached the resources
+            var statusPromise = $http.jsonp(apiUrl + "?ts=" + timeStamp + "&act=status&callback=JSON_CALLBACK");
+            statusPromise.success(function (status) {
+                if ((typeof status.is_cached == "undefined") || (typeof status.is_cached != "undefined" && !status.is_cached)) {
+                    var cachePromise = $http.jsonp(apiUrl + "?ts=" + timeStamp + "&act=cache&callback=JSON_CALLBACK");
+                    cachePromise.success(function (response) {
+                        //check if the turtle server is offline and no cache recorded
+                        if (response == "506") {
+                            deferred.reject("Server Offline");
+                        } else {
+                            //notify the current progress
+                            deferred.notify(response.progress);
+                            //get new downloading progress every 0.5 sec
+                            $timeout(function getNewResources() {
+                                var currentDataPromise = getLoadingProgress(timeStamp, apiUrl);
+                                currentDataPromise.then(function (progressData) {
+                                    if (progressData != "done") {
+                                        //notify the progress and show on the page
+                                        deferred.notify(progressData);
+                                        //recursively loading new status
+                                        $timeout(getNewResources, 500);
+                                        //turtle server has finished downloading resources
+                                    } else {
+                                        deferred.notify(100);
+                                        //complete downloading
+                                        deferred.resolve("complete");
+                                    }
+                                })
+                            }, 500);
+                        }
+                    })
+                } else if (status.is_cached) {
+                    deferred.resolve("already in cache");
+                }
+            })
+            statusPromise.error(function (err) {
+                deferred.reject("Requesting current resources status error: " + err);
+            })
+
+            return getResourcesPromise;
+        }
+
+        return {
+            emitEvent: emitEvent,
+            getServerResources: getServerResources
+        };
+    })
+
+    //provide material
+    .factory("MaterialProvider", function ($http, $q, $timeout, ExerciseService, APIProvider) {
+
+        var rootMaterial = {};
+        var userinfoMaterial = {};
         var Material = {};
         var materialMap = {};
 
         var getRoot = function () {
-            return {
-                subjects: [
-                    {
-                        id: "chinese",
-                        title: "语文"
-                    },
-                    {
-                        id: "math",
-                        title: "数学"
-                    },
-                    {
-                        id: "english",
-                        title: "英语"
-                    }
-                ]
-            }
-        }
-
-        var getSubjectMaterial = function (subjectId) {
-            if (subjectId == "chinese") {
-                return {
-                    chapters: [
-                        {
-                            id: "chapter1",
-                            title: "走一步，再走一步"
-                        },
-                        {
-                            id: "chapter2",
-                            title: "陈涉世家"
-                        },
-                        {
-                            id: "chapter3",
-                            title: "出师表"
-                        }
-                    ]};
-            } else if (subjectId == "math") {
-                return {
-                    chapters: [
-                        {
-                            id: "chapter4",
-                            title: "导数"
-                        },
-                        {
-                            id: "chapter5",
-                            title: "积分"
-                        },
-                        {
-                            id: "chapter6",
-                            title: "级数"
-                        }
-                    ]};
-            } else if (subjectId == "english") {
-                return {
-                    chapters: [
-                        {
-                            id: "chapter7",
-                            title: "定语从句"
-                        },
-                        {
-                            id: "chapter8",
-                            title: "非谓语动词"
-                        },
-                        {
-                            id: "chapter9",
-                            title: "虚拟语气"
-                        }
-                    ]
-                }
-            }
-        }
-
-        var getChapterMaterial = function (chapterId) {
             var deferred = $q.defer();
-            var getChapterPromise = deferred.promise;
+            var getRootPromise = deferred.promise;
 
-            var promise = $http.jsonp("http://192.168.3.100:3000/exercise/v1/chapter/" + chapterId + "?callback=JSON_CALLBACK");
-            //var promise = $http.get("data/" + chapterId + ".json");
+            var promise = $http.jsonp(APIProvider.getAPI("getRoot", "", ""));
             promise.success(function (data) {
+                rootMaterial = data;
+                for (var i = 0; i < rootMaterial.subjects.length; i++) {
+                    materialMap[rootMaterial.subjects[i].id] = rootMaterial.subjects[i];
+                    for (var j = 0; j < rootMaterial.subjects[i].chapters.length; j++) {
+                        materialMap[rootMaterial.subjects[i].chapters[j].id] = rootMaterial.subjects[i].chapters[j];
+                        for (var k = 0; k < rootMaterial.subjects[i].chapters[j].lessons.length; k++) {
+                            materialMap[rootMaterial.subjects[i].chapters[j].lessons[k].id] =
+                                rootMaterial.subjects[i].chapters[j].lessons[k];
+                        }
+                    }
+                }
                 deferred.resolve(data);
             })
             promise.error(function (data, err) {
-                console.log("Load Chapter Data Error: " + err);
+                deferred.reject("Load Root Data Error: " + err);
+            })
+
+            return getRootPromise;
+        }
+
+        var loadUserInfo = function (ts) {
+            var deferred = $q.defer();
+            var userInfoPromise = deferred.promise;
+
+            var promise = $http.jsonp(APIProvider.getAPI("getUserInfo", "", ts));
+            promise.success(function (UserInfo) {
+                userinfoMaterial = UserInfo;
+                deferred.resolve("Loading user info successful!");
+            });
+            promise.error(function (error) {
+                deferred.reject("Error occured while loading userInfo: " + error);
+            });
+
+            return userInfoPromise;
+        }
+
+        var getUserInfo = function () {
+            return userinfoMaterial;
+        }
+
+        var getSubjectMaterial = function (subjectId) {
+            return materialMap[subjectId];
+        }
+
+        var loadChapterResources = function (chapterId) {
+            var deferred = $q.defer();
+            var getChapterPromise = deferred.promise;
+
+            var ts = materialMap[chapterId].ts;
+            var promise = ExerciseService.getServerResources(APIProvider.getAPI("getChapterResources", chapterId, ""), ts);
+            promise.then(function (data) {
+                deferred.resolve(data);
+            }, function (data, err) {
+                deferred.reject(err);
+            }, function (progressData) {
+                deferred.notify(progressData);
             })
 
             return getChapterPromise;
+        }
+
+        var getChapterMaterial = function (chapterId) {
+            return materialMap[chapterId];
         }
 
         var getLessonMaterial = function (lessonId) {
             var deferred = $q.defer();
             var getLessonPromise = deferred.promise;
 
-            var promise = $http.jsonp("http://192.168.3.100:3000/exercise/v1/lesson/" + lessonId + ".json?callback=JSON_CALLBACK");
-            //var promise = $http.get("data/" + lessonId + ".json");
+            var ts = materialMap[lessonId].ts;
+            var promise = $http.jsonp(APIProvider.getAPI("getLessonJson", lessonId, ts));
 
             promise.success(function (data) {
                 Material = data;
-                if (typeof materialMap[Material.id] == "undefined") {
-                    for (var j = 0; j < Material.activities.length; j++) {
-                        //if randomize problems, shuffle all the problems in all activities
-                        if ((typeof Material.activities[j].randomize_problems != "undefined") &&
-                            (Material.activities[j].randomize_problems)) {
-                            Material.activities[j].problems = _.shuffle(Material.activities[j].problems);
-                        }
-                        //if randomize choices, shuffle all the choices in all problems
-                        if ((typeof Material.activities[j].randomize_choices != "undefined") &&
-                            (Material.activities[j].randomize_choices)) {
-                            for (var k = 0; k < Material.activities[j].problems[k].choices.length; k++) {
-                                Material.activities[j].problems[k].choices = _.shuffle(Material.activities[j].problems[k].choices);
-                            }
-                        }
-                        materialMap[Material.activities[j].id] = Material.activities[j];
+                for (var j = 0; j < Material.activities.length; j++) {
+                    //if randomize problems, shuffle all the problems in all activities
+                    if ((typeof Material.activities[j].randomize_problems != "undefined") &&
+                        (Material.activities[j].randomize_problems) && (typeof Material.activities[j].pool_count == "undefined")) {
+                        Material.activities[j].problems = _.shuffle(Material.activities[j].problems);
                     }
-                    materialMap[Material.id] = Material;
+                    //if randomize choices, shuffle all the choices in all problems
+                    if ((typeof Material.activities[j].randomize_choices != "undefined") &&
+                        (Material.activities[j].randomize_choices)) {
+                        for (var k = 0; k < Material.activities[j].problems[k].choices.length; k++) {
+                            Material.activities[j].problems[k].choices = _.shuffle(Material.activities[j].problems[k].choices);
+                        }
+                    }
+                    materialMap[Material.activities[j].id] = Material.activities[j];
                 }
+                materialMap[Material.id] = Material;
 
                 deferred.resolve(Material);
             })
             promise.error(function (data, err) {
-                console.log("Load Lesson Data Error: " + err);
+                deferred.reject("Load Lesson Data Error: " + err);
             })
 
             return getLessonPromise;
@@ -179,94 +288,147 @@ angular.module('LessonDemo.services', [])
             }
         }
 
-        //APIs
+        var getAchievementsMaterial = function () {
+            var deferred = $q.defer();
+            var achievementsPromise = deferred.promise;
+
+            var promise = $http.jsonp(APIProvider.getAPI("getAchievementsJson", "", rootMaterial.achievements.ts));
+            promise.success(function (achievementsJson) {
+                deferred.resolve(achievementsJson)
+            });
+            promise.error(function (err) {
+                deferred.reject("Error occurred while loading achievements json: " + err);
+            })
+
+            return achievementsPromise;
+        }
+
+        var loadAchievementsResources = function (ts) {
+            var deferred = $q.defer();
+            var achievementsPromise = deferred.promise;
+
+            var getAchievementsPromise = ExerciseService.getServerResources(APIProvider.getAPI("getAchievementsResources", "", ""), ts);
+            getAchievementsPromise.then(function (data) {
+                deferred.resolve(data);
+            }, function (err) {
+                deferred.reject("Error occurred while loading achievements resources: " + err);
+            }, function (progressData) {
+                deferred.notify(progressData);
+            })
+
+            return achievementsPromise;
+        }
+
+        var getIncompleteGlobalBadges = function (event) {
+            var deferred = $q.defer();
+            var globalBadgesPromise = deferred.promise;
+
+            var userinfo = getUserInfo();
+            var incompleteGlobalBadges = [];
+            var achievementsMaterialPromise = getAchievementsMaterial();
+            achievementsMaterialPromise.then(function (achievements) {
+                for (var i = 0; i < achievements.badges.length; i++) {
+                    if ((typeof achievements.badges[i].scope != "undefined") && (achievements.badges[i].scope == event.name) &&
+                        (typeof userinfo.achievements.badges[achievements.badges[i].id] == "undefined")) {
+                        incompleteGlobalBadges.push(achievements.badges[i]);
+                    }
+                }
+                deferred.resolve(incompleteGlobalBadges);
+            }, function (err) {
+                deferred.reject(err);
+            })
+
+            return globalBadgesPromise;
+        }
+
+        //General API
         var getMaterial = function (moduleId) {
             return materialMap[moduleId];
         }
 
         return {
             getRoot: getRoot,
+            loadUserInfo: loadUserInfo,
+            getUserInfo: getUserInfo,
             getSubjectMaterial: getSubjectMaterial,
+            loadChapterResources: loadChapterResources,
             getChapterMaterial: getChapterMaterial,
             getLessonMaterial: getLessonMaterial,
             getActivityMaterial: getActivityMaterial,
+            getAchievementsMaterial: getAchievementsMaterial,
+            loadAchievementsResources: loadAchievementsResources,
+            getIncompleteGlobalBadges: getIncompleteGlobalBadges,
             getMaterial: getMaterial
         }
     })
 
-    .
-    factory("UserdataProvider", function (MaterialProvider, $q, $http) {
-
-        /*var deferred = $q.defer();
-         var userInfoPromise = deferred.promise;
-
-         var promise = $http.get("http://192.168.3.100/userinfo");
-         promise.success(function (data) {
-         UserInfo = data;
-         deferred.resolve(UserInfo);
-         });
-         promise.error(function (error) {
-         deferred.reject("An error occured when loading userInfo: " + error);
-         });
-
-         return userInfoPromise;*/
-
-        var UserInfo = {
-            user_name: "张三",
-            achievements: {}
-        };
-
-        var getUserInfo = function () {
-            return UserInfo;
-        }
-
-        var USERDATA = {};
+    .factory("UserdataProvider", function (MaterialProvider, $q, $http, APIProvider) {
         var userdataMap = {};
-
-        var getChapterUserdata = function () {
-
-        }
 
         var getLessonUserdata = function (lessonId) {
             var deferred = $q.defer();
             var lessonPromise = deferred.promise;
 
-            if (typeof USERDATA[lessonId] == "undefined") {
-                USERDATA[lessonId] = {
-                    is_complete: false,
-                    activities: {},
-                    summary: { badges: [] }
-                };
-                userdataMap[lessonId] = USERDATA[lessonId];
-
-                var promise = MaterialProvider.getLessonMaterial(lessonId);
-                promise.then(function (material) {
-                    var lessonData = material;
-                    for (var i = 0; i < lessonData.activities.length; i++) {
-                        if (lessonData.activities[i].type === 'quiz') {
-                            USERDATA[lessonId].activities[lessonData.activities[i].id] = {
-                                is_complete: false,
-                                problems: {},
-                                summary: {}
-                            };
-                            if (typeof lessonData.activities[i].pool_count != "undefined") {
-                                USERDATA[lessonId].activities[lessonData.activities[i].id].seed = [];
-                            }
-                            userdataMap[lessonData.activities[i].id] = USERDATA[lessonId].
-                                activities[lessonData.activities[i].id];
-                        } else {
-                            USERDATA[lessonId].activities[lessonData.activities[i].id] = {
-                                summary: {}
-                            };
-                            userdataMap[lessonData.activities[i].id] = USERDATA[lessonId].
-                                activities[lessonData.activities[i].id];
-                        }
-                    }
-                    deferred.resolve(USERDATA[lessonId]);
-                })
-            } else {
-                deferred.resolve(USERDATA[lessonId])
+            //if userdata already in userdata map
+            if (typeof userdataMap[lessonId] != "undefined") {
+                deferred.resolve(userdataMap[lessonId]);
+                return lessonPromise;
             }
+            //the current userdata has not been cached
+            var userdataPromise = $http.jsonp(APIProvider.getAPI("getLessonUserdata", lessonId, ""));
+            userdataPromise.success(function (userdata, status) {
+                if (typeof userdata.summary != "undefined") {
+                    //update the local userdata ans re-write the userdata map
+                    userdataMap[lessonId] = userdata;
+                    var promise = MaterialProvider.getLessonMaterial(lessonId);
+                    promise.then(function (lessonData) {
+                        for (var i = 0; i < lessonData.activities.length; i++) {
+                            userdataMap[lessonData.activities[i].id] = userdata.activities[lessonData.activities[i].id];
+                            if (userdata.activities[lessonData.activities[i].id].type == "quiz") {
+                                for (var j = 0; j < lessonData.activities[i].problems.length; j++) {
+                                    userdataMap[lessonData.activities[i].problems[j].id] =
+                                        userdata.activities[lessonData.activities[i].id].
+                                            problems[lessonData.activities[i].problems[j].id];
+                                }
+                            }
+                        }
+                    });
+                    deferred.resolve(userdataMap[lessonId]);
+                } else if (typeof userdata.summary == "undefined" && status == 200) {
+                    userdataMap[lessonId] = {
+                        is_complete: false,
+                        activities: {},
+                        summary: { badges: [] }
+                    };
+
+                    var promise = MaterialProvider.getLessonMaterial(lessonId);
+                    promise.then(function (lessonData) {
+                        for (var i = 0; i < lessonData.activities.length; i++) {
+                            if (lessonData.activities[i].type === 'quiz') {
+                                userdataMap[lessonId].activities[lessonData.activities[i].id] =
+                                    userdataMap[lessonData.activities[i].id] = {
+                                        is_complete: false,
+                                        problems: {},
+                                        summary: {}
+                                    };
+                                if (typeof lessonData.activities[i].pool_count != "undefined") {
+                                    userdataMap[lessonId].activities[lessonData.activities[i].id].seed =
+                                        userdataMap[lessonData.activities[i].id].seed = [];
+                                }
+                            } else {
+                                userdataMap[lessonId].activities[lessonData.activities[i].id] =
+                                    userdataMap[lessonData.activities[i].id] = {
+                                        summary: {}
+                                    };
+                            }
+                        }
+                        deferred.resolve(userdataMap[lessonId]);
+                    })
+                }
+            });
+            userdataPromise.error(function (err) {
+                deferred.reject("Error occurred while loading userdata from turtle server: " + err);
+            });
 
             return lessonPromise;
         }
@@ -279,12 +441,11 @@ angular.module('LessonDemo.services', [])
                     activityData = MaterialProvider.getActivityMaterial(activityId);
                     userdataMap[activityId].seed = activityData.seed;
                     for (var i = 0; i < activityData.problems.length; i++) {
-                        userdataMap[activityId].problems[activityData.problems[i].id] = {
-                            is_correct: false,
-                            answer: []
-                        };
-                        userdataMap[activityData.problems[i].id] =
-                            userdataMap[activityId].problems[activityData.problems[i].id];
+                        userdataMap[activityId].problems[activityData.problems[i].id] =
+                            userdataMap[activityData.problems[i].id] = {
+                                is_correct: false,
+                                answer: []
+                            };
                     }
                     return userdataMap[activityId];
                     //resume activity, userdataMap has already recorded the chosen problems
@@ -293,12 +454,11 @@ angular.module('LessonDemo.services', [])
                 }
             } else if ((activityData.type === "quiz") && (typeof userdataMap[activityData.problems[0].id] == "undefined")) {
                 for (var i = 0; i < activityData.problems.length; i++) {
-                    userdataMap[activityId].problems[activityData.problems[i].id] = {
-                        is_correct: false,
-                        answer: []
-                    };
                     userdataMap[activityData.problems[i].id] =
-                        userdataMap[activityId].problems[activityData.problems[i].id];
+                        userdataMap[activityId].problems[activityData.problems[i].id] = {
+                            is_correct: false,
+                            answer: []
+                        };
                 }
                 return userdataMap[activityId];
                 //activity is a lecture
@@ -349,20 +509,63 @@ angular.module('LessonDemo.services', [])
             }
         }
 
+        var flushUserdata = function (lessonId) {
+            $http.post(APIProvider.getAPI("postLessonUserdata", lessonId, ""), "data=" + JSON.stringify(userdataMap[lessonId]));
+        }
+
+        //userinfo interfaces
+        var getUserinfoUserdata = function () {
+            if (typeof userdataMap['user_info'] != "undefined") {
+                return userdataMap['user_info'];
+            }
+            //initialize user_info in userdata
+            userdataMap['user_info'] = {
+                achievements: {
+                    badges: {},
+                    awards: {}
+                }
+            }
+            return userdataMap['user_info'];
+        }
+
+        var flushUserinfoUserdata = function () {
+            $http.post(APIProvider.getAPI("postUserInfoUserdata", "", ""), "data=" + JSON.stringify(userdataMap['user_info']));
+        }
+
+        var addAchievements = function (achievementType, achievementContent, getTime) {
+            var userinfoUserdata = getUserinfoUserdata();
+            var is_new = (typeof userinfoUserdata.achievements[achievementType][achievementContent] == "undefined");
+            userinfoUserdata.achievements[achievementType][achievementContent] = {
+                time: Date.now()
+            };
+            if (is_new) {
+                flushUserinfoUserdata();
+            }
+        }
+
         return{
-            getUserInfo: getUserInfo,
-            getChapterUserdata: getChapterUserdata,
             getLessonUserdata: getLessonUserdata,
             getActivityUserdata: getActivityUserdata,
             getUserdata: getUserdata,
-            resetUserdata: resetUserdata
+            resetUserdata: resetUserdata,
+            flushUserdata: flushUserdata,
+            addAchievements: addAchievements
         }
 
     })
 
-    .factory("GraderProvider", function ($http, $q) {
+    .factory("GraderProvider", function () {
 
         var graderCollection = {
+
+            /*global badges*/
+            first_golden_cup: function (condition) {
+                return function (userdata) {
+                    return (userdata.correct_percent >= condition[0]);
+                }
+            },
+
+            /*local badges*/
             lecture_finish: function () {
                 return function () {
                     return true;
@@ -409,18 +612,7 @@ angular.module('LessonDemo.services', [])
         }
     })
 
-    .factory("LessonService", function () {
-
-        var emitEvent = function (eventName, scope, args) {
-            scope.$emit(eventName, args);
-        }
-
-        return {
-            emitEvent: emitEvent
-        };
-    })
-
-    .factory("SandboxProvider", function (MaterialProvider, UserdataProvider, GraderProvider, LessonService) {
+    .factory("SandboxProvider", function (MaterialProvider, UserdataProvider, GraderProvider, ExerciseService) {
 
         function Sandbox() {
 
@@ -428,8 +620,16 @@ angular.module('LessonDemo.services', [])
                 return MaterialProvider.getRoot();
             }
 
+            Sandbox.prototype.getUserInfo = function () {
+                return MaterialProvider.getUserInfo();
+            }
+
             Sandbox.prototype.getSubjectMaterial = function (subjectId) {
                 return MaterialProvider.getSubjectMaterial(subjectId);
+            }
+
+            Sandbox.prototype.loadChapterResources = function (chapterId) {
+                return MaterialProvider.loadChapterResources(chapterId);
             }
 
             Sandbox.prototype.getChapterMaterial = function (chapterId) {
@@ -444,12 +644,20 @@ angular.module('LessonDemo.services', [])
                 return MaterialProvider.getActivityMaterial(activityId, seed);
             }
 
-            Sandbox.prototype.getUserInfo = function () {
-                return UserdataProvider.getUserInfo();
+            Sandbox.prototype.getAchievementsMaterial = function () {
+                return MaterialProvider.getAchievementsMaterial();
             }
 
-            Sandbox.prototype.getChapterUserdata = function () {
-                return UserdataProvider.getChapterUserdata();
+            Sandbox.prototype.loadAchievementsResources = function (ts) {
+                return MaterialProvider.loadAchievementsResources(ts);
+            }
+
+            Sandbox.prototype.getIncompleteGlobalBadges = function (eventName) {
+                return MaterialProvider.getIncompleteGlobalBadges(eventName);
+            }
+
+            Sandbox.prototype.addAchievements = function (achievementType, achievementContent) {
+                return UserdataProvider.addAchievements(achievementType, achievementContent);
             }
 
             Sandbox.prototype.getLessonUserdata = function (lessonId) {
@@ -462,6 +670,10 @@ angular.module('LessonDemo.services', [])
 
             Sandbox.prototype.getUserdata = function (moduleId) {
                 return UserdataProvider.getUserdata(moduleId);
+            }
+
+            Sandbox.prototype.flushUserdata = function (lessonId) {
+                return UserdataProvider.flushUserdata(lessonId);
             }
 
             Sandbox.prototype.resetUserdata = function (moduleName, moduleId) {
@@ -495,7 +707,7 @@ angular.module('LessonDemo.services', [])
 
             //a emitter for communications between modules
             Sandbox.prototype.sendEvent = function (eventName, scope, args) {
-                LessonService.emitEvent(eventName, scope, args);
+                ExerciseService.emitEvent(eventName, scope, args);
             }
 
             //a parser for lesson complete logic
@@ -503,10 +715,10 @@ angular.module('LessonDemo.services', [])
                 var target_score = 0;
                 if (pass_score.slice(pass_score.length - 1) === "%") {
                     target_score = parseInt(pass_score.slice(0, pass_score.length - 1));
-                    return (summary.correctPercent >= target_score);
+                    return (summary.correct_percent >= target_score);
                 } else {
                     target_score = parseInt(pass_score);
-                    return (summary.correctCount >= target_score);
+                    return (summary.correct_count >= target_score);
                 }
             }
 
@@ -637,6 +849,11 @@ angular.module('LessonDemo.services', [])
                     }
                     return isCorrect;
                 }
+            }
+
+            Sandbox.prototype.playSoundEffects = function (soundUrl) {
+                var soundEffect = new Audio(soundUrl);
+                soundEffect.play();
             }
 
         }
