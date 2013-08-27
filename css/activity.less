@@ -6,11 +6,6 @@
 @grass-green: #73dcbe;
 @pink-red: #f4a5aa;
 
-@font-size-large: 24px;
-@font-size-big: 18px;
-@font-size-middle: 15px;
-@font-size-small: 12px;
-
 .background-canvas {
   background-color: @background-gray;
   padding: 80px 0 20px 0;
@@ -44,12 +39,30 @@
   right: 0;
 }
 
+/* lecture activity */
+.lecture-title {
+
+}
+
+.lecture-body {
+
+}
+
+xvideo, xaudio, xpdf, ximage {
+  display: block;
+  margin-top: 40px;
+}
+
+.xvideo-button, {
+  display: block;
+}
+
+/* quiz activity */
 .question-container {
-  min-height: 150px;
+  min-height: 700px;
 }
 
 .question-content {
-  font-size: @font-size-big;
   margin-left: 15px;
 }
 
@@ -59,7 +72,6 @@
 
 /* general layouts for list layout choices */
 .choice-layout-list {
-  font-size: @font-size-large;
   margin: 0px 0px 15px 0px;
   padding: 15px 0px 15px 15px;
 }
@@ -123,6 +135,10 @@
   .choice-layout-card;
 }
 
+.choice-content {
+  display: inline-block;
+}
+
 .singlefilling-text-success {
   color: @pink-red;
 }
@@ -136,15 +152,13 @@
 }
 
 .explanation-title {
-  font-size: @font-size-middle;
   background-image: url("../img/diagonal-pattern.png");
   background-repeat: repeat;
   height: 48px;
-  padding: 15px 0 0 15px;
+  padding: 7px 0 0 15px;
 }
 
 .explanation-content {
-  font-size: @font-size-middle;
   margin: 15px 0 15px 15px;
 }
 
@@ -160,4 +174,17 @@
 
 .continue-btn {
   margin-top: 36px;
+}
+
+.activity-summary {
+  text-align: center;
+}
+
+.activity-summary-percent {
+  font-size: 200px;
+}
+
+.activity-summary-count {
+  font-size: 100px;
+  padding-left: 10px;
 }

@@ -1,25 +1,53 @@
 <div>
-    <div style="width:200px;height:40px;background-color: #f0f0f0;border: 1px #a0a0a0 solid;text-align: center;color:black;margin-top:30px;"
-         ng-click="showLessonDialogue()">{{ title }}
-    </div>
     <div ng-show="showResult">
         <span>答对 {{ lessonResultCount }} 题 正确率 {{ lessonResultPercent }} %</span><br>
         <span ng-show="hasStar">恭喜你在本课程获得 {{ lessonStar }}</span>
     </div>
 
-    <div ng-show="lessonDialogue"
-         style="width:500px;height:300px;top:30%;left:30%;position:absolute;background-color: white;color:black">
-        <div ng-show="startLesson">
-            <span>课程名称：{{title}}</span><br>
-            <span>课程梗概：{{summary}}</span><br><br>
-            <button ng-click="enterActivity(lesson.id)">{{buttonMsg}}</button>
-        </div>
-        <div ng-show="reviewLesson">
-            <span>已经完成啦</span><br><br>
-            <span ng-show="showResult">答对 {{ lessonResultCount }} 题 正确率 {{ lessonResultPercent }} %</span><br>
-            <span>课程名称：{{title}}</span><br>
-            <span>课程梗概：{{summary}}</span><br><br>
-            <review ng-repeat="activity in activities"></review>
-        </div>
+    <!-- Button trigger modal -->
+    <div style="width:200px;height:40px;background-color: #f0f0f0;border: 1px #a0a0a0 solid;text-align: center;color:black;margin-top:30px;"
+         ng-click="showLessonDialogue()">{{ title }}
     </div>
+
+    <!-- Modal -->
+    <div class="modal fade" id="lessonModal-{{ id }}"
+         tabindex="-1"
+         role="dialog"
+         aria-labelledby="lessonModalLabel"
+         aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="lesson-container modal-content">
+                <div class="lesson-header-{{ lessonState }}">
+                    <img class="lesson-icon" src="img/{{ lessonStateIcon }}.png"/>
+                    <span class="lesson-title font-size-big">{{ title }}</span>
+                </div>
+                <div class="lesson-body-enter" ng-show="startLesson">
+                    <span>{{ summary }}</span>
+                </div>
+                <div class="lesson-body-review" ng-show="reviewLesson">
+                    <!--<span>已经完成啦</span><br><br>
+                    <span ng-show="showResult">答对 {{ lessonResultCount }} 题 正确率 {{ lessonResultPercent }} %</span><br> -->
+                    <review ng-repeat="activity in activities"></review>
+                </div>
+                <div class="lesson-footer modal-footer">
+                    <div ng-show="startLesson">
+                        <button class="lesson-enter-button-{{ lessonState }} col-md-4 col-md-offset-4"
+                                ng-click="enterActivity(lesson.id)">{{buttonMsg}}
+                        </button>
+                    </div>
+                    <div ng-show="reviewLesson">
+                        <button class="lesson-enter-button-review col-md-4 col-md-offset-1"
+                                ng-click="enterActivity(lesson.id)">复习
+                        </button>
+                        <button class="lesson-enter-button-review col-md-4 col-md-offset-2 pull-left"
+                                ng-click="enterActivity(lesson.id)">重做错题
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <!-- /.modal-content -->
+        </div>
+        <!-- /.modal-dialog -->
+    </div>
+    <!-- /.modal -->
 </div>

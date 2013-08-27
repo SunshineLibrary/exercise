@@ -31,12 +31,25 @@
     right: 0;
 }
 
+/* lecture activity */
+xvideo,
+xaudio,
+xpdf,
+ximage {
+    display: block;
+    margin-top: 40px;
+}
+
+.xvideo-button {
+    display: block;
+}
+
+/* quiz activity */
 .question-container {
-    min-height: 150px;
+    min-height: 700px;
 }
 
 .question-content {
-    font-size: 18px;
     margin-left: 15px;
 }
 
@@ -46,7 +59,6 @@
 
 /* general layouts for list layout choices */
 .choice-layout-list {
-    font-size: 24px;
     margin: 0px 0px 15px 0px;
     padding: 15px 0px 15px 15px;
 }
@@ -66,7 +78,6 @@
 
 .choice-layout-list-state-default {
     background-color: #ffffff;
-    font-size: 24px;
     margin: 0px 0px 15px 0px;
     padding: 15px 0px 15px 15px;
 }
@@ -74,7 +85,6 @@
 .choice-layout-list-state-choose {
     background-color: #64b7e9;
     color: white;
-    font-size: 24px;
     margin: 0px 0px 15px 0px;
     padding: 15px 0px 15px 15px;
 }
@@ -82,7 +92,6 @@
 .choice-layout-list-state-correct {
     background-color: #73dcbe;
     color: white;
-    font-size: 24px;
     margin: 0px 0px 15px 0px;
     padding: 15px 0px 15px 15px;
 }
@@ -90,7 +99,6 @@
 .choice-layout-list-state-wrong {
     background-color: #f4a5aa;
     color: white;
-    font-size: 24px;
     margin: 0px 0px 15px 0px;
     padding: 15px 0px 15px 15px;
 }
@@ -150,6 +158,10 @@
     max-width: 100%;
 }
 
+.choice-content {
+    display: inline-block;
+}
+
 .singlefilling-text-success {
     color: #f4a5aa;
 }
@@ -163,15 +175,13 @@
 }
 
 .explanation-title {
-    font-size: 15px;
     background-image: url("../img/diagonal-pattern.png");
     background-repeat: repeat;
     height: 48px;
-    padding: 15px 0 0 15px;
+    padding: 7px 0 0 15px;
 }
 
 .explanation-content {
-    font-size: 15px;
     margin: 15px 0 15px 15px;
 }
 
@@ -187,4 +197,17 @@
 
 .continue-btn {
     margin-top: 36px;
+}
+
+.activity-summary {
+    text-align: center;
+}
+
+.activity-summary-percent {
+    font-size: 200px;
+}
+
+.activity-summary-count {
+    font-size: 100px;
+    padding-left: 10px;
 }
