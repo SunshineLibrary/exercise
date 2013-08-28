@@ -1,6 +1,6 @@
 /**
  * Created with JetBrains WebStorm.
- * User: Tony_Zhang
+ * Author: Zhenghan
  * Date: 13-8-1
  * Time: 下午9:27
  * To change this template use File | Settings | File Templates.
@@ -8,7 +8,8 @@
 angular.module('SunExercise.services', [])
 
     .factory("APIProvider", function () {
-        var HOST = "http://192.168.3.23:3000";
+        var HOST = "http://192.168.3.26:30000";
+        //var HOST = "http://127.0.0.1:3000";
         var getAPI = function (type, id, ts) {
             switch (type) {
                 case "getRoot" :
@@ -149,11 +150,15 @@ angular.module('SunExercise.services', [])
                 rootMaterial = data;
                 for (var i = 0; i < rootMaterial.subjects.length; i++) {
                     materialMap[rootMaterial.subjects[i].id] = rootMaterial.subjects[i];
-                    for (var j = 0; j < rootMaterial.subjects[i].chapters.length; j++) {
-                        materialMap[rootMaterial.subjects[i].chapters[j].id] = rootMaterial.subjects[i].chapters[j];
-                        for (var k = 0; k < rootMaterial.subjects[i].chapters[j].lessons.length; k++) {
-                            materialMap[rootMaterial.subjects[i].chapters[j].lessons[k].id] =
-                                rootMaterial.subjects[i].chapters[j].lessons[k];
+                    if (typeof rootMaterial.subjects[i].chapters != "undefined") {
+                        for (var j = 0; j < rootMaterial.subjects[i].chapters.length; j++) {
+                            materialMap[rootMaterial.subjects[i].chapters[j].id] = rootMaterial.subjects[i].chapters[j];
+                            if (typeof rootMaterial.subjects[i].chapters[j].lessons != "undefined") {
+                                for (var k = 0; k < rootMaterial.subjects[i].chapters[j].lessons.length; k++) {
+                                    materialMap[rootMaterial.subjects[i].chapters[j].lessons[k].id] =
+                                        rootMaterial.subjects[i].chapters[j].lessons[k];
+                                }
+                            }
                         }
                     }
                 }
@@ -164,6 +169,10 @@ angular.module('SunExercise.services', [])
             })
 
             return getRootPromise;
+        }
+
+        var getRootMaterial = function () {
+            return rootMaterial;
         }
 
         var loadUserInfo = function (ts) {
@@ -188,6 +197,26 @@ angular.module('SunExercise.services', [])
 
         var getSubjectMaterial = function (subjectId) {
             return materialMap[subjectId];
+        }
+
+        var getCurrentChapterStatus = function (chapterId) {
+            var deferred = $q.defer();
+            var getChapterStatusPromise = deferred.promise;
+
+            var ts = materialMap[chapterId].ts;
+            var promise = $http.jsonp(APIProvider.getAPI("getChapterResources", chapterId, "") + "?ts=" + ts +
+                "&act=status&callback=JSON_CALLBACK");
+            promise.success(function (status) {
+                if ((typeof status.is_cached != "undefined") && (status.is_cached)) {
+                    deferred.resolve(true);
+                } else {
+                    deferred.resolve(false);
+                }
+            }, function (err) {
+                deferred.reject("Error occurred while getting current chapter status: " + err);
+            });
+
+            return getChapterStatusPromise;
         }
 
         var loadChapterResources = function (chapterId) {
@@ -348,9 +377,11 @@ angular.module('SunExercise.services', [])
 
         return {
             getRoot: getRoot,
+            getRootMaterial: getRootMaterial,
             loadUserInfo: loadUserInfo,
             getUserInfo: getUserInfo,
             getSubjectMaterial: getSubjectMaterial,
+            getCurrentChapterStatus: getCurrentChapterStatus,
             loadChapterResources: loadChapterResources,
             getChapterMaterial: getChapterMaterial,
             getLessonMaterial: getLessonMaterial,
@@ -532,7 +563,7 @@ angular.module('SunExercise.services', [])
             $http.post(APIProvider.getAPI("postUserInfoUserdata", "", ""), "data=" + JSON.stringify(userdataMap['user_info']));
         }
 
-        var addAchievements = function (achievementType, achievementContent, getTime) {
+        var addAchievements = function (achievementType, achievementContent) {
             var userinfoUserdata = getUserinfoUserdata();
             var is_new = (typeof userinfoUserdata.achievements[achievementType][achievementContent] == "undefined");
             userinfoUserdata.achievements[achievementType][achievementContent] = {
@@ -616,8 +647,12 @@ angular.module('SunExercise.services', [])
 
         function Sandbox() {
 
-            Sandbox.prototype.getRoot = function () {
-                return MaterialProvider.getRoot();
+            Sandbox.prototype.getRootMaterial = function () {
+                return MaterialProvider.getRootMaterial();
+            }
+
+            Sandbox.prototype.loadUserInfo = function (ts) {
+                return MaterialProvider.loadUserInfo(ts);
             }
 
             Sandbox.prototype.getUserInfo = function () {
@@ -626,6 +661,10 @@ angular.module('SunExercise.services', [])
 
             Sandbox.prototype.getSubjectMaterial = function (subjectId) {
                 return MaterialProvider.getSubjectMaterial(subjectId);
+            }
+
+            Sandbox.prototype.getCurrentChapterStatus = function (chapterId) {
+                return MaterialProvider.getCurrentChapterStatus(chapterId);
             }
 
             Sandbox.prototype.loadChapterResources = function (chapterId) {

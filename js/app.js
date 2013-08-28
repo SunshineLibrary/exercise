@@ -1,5 +1,5 @@
 angular.module("SunExercise", ['SunExercise.controllers', 'SunExercise.directives',
-        'SunExercise.services', 'LazyLoader'])
+        'SunExercise.services'])
 
     .run(function (APIProvider, MaterialProvider, ExerciseService, $rootScope, $q) {
         var deferred = $q.defer();

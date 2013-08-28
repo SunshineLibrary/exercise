@@ -1,5 +1,5 @@
 <div id='problem{{$index}}'>
-    <div class="col-md-10">
+    <div class="col-md-10 question-container">
         <div class="question-content">
             <!--<span>第&nbsp;{{ $index+1 }}&nbsp;题&nbsp;/&nbsp;共&nbsp;{{ total }}&nbsp;题&nbsp;{{ problem.parent_id }}</span><br> -->
             <span>{{ problemIndex+$index+1 }}.&nbsp;<span class="question-type">({{ type }})</span></span>
@@ -40,9 +40,34 @@
             <img src="img/next.png"/>
         </div>
 
-        <div class="hint-btn" ng-show="showHintButton" ng-click="showHint()">
+        <!-- Button trigger modal -->
+        <div ng-click="showHint(problem.id)" ng-show="showHintButton">
             <img src="img/hint.png"/>
         </div>
-        <span ng-show="showHintBox">{{ hint }}</span>
     </div>
+
+    <!-- Modal -->
+    <div class="modal fade" id="hintModal-{{ problem.id }}"
+         tabindex="-1"
+         role="dialog"
+         aria-labelledby="hintModalLabel"
+         aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title">暗示</h4>
+                </div>
+                <div class="modal-body">
+                    {{ hint }}
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                </div>
+            </div>
+            <!-- /.modal-content -->
+        </div>
+        <!-- /.modal-dialog -->
+    </div>
+    <!-- /.modal -->
 </div>
+

@@ -1,5 +1,5 @@
 <lesson>
-    <activity>
+    <activity ng-hide="showLessonSummary">
         <div class="row">
             <div class="col-md-12 navbar-fixed-top _progress-bar" style="padding-left:0px">
                 <div class="_progress-canvas">
@@ -15,9 +15,9 @@
 
             <div id="lecture" ng-show="lecture">
                 <div class="col-md-10">
-                    <span>lecture标题： {{title}}</span><br>
+                    <span class="lecture-title">lecture标题： {{title}}</span><br>
 
-                    <div ng-bind-html-unsafe="body"></div>
+                    <div class="lecture-body" ng-bind-html-unsafe="body"></div>
                 </div>
                 <div class="col-md-2 ctrlBar">
                     <div ng-hide="hideContinueButton"
@@ -36,12 +36,21 @@
                              activity=true></problem>
                 </div>
 
-                <div ng-show="showQuizSummary">
-                    <span>总共答对&nbsp;{{ quizCorrectCount }}&nbsp;题，正确率&nbsp; {{ quizCorrectPercent }}&nbsp;</span>
+                <div class="activity-summary" ng-show="showQuizSummary">
+                    <span class="activity-summary-label">正确率</span>
+                    <span class="activity-summary-percent">{{ quizCorrectPercent }}</span>
+                    <hr style="border:1px solid #aaa; width:40%"/>
+                    <span class="activity-summary-label">答对
+                        <span class="activity-summary-count">{{ quizCorrectCount }}</span>题
+                    </span>
+                    <span class="activity-summary-label">共
+                        <span class="activity-summary-count">{{ totalProblemsNum }}</span>题
+                    </span>
 
-                    <div ng-click="nextActivity()">
+                    <div class="col-md-2 ctrlBar" ng-click="nextActivity()">
                         <img src="img/next.png"/>
                     </div>
+                    </dl>
                 </div>
             </div>
 
@@ -49,36 +58,21 @@
 
     </activity>
 
-    <!--<div ng-show="show-summary">
+    <div class="lesson-summary" ng-show="showLessonSummary">
         <div class="lesson-summary-header">
-
+            <img src="img/lesson-summary-header.png"/>
         </div>
         <div class="lesson-summary-body">
-            <h3>赞，你完成了本课学习</h3>
-            <h4></h4>
+            <span class="lesson-summary-title font-size-big">赞，你完成了本课学习</span>
 
-            <div class="media">
-                <h4></h4>
-                <div class="lesson-achievements" ng-repeat="award in awards">
-                    <img class="media-object pull-left" src="" />
-                    <div class="media-body">
-                        <h4 class="media-heading">{{ award.title }}</h4>
-                        <div>{{ award.desc }}</div>
-                    </div>
-                </div>
-                <h4></h4>
-                <div class="lesson-achievements" ng-repeat="badge in badges">
-                    <img class="media-object pull-left" src="" />
-                    <div class="media-body">
-                        <h4 class="media-heading">{{ badge.title }}</h4>
-                        <div>{{ badge.desc }}</div>
-                    </div>
-                </div>
+            <div class="lesson-summary-stat font-size-big">
+                <span ng-show="hasFinalQuiz">最终测试正确率&nbsp;{{ lessonCorrectPercent }}&nbsp;%</span>
+                {{ lessonStar }}<br>
             </div>
         </div>
         <div class="lesson-summary-footer">
-            <button class="back-button">结束学习</button>
+            <button class="back-button" ng-click="backToChapter()">结束学习</button>
         </div>
-    </div>-->
+    </div>
 </lesson>
 

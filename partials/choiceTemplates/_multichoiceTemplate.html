@@ -1,5 +1,5 @@
 <div id='problem{{$index}}'>
-    <div class="col-md-10">
+    <div class="col-md-10 question-container">
         <div class="question-content">
             <!--<span>第&nbsp;{{ $index+1 }}&nbsp;题&nbsp;/&nbsp;共&nbsp;{{ total }}&nbsp;题&nbsp;{{ problem.parent_id }}</span><br> -->
             <span>{{ problemIndex+$index+1 }}.&nbsp;<span class="question-type">({{ type }})</span></span>
@@ -11,7 +11,8 @@
             <div id='problem{{$parent.$index}}_choice{{$index}}'
                  class="choice-layout-{{ layout }}-state-{{ checked[$index] }}"
                  ng-click='chooseOption(choice.id, $index)'>
-                <div ng-bind-html-unsafe="choiceBody[choice.id]"></div>
+                {{ calcChoiceNum($index) }}&nbsp;&nbsp;<span class="choice-content"
+                                                             ng-bind-html-unsafe="choiceBody[choice.id]"></span>
             </div>
         </div>
 
@@ -37,9 +38,9 @@
             <img src="img/next.png"/>
         </div>
 
-        <div class="hint-btn" ng-show="showHintButton" ng-click="showHint()">
+        <div class="md-trigger hint-btn" data-modal="modal-1" ng-show="showHintButton" ng-click="showHint()">
             <img src="img/hint.png"/>
         </div>
-        <span ng-show="showHintBox">{{ hint }}</span>
+        <span class="md-modal md-effect-1" id="modal-1" ng-show="showHintBox">{{ hint }}</span>
     </div>
 </div>
