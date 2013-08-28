@@ -22,7 +22,7 @@
 
             <div class="subject-content">
                 <div ng-repeat="chapter in chapters">
-                    <div class="chapter-container col-md-3"
+                    <div class="chapters-container col-md-3"
                          ng-click="enterChapter(chapter.id)">
                         {{ chapter.title }}
                         <div ng-hide="hasCached[chapter.id]" class="download-container">

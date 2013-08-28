@@ -88,6 +88,7 @@ angular.module('SunExercise.directives', [])
             restrict: "E",
             link: function ($scope, $element) {
                 var chapterData = chapterSandbox.getChapterMaterial($routeParams.cid);
+                $scope.title = chapterData.title;
                 $scope.lessons = chapterData.lessons;
                 var lessonState = {};
                 for (var i = 0; i < chapterData.lessons.length; i++) {
@@ -197,16 +198,12 @@ angular.module('SunExercise.directives', [])
                     $scope.title = lessonData.title;
                     $scope.summary = lessonData.summary;
                     $scope.activities = lessonData.activities;
-                    if (lessonUserdata.is_complete) {
-                        $scope.showResult = true;
-                        $scope.lessonResultCount = lessonUserdata.summary.correct_count;
-                        $scope.lessonResultPercent = lessonUserdata.summary.correct_percent;
-                        if (typeof lessonUserdata.summary.star != "undefined") {
-                            $scope.hasStar = true;
-                            $scope.lessonStar = (lessonUserdata.summary.star == 1) ? "铜杯" :
-                                ((lessonUserdata.summary.star == 2) ? "银杯" :
-                                    ((lessonUserdata.summary.star == 3) ? "金杯" : null));
-                        }
+                    if ((lessonUserdata.is_complete) && (typeof lessonUserdata.summary.star != "undefined")) {
+                        $scope.lessonIcon = "lesson-button-icon-star";
+                        $scope.lessonIconClass = "lesson-button-icon-star" + lessonUserdata.summary.star;
+                    } else {
+                        $scope.lessonIcon = "lesson-button-icon-unlocked";
+                        $scope.lessonIconClass = "lesson-button-icon-unlocked";
                     }
                     if (typeof lessonUserdata.current_activity === "undefined") {
                         $scope.buttonMsg = "开始学习";
@@ -347,9 +344,9 @@ angular.module('SunExercise.directives', [])
 
                             $scope.hasFinalQuiz = (typeof lessonUserdata.summary.correct_count != "undefined");
                             $scope.lessonCorrectPercent = lessonUserdata.summary.correct_percent;
-                            $scope.lessonStar = (lessonUserdata.summary.star == 1) ? "铜杯" :
-                                ((lessonUserdata.summary.star == 2) ? "银杯" :
-                                    ((lessonUserdata.summary.star == 3) ? "金杯" : null));
+                            $scope.lessonStar = (lessonUserdata.summary.star == 1) ? " 获得 铜杯" :
+                                ((lessonUserdata.summary.star == 2) ? " 获得 银杯" :
+                                    ((lessonUserdata.summary.star == 3) ? " 获得 金杯" : null));
                             $scope.showLessonSummary = true;
                         }
                     })
@@ -372,17 +369,18 @@ angular.module('SunExercise.directives', [])
                                 if ((typeof args !== "undefined") && (typeof args.activity !== "undefined")) {
                                     lessonUserdata.current_activity = args.activity;
                                     if (args.should_transition) {
+                                        //userdata analyzing completed, flush the current userdata
+                                        lessonSandbox.flushUserdata(lessonData.id);
                                         continueLesson(lessonData.id, args.activity);
                                     }
                                 } else {
                                     lessonUserdata.current_activity = lessonData.activities[index + 1].id;
                                     if (args.should_transition) {
+                                        //userdata analyzing completed, flush the current userdata
+                                        lessonSandbox.flushUserdata(lessonData.id);
                                         continueLesson(lessonData.id, lessonData.activities[index + 1].id);
                                     }
                                 }
-
-                                //userdata analyzing completed, flush the current userdata
-                                lessonSandbox.flushUserdata(lessonData.id);
                             } else {
                                 //set the current_activity to undefined so that the back button can operate as intended
                                 lessonUserdata.current_activity = undefined;
@@ -438,9 +436,9 @@ angular.module('SunExercise.directives', [])
 
                                     $scope.hasFinalQuiz = (typeof lessonUserdata.summary.correct_count != "undefined");
                                     $scope.lessonCorrectPercent = lessonUserdata.summary.correct_percent;
-                                    $scope.lessonStar = (lessonUserdata.summary.star == 1) ? "铜杯" :
-                                        ((lessonUserdata.summary.star == 2) ? "银杯" :
-                                            ((lessonUserdata.summary.star == 3) ? "金杯" : null));
+                                    $scope.lessonStar = (lessonUserdata.summary.star == 1) ? " 获得 铜杯" :
+                                        ((lessonUserdata.summary.star == 2) ? " 获得 银杯" :
+                                            ((lessonUserdata.summary.star == 3) ? " 获得 金杯" : null));
                                     $scope.showLessonSummary = true;
                                 }
                             }
@@ -922,7 +920,7 @@ angular.module('SunExercise.directives', [])
                 }
                 //show the "A B C D" of a choice
                 $scope.calcChoiceNum = function (index) {
-                    return String.fromCharCode(65 + index);
+                    return String.fromCharCode(65 + index) + ".";
                 };
                 if (typeof currProblem.hint !== "undefined") {
                     problemUserdata.is_hint_checked = false;
@@ -1146,6 +1144,11 @@ angular.module('SunExercise.directives', [])
                                 awards[$scope.awards[i].id] != "undefined")
                         }
                     }
+
+                    $('#achievementTab a').click(function (e) {
+                        e.preventDefault();
+                        $(this).tab('show');
+                    })
 
                 }, function (err) {
                     console.log("Error occurred while loading achievements resources: " + err);

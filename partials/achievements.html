@@ -3,36 +3,41 @@
         <h3>正在努力下载中....进度：{{ progress }}%</h3>
     </div>
 
-    <div id="contentContainer" ng-show="completeDownload">
-        <h3>徽章</h3>
+    <div id="achievements-container" ng-show="completeDownload">
+        <ul class="nav nav-tabs" id="achievementTab">
+            <li class="active"><a href="#badges-tab">徽章</a></li>
+            <li><a href="#awards-tab">奖励视频</a></li>
+        </ul>
 
-        <div ng-repeat="badge in badges">
-            <div class="media">
-                <img class="media-object pull-left" src="img/badge-icon.png"/>
+        <div class="tab-content">
+            <div class="tab-pane fade active in" id="badges-tab">
+                <div ng-repeat="badge in badges">
+                    <div class="media">
+                        <img class="media-object pull-left" src="img/badge-icon.png"/>
 
-                <div class="media-body">
-                    <h4 class="media-heading has-badge-{{ hasBadge[badge.id] }}">{{ badge.title }}</h4>
+                        <div class="media-body">
+                            <h4 class="media-heading has-badge-{{ hasBadge[badge.id] }}">{{ badge.title }}</h4>
 
-                    <div>{{ badge.desc }}</div>
+                            <div>{{ badge.desc }}</div>
+                        </div>
+                    </div>
                 </div>
             </div>
-            <br>
-        </div>
 
-        <h3>奖励视频</h3>
+            <div class="tab-pane fade" id="awards-tab">
+                <div ng-repeat="award in awards">
+                    <div class="media">
+                        <img class="media-object pull-left" src="img/badge-icon.png"/>
 
-        <div ng-repeat="award in awards">
-            <div class="media">
-                <img class="media-object pull-left" src="img/badge-icon.png"/>
+                        <div class="media-body">
+                            <h4 class="media-heading has-award-{{ hasAward[award.id] }}">{{ award.title }}</h4>
+                            <h5>{{ award.url }}</h5>
 
-                <div class="media-body">
-                    <h4 class="media-heading has-award-{{ hasAward[award.id] }}">{{ award.title }}</h4>
-                    <h5>{{ award.url }}</h5>
-
-                    <div>{{ award.desc }}</div>
+                            <div>{{ award.desc }}</div>
+                        </div>
+                    </div>
                 </div>
             </div>
-            <br>
         </div>
     </div>
 </achievements>

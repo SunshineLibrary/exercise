@@ -1,3 +1,66 @@
+.lesson-button-container {
+    height: 120px;
+}
+
+.lesson-button-icon {
+    height: 72px;
+    text-align: center;
+    overflow: hidden;
+}
+
+.lesson-button-icon-star3 {
+    background-color: #ffcd5a;
+    height: 72px;
+    text-align: center;
+    overflow: hidden;
+}
+
+.lesson-button-icon-star2 {
+    background-color: #ccd4d4;
+    height: 72px;
+    text-align: center;
+    overflow: hidden;
+}
+
+.lesson-button-icon-star1 {
+    background-color: #c27d57;
+    height: 72px;
+    text-align: center;
+    overflow: hidden;
+}
+
+.lesson-button-icon-unlocked {
+    background-color: #64b7e9;
+    height: 72px;
+    text-align: center;
+    overflow: hidden;
+}
+
+.lesson-button-icon-unlocked img {
+    margin-top: 6px;
+    opacity: 0.8;
+}
+
+.lesson-button-icon-locked {
+    background-color: #cccccc;
+    height: 72px;
+    text-align: center;
+    overflow: hidden;
+}
+
+.lesson-button-icon-locked img {
+    margin-top: 6px;
+    opacity: 0.8;
+}
+
+.lesson-button-title {
+    display: block;
+    height: 48px;
+    background-color: white;
+    text-align: center;
+    border-bottom: 2px solid #cccccc;
+}
+
 .lesson-container {
     border-radius: 0;
     height: 550px;
@@ -18,12 +81,20 @@
     text-align: center;
 }
 
+.lesson-header-locked img {
+    opacity: 0.8;
+}
+
 .lesson-header-unlocked {
     background-color: #64b7e9;
     width: 100%;
     height: 35%;
     color: white;
     text-align: center;
+}
+
+.lesson-header-unlocked img {
+    opacity: 0.8;
 }
 
 .lesson-header-review {
@@ -122,14 +193,15 @@
     width: 100%;
     height: 55%;
     overflow: scroll;
+    text-align: center;
 }
 
 .lesson-summary-title {
     display: block;
     width: 100%;
     color: #ff8b59;
-    text-align: center;
     line-height: 3.5em;
+    font-size: 2.1em;
     margin-top: 45px;
 }
 

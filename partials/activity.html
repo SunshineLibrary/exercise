@@ -63,37 +63,11 @@
             <img src="img/lesson-summary-header.png"/>
         </div>
         <div class="lesson-summary-body">
-            <span style="font-size:50px;" class="lesson-summary-title font-size-big">赞，你完成了本课学习</span>
+            <span class="lesson-summary-title font-size-big">赞，你完成了本课学习</span>
 
-            <div class="col-md-8 col-md-offset-2">
-                <div class="lesson-summary-stat">
-                    <span ng-show="hasFinalQuiz">最终测试正确率&nbsp;{{ lessonCorrectPercent }}&nbsp;%，</span>
-                    获得{{ lessonStar }}<br>
-                </div>
-                <div class="lesson-summary-achievements">
-                    <div class="media">
-                        <div class="lesson-achievements" ng-repeat="badge in badges">
-                            <img class="media-object pull-left" src="img/lesson-badge-icon.png"/>
-
-                            <div class="media-body">
-                                <h4 class="media-heading">获得了{{ badge.title }}徽章</h4>
-
-                                <div>({{ badge.desc }})</div>
-                            </div>
-                        </div>
-                        <div class="lesson-achievements" ng-repeat="award in awards">
-                            <img class="media-object pull-left" src="img/badge-icon.png"/>
-
-                            <div class="media-body">
-                                <h4 class="media-heading">获得了奖励视频:{{ award.title }}</h4>
-                                <span>请去成就陈列室观看</span>
-
-                                <div>({{ award.desc }})</div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
+            <div class="lesson-summary-stat font-size-big">
+                <span ng-show="hasFinalQuiz">最终测试正确率&nbsp;{{ lessonCorrectPercent }}&nbsp;%</span>
+                {{ lessonStar }}<br>
             </div>
         </div>
         <div class="lesson-summary-footer">
