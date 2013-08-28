@@ -1,23 +1,48 @@
 <subject>
     <div ng-hide="completeLoading">努力加载资源中...{{ progress }}%</div>
-    <div ng-show="completeLoading">
-        <span>不同的科目</span><br>
+    <div ng-show="completeLoading" class="subjects-container">
+        <nav class="main-nav" id="main-nav">
+            <span class="main-nav-label">选择科目</span>
 
-        <div ng-repeat="subject in subjects">
-            <button ng-click="enterSubject(subject.id)">{{ subject.title }}</button>
-        </div>
-        <br><br>
+            <div style="width: 50%" class="pull-left" ng-repeat="subject in subjects">
+                <div class="subject-container" ng-click="enterSubject(subject.id)">
+                    <img src="img/subjects-icon/subject-{{ subject.subject }}.png"/>
+                    <span class="subject-title font-size-small">{{ subject.title }}</span>
+                </div>
+            </div>
+        </nav>
 
-        <span>具体课程内的章节</span><br>
+        <div class="page-wrap" style="width:100%; left:{{ offsetWidth }}">
+            <header class="main-header" style="width:100%; left:{{ offsetWidth }}">
+                <a ng-click="showSubjectsNav()" class="open-menu">
+                    <img src="img/hamburg.png"/>
+                </a>
+                <span>{{ title }}</span>
+            </header>
 
-        <div ng-repeat="chapter in chapters">
-            <button class="btn btn-primary" ng-click="enterChapter(chapter.id)"
-                    ng-disabled="isCompleteLoad[chapter.id]">{{
-                chapter.title }}
-            </button>
-            <button class="btn btn-default" ng-click="downloadResources(chapter.id)">下载资源</button>
-            <div ng-show="showProgress[chapter.id]">进度：{{ loadProgress[chapter.id] }}</div>
+            <div class="subject-content">
+                <div ng-repeat="chapter in chapters">
+                    <div class="chapters-container col-md-3"
+                         ng-click="enterChapter(chapter.id)">
+                        {{ chapter.title }}
+                        <div ng-hide="hasCached[chapter.id]" class="download-container">
+                        <span class="font-size-small" ng-hide="showProgress[chapter.id]">
+                            <img src="img/downloadChapter.png"/>&nbsp;&nbsp;下载
+                        </span>
+
+                            <div style="margin-top: 10px;" ng-show="showProgress[chapter.id]" class="progress">
+                                <div class="progress-bar progress-bar-info"
+                                     role="progressbar"
+                                     aria-valuenow="{{ loadProgress[chapter.id] }}"
+                                     aria-valuemin="0"
+                                     aria-valuemax="100"
+                                     style="width: {{ loadProgress[chapter.id] }}%">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
-
 </subject>

@@ -1,3 +1,76 @@
+.header-wrapper {
+    position: fixed;
+    width: 100%;
+    left: 0;
+    text-align: center;
+    z-index: 99999;
+}
+
+.achievements-header {
+    background: #fd8b5e;
+    padding: 10px 0 16px 15px;
+    color: white;
+    height: 56px;
+}
+
+.achievements-tab {
+    background-color: white;
+    height: 48px;
+}
+
+.progressContainer {
+    width: 100%;
+    height: 100%;
+    background-color: #e5e5e5;
+    text-align: center;
+}
+
+.loading-icon {
+    line-height: 100%;
+    height: 100%;
+}
+
+.achievements-back-button {
+    position: absolute;
+}
+
+.achievements-container {
+    padding: 120px 20px 20px 20px;
+    background-color: #e5e5e5;
+    height: 100%;
+    overflow: scroll;
+}
+
+.badge-container {
+    height: 140px;
+    padding-bottom: 20px;
+}
+
+.badge-icon {
+    background-color: #f2f2f2;
+    height: 100%;
+    padding: 10px 0 0 10px;
+    width: 120px;
+    float: left;
+}
+
+.badge-content {
+    float: left;
+    width: 200px;
+    background-color: white;
+    height: 100%;
+    padding: 15px;
+}
+
+.badge-title {
+    color: #ff8b59;
+    display: block;
+}
+
+.achievements-stat {
+    color: #999999;
+}
+
 .has-badge-true {
     color: red;
 }
