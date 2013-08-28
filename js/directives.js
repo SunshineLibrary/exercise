@@ -1,6 +1,6 @@
 /**
  * Created with JetBrains WebStorm.
- * User: Tony_Zhang
+ * Author: Zhenghan
  * Date: 13-8-1
  * Time: 下午9:26
  * To change this template use File | Settings | File Templates.
@@ -1089,7 +1089,7 @@ angular.module('SunExercise.directives', [])
         }
     })
 
-    .directive("achievements", function (SandboxProvider, $q) {
+    .directive("achievements", function (SandboxProvider, $q, $location) {
 
         var achievementSandbox = SandboxProvider.getSandbox();
 
@@ -1133,22 +1133,34 @@ angular.module('SunExercise.directives', [])
                     $scope.hasBadge = {};
                     $scope.hasAward = {};
                     if (typeof userinfoData.achievements.badges != "null") {
+                        var currentBadges = 0;
                         for (var i = 0; i < $scope.badges.length; i++) {
-                            $scope.hasBadge[$scope.badges[i].id] = (typeof userinfoData.achievements.
-                                badges[$scope.badges[i].id] != "undefined")
+                            if (typeof userinfoData.achievements.badges[$scope.badges[i].id] != "undefined") {
+                                $scope.hasBadge[$scope.badges[i].id] = true;
+                                currentBadges++;
+                            }
                         }
+                        $scope.currentBadges = currentBadges;
                     }
                     if (typeof userinfoData.achievements.awards != "null") {
+                        var currentAwards = 0;
                         for (i = 0; i < $scope.awards.length; i++) {
-                            $scope.hasAward[$scope.awards[i].id] = (typeof userinfoData.achievements.
-                                awards[$scope.awards[i].id] != "undefined")
+                            if (typeof userinfoData.achievements.awards[$scope.awards[i].id] != "undefined") {
+                                $scope.hasAward[$scope.awards[i].id] = true;
+                                currentAwards++;
+                            }
                         }
+                        $scope.currentAwards = currentAwards;
                     }
 
                     $('#achievementTab a').click(function (e) {
                         e.preventDefault();
                         $(this).tab('show');
                     })
+
+                    $scope.returnToChapter = function () {
+                        $location.path()
+                    }
 
                 }, function (err) {
                     console.log("Error occurred while loading achievements resources: " + err);
