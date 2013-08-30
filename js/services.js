@@ -8,8 +8,8 @@
 angular.module('SunExercise.services', [])
 
     .factory("APIProvider", function () {
-        var HOST = "http://192.168.3.26:30000";
-        //var HOST = "http://127.0.0.1:3000";
+        //var HOST = "http://192.168.3.26:30000";
+        var HOST = "http://127.0.0.1:3000";
         var getAPI = function (type, id, ts) {
             switch (type) {
                 case "getRoot" :
@@ -541,7 +541,13 @@ angular.module('SunExercise.services', [])
         }
 
         var flushUserdata = function (lessonId) {
-            $http.post(APIProvider.getAPI("postLessonUserdata", lessonId, ""), "data=" + JSON.stringify(userdataMap[lessonId]));
+            //$http.post(APIProvider.getAPI("postLessonUserdata", lessonId, ""), "data=" + JSON.stringify(userdataMap[lessonId]));
+            $http({
+                method: "POST",
+                url: APIProvider.getAPI("postLessonUserdata", lessonId, ""),
+                headers: {'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8'},
+                data: "data=" + JSON.stringify(userdataMap[lessonId])
+            });
         }
 
         //userinfo interfaces

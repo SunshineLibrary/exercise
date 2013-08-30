@@ -79,7 +79,7 @@ angular.module('SunExercise.directives', [])
     })
 
     //chapter module
-    .directive("chapter", function (SandboxProvider, $routeParams, $location) {
+    .directive("chapter", function (SandboxProvider, $routeParams, $location, $http, $templateCache, $compile) {
 
         //create the chapter sandbox
         var chapterSandbox = SandboxProvider.getSandbox();
@@ -102,7 +102,8 @@ angular.module('SunExercise.directives', [])
                             }
                         });
                 })
-                $scope.loadLesson = function (lesson) {
+                $scope.loadLesson = function (lessonIndex) {
+                    var lesson = chapterData.lessons[lessonIndex];
                     if (typeof lesson.requirements == 'undefined') {
                         return true;
                     } else {
@@ -114,7 +115,8 @@ angular.module('SunExercise.directives', [])
                         return true;
                     }
                 }
-                $scope.showLockDialogue = function (id) {
+                $scope.showLockDialogue = function (lessonIndex) {
+                    var id = chapterData.lessons[lessonIndex].id;
                     $("#lessonModal-" + id).modal("toggle");
                 }
                 $scope.enterAchievementCenter = function () {
@@ -127,6 +129,84 @@ angular.module('SunExercise.directives', [])
         }
     })
 
+    .directive("tree", function (SandboxProvider, $http, $templateCache, $compile, $routeParams) {
+
+        var treeSandbox = SandboxProvider.getSandbox();
+
+        return {
+            restrict: "E",
+            link: function ($scope, $element) {
+                var chapterData = treeSandbox.getChapterMaterial($routeParams.cid);
+                var mergedTree = chapterTreeDrawer.initChapterTree(chapterData);
+                var chapterPage = "<div class='chapter-tree-container'><table>";
+                angular.forEach(mergedTree, function (row, i) {
+                    chapterPage += "<tr>";
+                    angular.forEach(mergedTree[i], function (col, j) {
+                            chapterPage += "<td>";
+                            if (typeof mergedTree[i][j] == "string") {
+                                if (mergedTree[i][j] == 'I') {
+                                    chapterPage += "<div class='chapter-tree-line'><img src='img/vertical-line.png' /></div>";
+                                } else if (mergedTree[i][j] == "L") {
+                                    chapterPage += "<div class='chapter-tree-line'><img src='img/long-vertical-line.png' /></div>";
+                                } else if (mergedTree[i][j] == "*") {
+                                    chapterPage += "<div class='chapter-tree-line'><img src='img/dot.png' /></div>";
+                                } else {
+                                    angular.forEach(chapterData.lessons, function (lesson, k) {
+                                        if (lesson.id == mergedTree[i][j]) {
+                                            chapterPage += '<lesson ng-if="loadLesson(' + k + ')" ng-init="lessonId=\''
+                                                + lesson.id + '\'"></lesson>' +
+                                                '<div ng-if="!loadLesson(' + k + ')">' +
+                                                '<div class="lesson-button-container font-size-small"' +
+                                                'ng-click="showLockDialogue(' + k + ')">' +
+                                                '<div class="lesson-button-icon-locked">' +
+                                                '<img src="img/lesson-button-icon-locked.png"/>' +
+                                                '</div>' +
+                                                '<span class="lesson-button-title">' + lesson.title + '</span>' +
+                                                '</div>' +
+                                                '<div class="modal fade" id="lessonModal-' + lesson.id + '"' +
+                                                'tabindex="-1"' +
+                                                'role="dialog"' +
+                                                'aria-labelledby="lessonModalLabel"' +
+                                                'aria-hidden="true">' +
+                                                '<div class="modal-dialog">' +
+                                                '<div class="lesson-container modal-content">' +
+                                                '<div class="lesson-header-locked">' +
+                                                '<img class="lesson-icon" src="img/headerLocked.png"/>' +
+                                                '<span class="lesson-title font-size-big">' + lesson.title + '</span>' +
+                                                '</div>' +
+                                                '<div class="lesson-body-enter">' +
+                                                '<span>' + lesson.summary + '</span>' +
+                                                '</div>' +
+                                                '<div class="lesson-footer modal-footer">' +
+                                                '<button class="lesson-enter-button-locked col-md-4 col-md-offset-4">开始学习' +
+                                                '</button>' +
+                                                '</div>' +
+                                                '</div>' +
+                                                '</div>' +
+                                                '</div>' +
+                                                '</div>';
+                                        }
+                                    })
+                                }
+                            } else if (mergedTree[i][j] == 1) {
+                                chapterPage += "<div class='chapter-tree-right-line'><img src='img/right-line.png' /></div>";
+                            } else if (mergedTree[i][j] == 2) {
+                                chapterPage += "<div class='chapter-tree-left-line'><img src='img/left-line.png' /></div>";
+                            } else if (mergedTree[i][j] == 3) {
+                                chapterPage += "<div class='chapter-tree-line'><img src='img/middle-line.png' /></div>";
+                            }
+                            chapterPage += "</td>";
+                        }
+                    )
+                    chapterPage += "</tr>";
+                })
+                chapterPage += "</table></div>";
+
+                $element.html(chapterPage);
+                $compile($element.contents())($scope);
+            }
+        }
+    })
 
     //lesson module
     .directive("lesson", function (SandboxProvider, $location, $routeParams, $http, $q, $templateCache, $compile) {
@@ -163,9 +243,9 @@ angular.module('SunExercise.directives', [])
         return {
             restrict: "E",
             link: function ($scope, $element) {
-                if (typeof $scope.lesson != "undefined") {
-                    var lessonMaterialPromise = lessonSandbox.getLessonMaterial($scope.lesson.id);
-                    var lessonUserdataPromise = lessonSandbox.getLessonUserdata($scope.lesson.id);
+                if (typeof $scope.lessonId != "undefined") {
+                    var lessonMaterialPromise = lessonSandbox.getLessonMaterial($scope.lessonId);
+                    var lessonUserdataPromise = lessonSandbox.getLessonUserdata($scope.lessonId);
 
                     //load the lesson template on the chapter page
                     $http.get('partials/lesson.html', {cache: $templateCache}).success(function (contents) {
@@ -344,7 +424,9 @@ angular.module('SunExercise.directives', [])
 
                             $scope.hasFinalQuiz = (typeof lessonUserdata.summary.correct_count != "undefined");
                             $scope.lessonCorrectPercent = lessonUserdata.summary.correct_percent;
-                            $scope.lessonStar = (lessonUserdata.summary.star == 1) ? " 获得 铜杯" :
+                            $scope.lessonStar = (typeof lessonUserdata.summary.star != "undefined") ?
+                                lessonUserdata.summary.star : 0;
+                            $scope.lessonCup = (lessonUserdata.summary.star == 1) ? " 获得 铜杯" :
                                 ((lessonUserdata.summary.star == 2) ? " 获得 银杯" :
                                     ((lessonUserdata.summary.star == 3) ? " 获得 金杯" : null));
                             $scope.showLessonSummary = true;
@@ -436,7 +518,9 @@ angular.module('SunExercise.directives', [])
 
                                     $scope.hasFinalQuiz = (typeof lessonUserdata.summary.correct_count != "undefined");
                                     $scope.lessonCorrectPercent = lessonUserdata.summary.correct_percent;
-                                    $scope.lessonStar = (lessonUserdata.summary.star == 1) ? " 获得 铜杯" :
+                                    $scope.lessonStar = (typeof lessonUserdata.summary.star != "undefined") ?
+                                        lessonUserdata.summary.star : 0;
+                                    $scope.lessonCup = (lessonUserdata.summary.star == 1) ? " 获得 铜杯" :
                                         ((lessonUserdata.summary.star == 2) ? " 获得 银杯" :
                                             ((lessonUserdata.summary.star == 3) ? " 获得 金杯" : null));
                                     $scope.showLessonSummary = true;
@@ -926,8 +1010,8 @@ angular.module('SunExercise.directives', [])
                     problemUserdata.is_hint_checked = false;
                     $scope.hint = currProblem.hint;
                     $scope.showHintButton = true;
-                    $scope.showHint = function (id) {
-                        $('#hintModal-' + id).modal("toggle");
+                    $scope.showHint = function () {
+                        $scope.showHintBox = true;
                         //record if the student looks up the hint or not
                         problemUserdata.is_hint_checked = true;
                     }
@@ -1018,6 +1102,7 @@ angular.module('SunExercise.directives', [])
                             $scope.submitIcon = "submitDisable";
                         }
                     }
+                    $scope.problemResult = "default";
                     $scope.writeAnswer = singleFilling;
                 }
 
@@ -1027,6 +1112,10 @@ angular.module('SunExercise.directives', [])
                     problemUserdata.submit_time = Date.now();
                     //disable the choices inputs
                     $scope.submitted = true;
+                    //hide the hintbox if exists
+                    if (typeof currProblem.hint !== "undefined" && $scope.showHintBox) {
+                        $scope.showHintBox = false;
+                    }
 
                     if ($scope.answer !== null) {
                         //multi-choice question grader
@@ -1130,14 +1219,19 @@ angular.module('SunExercise.directives', [])
                     $scope.completeDownload = true;
                     $scope.badges = achievementsPool.badges;
                     $scope.awards = achievementsPool.awards;
-                    $scope.hasBadge = {};
-                    $scope.hasAward = {};
+                    $scope.badgeName = {};
+                    $scope.badgeStatus = {};
+                    $scope.awardName = {};
                     if (typeof userinfoData.achievements.badges != "null") {
                         var currentBadges = 0;
                         for (var i = 0; i < $scope.badges.length; i++) {
                             if (typeof userinfoData.achievements.badges[$scope.badges[i].id] != "undefined") {
-                                $scope.hasBadge[$scope.badges[i].id] = true;
+                                $scope.badgeName[$scope.badges[i].id] = $scope.badges[i].id;
+                                $scope.badgeStatus[$scope.badges[i].id] = "unlocked";
                                 currentBadges++;
+                            } else {
+                                $scope.badgeName[$scope.badges[i].id] = "unknown-badge";
+                                $scope.badgeStatus[$scope.badges[i].id] = "locked";
                             }
                         }
                         $scope.currentBadges = currentBadges;
@@ -1146,8 +1240,10 @@ angular.module('SunExercise.directives', [])
                         var currentAwards = 0;
                         for (i = 0; i < $scope.awards.length; i++) {
                             if (typeof userinfoData.achievements.awards[$scope.awards[i].id] != "undefined") {
-                                $scope.hasAward[$scope.awards[i].id] = true;
+                                $scope.awardName[$scope.awards[i].id] = $scope.awards[i].id;
                                 currentAwards++;
+                            } else {
+                                $scope.awardName[$scope.awards[i].id] = "unknown-award";
                             }
                         }
                         $scope.currentAwards = currentAwards;

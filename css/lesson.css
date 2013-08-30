@@ -1,5 +1,8 @@
 .lesson-button-container {
+    width: 175px;
     height: 120px;
+    padding-left: 15px;
+    padding-right: 15px;
 }
 
 .lesson-button-icon {
@@ -38,7 +41,6 @@
 
 .lesson-button-icon-unlocked img {
     margin-top: 6px;
-    opacity: 0.8;
 }
 
 .lesson-button-icon-locked {
@@ -50,7 +52,6 @@
 
 .lesson-button-icon-locked img {
     margin-top: 6px;
-    opacity: 0.8;
 }
 
 .lesson-button-title {

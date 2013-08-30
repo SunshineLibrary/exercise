@@ -1,10 +1,4 @@
 <achievements>
-    <div id="progressContainer" ng-hide="completeDownload">
-        <span class="loading-icon">
-            <img src="img/ajax-loader.gif"/>
-        </span>
-    </div>
-
     <div class="header-wrapper">
         <header class="achievements-header">
             <div class="achievements-back-button" ng-click="returnToChapter()">
@@ -13,29 +7,37 @@
             <span>成就陈列室</span>
         </header>
 
-        <ul class="nav nav-tabs font-size-small achievements-tab" id="achievementTab">
+        <ul class="nav nav-tabs nav-justified font-size-small achievements-tab" id="achievementTab">
             <li class="active">
                 <a href="#badges-tab">徽章
-                    <span class="achievements-stat">{{ currentBadges }}/{{ badges.length }}</span>
+                    <span ng-show="completeDownload" class="achievements-stat">
+                        {{ currentBadges }}/{{ badges.length }}
+                    </span>
                 </a>
             </li>
             <li>
                 <a href="#awards-tab">奖励视频
-                    <span class="achievements-stat">{{ currentAwards }}/{{ awards.length }}</span>
+                    <span ng-show="completeDownload" class="achievements-stat">
+                        {{ currentAwards }}/{{ awards.length }}
+                    </span>
                 </a>
             </li>
         </ul>
     </div>
 
-    <div class="achievements-container" ng-show="completeDownload">
-        <div class="tab-content">
+    <div class="achievements-container">
+        <span class="loading-icon" ng-hide="completeDownload">
+            <img src="img/ajax-loader.gif"/>
+        </span>
+
+        <div class="tab-content" ng-show="completeDownload">
             <div class="tab-pane fade active in" id="badges-tab">
                 <div ng-repeat="badge in badges">
                     <div class="col-md-4 badge-container media">
                         <div class="badge-icon">
-                            <img class="media-object pull-left" src="img/unknown-badge.png"/>
+                            <img class="media-object pull-left" src="img/badge-icons/{{ badgeName[badge.id] }}.png"/>
                         </div>
-                        <div class="badge-content">
+                        <div class="badge-content-{{ badgeStatus[badge.id] }}">
                             <span class="badge-title">{{ badge.title }}</span>
 
                             <div class="font-size-small">{{ badge.desc }}</div>
@@ -50,7 +52,7 @@
                         <img class="media-object pull-left" src="img/badge-icon.png"/>
 
                         <div class="media-body">
-                            <h4 class="media-heading has-award-{{ hasAward[award.id] }}">{{ award.title }}</h4>
+                            <h4 class="media-heading">{{ award.title }}</h4>
                             <h5>{{ award.url }}</h5>
 
                             <div>{{ award.desc }}</div>

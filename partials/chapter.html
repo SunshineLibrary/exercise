@@ -13,46 +13,7 @@
         </header>
 
         <div class="chapter-content">
-            <div ng-repeat="lesson in lessons">
-                <lesson ng-if="loadLesson(lesson)"></lesson>
-
-                <div ng-if="!loadLesson(lesson)">
-                    <!-- Button trigger modal -->
-                    <div class="lesson-button-container col-md-2 font-size-small"
-                         ng-click="showLockDialogue(lesson.id)">
-                        <div class="lesson-button-icon-locked">
-                            <img src="img/lesson-button-icon-locked.png"/>
-                        </div>
-                        <span class="lesson-button-title">{{ lesson.title }}</span>
-                    </div>
-
-                    <!-- Modal -->
-                    <div class="modal fade" id="lessonModal-{{ lesson.id }}"
-                         tabindex="-1"
-                         role="dialog"
-                         aria-labelledby="lessonModalLabel"
-                         aria-hidden="true">
-                        <div class="modal-dialog">
-                            <div class="lesson-container modal-content">
-                                <div class="lesson-header-locked">
-                                    <img class="lesson-icon" src="img/headerLocked.png"/>
-                                    <span class="lesson-title font-size-big">{{ lesson.title }}</span>
-                                </div>
-                                <div class="lesson-body-enter">
-                                    <span>{{ lesson.summary }}</span>
-                                </div>
-                                <div class="lesson-footer modal-footer">
-                                    <button class="lesson-enter-button-locked col-md-4 col-md-offset-4">开始学习
-                                    </button>
-                                </div>
-                            </div>
-                            <!-- /.modal-content -->
-                        </div>
-                        <!-- /.modal-dialog -->
-                    </div>
-                    <!-- /.modal -->
-                </div>
-            </div>
+            <tree></tree>
         </div>
     </chapter>
 </div>

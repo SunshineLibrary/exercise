@@ -60,14 +60,14 @@
 
     <div class="lesson-summary" ng-show="showLessonSummary">
         <div class="lesson-summary-header">
-            <img src="img/lesson-summary-header.png"/>
+            <img src="img/lesson-summary-header-star{{ lessonStar }}.png"/>
         </div>
         <div class="lesson-summary-body">
             <span class="lesson-summary-title font-size-big">赞，你完成了本课学习</span>
 
             <div class="lesson-summary-stat font-size-big">
                 <span ng-show="hasFinalQuiz">最终测试正确率&nbsp;{{ lessonCorrectPercent }}&nbsp;%</span>
-                {{ lessonStar }}<br>
+                {{ lessonCup }}<br>
             </div>
         </div>
         <div class="lesson-summary-footer">

@@ -16,15 +16,24 @@
             </div>
         </div>
 
-        <div class="col-md-12 explanation-container pull-left" ng-show='showExplanation'>
-            <div class="explanation-title">
-                <img src="img/answer.png"/>&nbsp;&nbsp;&nbsp;正确答案
+        <div class="col-md-12 explanation-container pull-left">
+            <div ng-show="showHintBox" ng-hide="showExplanation">
+                <div class="explanation-title">
+                    <img src="img/hint.png"/>&nbsp;&nbsp;&nbsp;暗示
+                </div>
+                <div class="explanation-content">{{ hint }}</div>
             </div>
-            <div class="explanation-content">{{ correct_answers }}</div>
-            <div class="explanation-title">
-                <img src="img/explanation.png"/>&nbsp;&nbsp;&nbsp;题目解析
+
+            <div ng-show='showExplanation'>
+                <div class="explanation-title">
+                    <img src="img/answer.png"/>&nbsp;&nbsp;&nbsp;正确答案
+                </div>
+                <div class="explanation-content">{{ correct_answers }}</div>
+                <div class="explanation-title">
+                    <img src="img/explanation.png"/>&nbsp;&nbsp;&nbsp;题目解析
+                </div>
+                <div class="explanation-content">{{ explanation }}</div>
             </div>
-            <div class="explanation-content">{{ explanation }}</div>
         </div>
     </div>
 
@@ -38,9 +47,9 @@
             <img src="img/next.png"/>
         </div>
 
-        <div class="md-trigger hint-btn" data-modal="modal-1" ng-show="showHintButton" ng-click="showHint()">
-            <img src="img/hint.png"/>
+        <div class="hint-btn" ng-show="showHintButton" ng-click="showHint()">
+            <img src="img/hint-button.png"/>
         </div>
-        <span class="md-modal md-effect-1" id="modal-1" ng-show="showHintBox">{{ hint }}</span>
+
     </div>
 </div>
