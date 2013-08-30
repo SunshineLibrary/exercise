@@ -68,6 +68,9 @@ angular.module('SunExercise.directives', [])
                             $scope.loadProgress[chapterId] = progressData;
                         })
                     }
+                    $scope.enterAchievementCenter = function () {
+                        $location.path('/achievements');
+                    }
                 }, function (err) {
                     console.log(err);
                 }, function (progressData) {
@@ -118,9 +121,6 @@ angular.module('SunExercise.directives', [])
                 $scope.showLockDialogue = function (lessonIndex) {
                     var id = chapterData.lessons[lessonIndex].id;
                     $("#lessonModal-" + id).modal("toggle");
-                }
-                $scope.enterAchievementCenter = function () {
-                    $location.path('/achievements');
                 }
                 $scope.returnToSubject = function () {
                     $location.path('/subject/' + $routeParams.sid);
@@ -279,11 +279,9 @@ angular.module('SunExercise.directives', [])
                     $scope.summary = lessonData.summary;
                     $scope.activities = lessonData.activities;
                     if ((lessonUserdata.is_complete) && (typeof lessonUserdata.summary.star != "undefined")) {
-                        $scope.lessonIcon = "lesson-button-icon-star";
-                        $scope.lessonIconClass = "lesson-button-icon-star" + lessonUserdata.summary.star;
+                        $scope.lessonIcon = $scope.lessonIconClass = "lesson-button-icon-star" + lessonUserdata.summary.star;
                     } else {
-                        $scope.lessonIcon = "lesson-button-icon-unlocked";
-                        $scope.lessonIconClass = "lesson-button-icon-unlocked";
+                        $scope.lessonIcon = $scope.lessonIconClass = "lesson-button-icon-unlocked";
                     }
                     if (typeof lessonUserdata.current_activity === "undefined") {
                         $scope.buttonMsg = "开始学习";
@@ -307,7 +305,11 @@ angular.module('SunExercise.directives', [])
                             }
                             $scope.reviewLesson = true;
                             $scope.lessonState = "review";
-                            $scope.lessonStateIcon = "headerGold";
+                            if (typeof lessonUserdata.summary.star != "undefined") {
+                                $scope.lessonStateIcon = "lesson-header-star" + lessonUserdata.summary.star;
+                            } else {
+                                $scope.lessonStateIcon = "headerUnlock";
+                            }
                         }
                     }
                     $scope.enterActivity = function (id) {
@@ -1254,8 +1256,8 @@ angular.module('SunExercise.directives', [])
                         $(this).tab('show');
                     })
 
-                    $scope.returnToChapter = function () {
-                        $location.path()
+                    $scope.returnToSubject = function () {
+                        $location.path('/root');
                     }
 
                 }, function (err) {

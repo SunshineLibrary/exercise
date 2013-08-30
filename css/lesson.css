@@ -25,6 +25,10 @@
     overflow: hidden;
 }
 
+.lesson-button-icon-star2 img {
+    margin-top: -15px;
+}
+
 .lesson-button-icon-star1 {
     background-color: #c27d57;
     height: 72px;
