@@ -1,0 +1,55 @@
+<div id='problem{{$index}}'>
+    <div class="col-md-10 question-container">
+        <div class="question-content">
+            <!--<span>第&nbsp;{{ $index+1 }}&nbsp;题&nbsp;/&nbsp;共&nbsp;{{ total }}&nbsp;题&nbsp;{{ problem.parent_id }}</span><br> -->
+            <span>{{ problemIndex+$index+1 }}.&nbsp;<span class="question-type">({{ type }})</span></span>
+            <span>{{ problem.title }}</span><br>
+            <span ng-bind-html-unsafe="body"></span><br>
+        </div>
+
+        <div ng-repeat='choice in problem.choices' class="col-md-{{ colNum }}" choices>
+            <div id='problem{{$parent.$index}}_choice{{$index}}'
+                 class="choice-layout-{{ layout }}-state-{{ checked[$index] }}"
+                 ng-click='chooseOption(choice.id, $index)'>
+                {{ calcChoiceNum($index) }}&nbsp;&nbsp;<span class="choice-content"
+                                                             ng-bind-html-unsafe="choiceBody[choice.id]"></span>
+            </div>
+        </div>
+
+        <div class="col-md-12 explanation-container pull-left">
+            <div ng-show="showHintBox">
+                <div class="explanation-title">
+                    <img src="img/hint.png"/>&nbsp;&nbsp;&nbsp;暗示
+                </div>
+                <div class="explanation-content">{{ hint }}</div>
+            </div>
+
+            <div ng-show='showExplanation'>
+                <div class="explanation-title">
+                    <img src="img/answer.png"/>&nbsp;&nbsp;&nbsp;正确答案
+                </div>
+                <div class="explanation-content">{{ correct_answers }}</div>
+                <div class="explanation-title">
+                    <img src="img/explanation.png"/>&nbsp;&nbsp;&nbsp;题目解析
+                </div>
+                <div class="explanation-content">{{ explanation }}</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-2 ctrlBar">
+        <div class="continue-btn" ng-hide='hideSubmitButton' class="submit-btn"
+             ng-click='submitAnswer()'>
+            <img src="img/{{ submitIcon }}.png"/>
+        </div>
+        <div class="continue-btn" ng-show='showContinueButton'
+             ng-click='continueProblem()'>
+            <img src="img/next.png"/>
+        </div>
+
+        <div class="hint-btn" ng-show="showHintButton" ng-click="showHint()">
+            <img src="img/hint-button.png"/>
+        </div>
+
+    </div>
+</div>

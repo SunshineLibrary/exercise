@@ -1,0 +1,78 @@
+<lesson>
+    <activity ng-hide="showLessonSummary">
+        <div class="row">
+            <div class="col-md-12 navbar-fixed-top _progress-bar" style="padding-left:0px">
+                <div class="_progress-canvas">
+                    <div class="_progress" style="width:{{ progressWidth }}%;"></div>
+                </div>
+                <div id="buttonContainer" class="return-button">
+                    <div ng-click='pauseLearn()'><img src="img/exit.png"/></div>
+                </div>
+            </div>
+        </div>
+
+        <div id="pt-main" class="col-md-12 background-canvas">
+
+            <div id="lecture" ng-show="lecture">
+                <div class="col-md-10">
+                    <span class="lecture-title">lecture标题： {{title}}</span><br>
+
+                    <div class="lecture-body" ng-bind-html-unsafe="body"></div>
+                </div>
+                <div class="col-md-2 ctrlBar">
+                    <div ng-hide="hideContinueButton"
+                         ng-click='continueActivity()'>
+                        <img src="img/next.png"/>
+                    </div>
+                </div>
+            </div>
+
+            <div id="quiz" ng-hide="lecture">
+                <div switch ng-hide="showQuizSummary">
+                    <problem id="{{ problem.id }}"
+                             class="question-container pt-page pt-page-{{ $index+1 }}"
+                             ng-repeat='problem in problems'
+                             ng-model="problemShow"
+                             activity=true></problem>
+                </div>
+
+                <div class="activity-summary" ng-show="showQuizSummary">
+                    <span class="activity-summary-label">正确率</span>
+                    <span class="activity-summary-percent">{{ quizCorrectPercent }}</span>
+                    <hr style="border:1px solid #aaa; width:40%"/>
+                    <span class="activity-summary-label">答对
+                        <span class="activity-summary-count">{{ quizCorrectCount }}</span>题
+                    </span>
+                    <span class="activity-summary-label">共
+                        <span class="activity-summary-count">{{ totalProblemsNum }}</span>题
+                    </span>
+
+                    <div class="col-md-2 ctrlBar" ng-click="nextActivity()">
+                        <img src="img/next.png"/>
+                    </div>
+                    </dl>
+                </div>
+            </div>
+
+        </div>
+
+    </activity>
+
+    <div class="lesson-summary" ng-show="showLessonSummary">
+        <div class="lesson-summary-header">
+            <img src="img/lesson-summary-header-star{{ lessonStar }}.png"/>
+        </div>
+        <div class="lesson-summary-body">
+            <span class="lesson-summary-title font-size-big">赞，你完成了本课学习</span>
+
+            <div class="lesson-summary-stat font-size-big">
+                <span ng-show="hasFinalQuiz">最终测试正确率&nbsp;{{ lessonCorrectPercent }}&nbsp;%</span>
+                {{ lessonCup }}<br>
+            </div>
+        </div>
+        <div class="lesson-summary-footer">
+            <button class="back-button" ng-click="backToChapter()">结束学习</button>
+        </div>
+    </div>
+</lesson>
+
