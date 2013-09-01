@@ -1,0 +1,210 @@
+@fix-position: fixed;
+
+@background-gray: #f2f2f2;
+@background-white: #ffffff;
+@sea-blue: #64b7e9;
+@grass-green: #73dcbe;
+@pink-red: #f4a5aa;
+@warning-red: #ff656d;
+
+.background-canvas {
+  background-color: @background-gray;
+  padding: 80px 0 20px 0;
+  height: 100%;
+  overflow-y: scroll;
+}
+
+.ctrlBar {
+  position: @fix-position;
+  right: 0;
+}
+
+._progress-bar {
+  background-color: @background-gray;
+}
+
+._progress-canvas {
+  background-color: @background-white;
+  width: 100%;
+  height: 20px;
+}
+
+._progress {
+  background-color: @sea-blue;
+  height: 20px;
+}
+
+.return-button {
+  position: absolute;
+  top: 0;
+  right: 0;
+}
+
+/* lecture activity */
+.lecture-title {
+
+}
+
+.lecture-body {
+
+}
+
+xvideo, xaudio, xpdf, ximage {
+  display: block;
+  margin-top: 40px;
+}
+
+.xvideo-button, {
+  display: block;
+}
+
+/* quiz activity */
+.question-container {
+  min-height: 700px;
+}
+
+.question-content {
+  padding-left: 15px;
+}
+
+.question-type {
+  color: #aaaaaa;
+}
+
+/* general layouts for list layout choices */
+.choice-layout-list {
+  margin: 0px 0px 15px 0px;
+  padding: 15px 0px 15px 15px;
+}
+
+/* general layouts for card layout choices */
+.choice-layout-card {
+  width: 100%;
+  height: 225px;
+  padding: 0px 0px 0px 20%;
+  margin: 15px 15px 0 0;
+
+  img {
+    max-height: 100%;
+    max-width: 100%;
+  }
+}
+
+.choice-layout-list-state-default {
+  background-color: @background-white;
+  .choice-layout-list;
+}
+
+.choice-layout-list-state-choose {
+  background-color: @sea-blue;
+  color: white;
+  .choice-layout-list;
+}
+
+.choice-layout-list-state-correct {
+  background-color: @grass-green;
+  color: white;
+  .choice-layout-list;
+}
+
+.choice-layout-list-state-wrong {
+  background-color: @pink-red;
+  color: white;
+  .choice-layout-list;
+}
+
+.choice-layout-card-state-default {
+  background-color: @background-white;
+  .choice-layout-card;
+}
+
+.choice-layout-card-state-choose {
+  background-color: @sea-blue;
+  color: white;
+  .choice-layout-card;
+}
+
+.choice-layout-card-state-correct {
+  background-color: @grass-green;
+  color: white;
+  .choice-layout-card;
+}
+
+.choice-layout-card-state-wrong {
+  background-color: red;
+  color: white;
+  .choice-layout-card;
+}
+
+.choice-content {
+  display: inline-block;
+}
+
+.singlefilling-text-container {
+  padding-left: 15px;
+}
+
+.singlefilling-text {
+  height: 60px;
+  width: 100%;
+  padding-left: 20px;
+}
+
+.singlefilling-text-default {
+  border: 2px solid #aaaaaa;
+  .singlefilling-text;
+}
+
+.singlefilling-text-success {
+  border: 3px solid @grass-green;
+  color: @grass-green;
+  .singlefilling-text;
+}
+
+.singlefilling-text-error {
+  border: 3px solid @warning-red;
+  color: @warning-red;
+  .singlefilling-text;
+}
+
+.explanation-container {
+  margin: 60px 0 0 0;
+}
+
+.explanation-title {
+  background-image: url("../img/diagonal-pattern.png");
+  background-repeat: repeat;
+  height: 48px;
+  padding: 7px 0 0 15px;
+}
+
+.explanation-content {
+  margin: 15px 0 15px 15px;
+}
+
+/* button layouts */
+.submit-btn {
+  color: @sea-blue;
+}
+
+.hint-btn {
+  margin-left: 14px;
+  margin-top: 125px;
+}
+
+.continue-btn {
+  margin-top: 36px;
+}
+
+.activity-summary {
+  text-align: center;
+}
+
+.activity-summary-percent {
+  font-size: 8.3em;
+}
+
+.activity-summary-count {
+  font-size: 4.2em;
+  padding-left: 10px;
+}
