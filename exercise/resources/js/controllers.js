@@ -39,4 +39,9 @@ angular.module('SunExercise.controllers', [])
     //achievements controller
     .controller('achievementsCtrl', function () {
 
+    })
+
+    //achievement awards controller
+    .controller('awardsCtrl', function () {
+
     });

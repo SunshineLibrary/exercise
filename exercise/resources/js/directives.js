@@ -145,11 +145,11 @@ angular.module('SunExercise.directives', [])
                             chapterPage += "<td>";
                             if (typeof mergedTree[i][j] == "string") {
                                 if (mergedTree[i][j] == 'I') {
-                                    chapterPage += "<div class='chapter-tree-line'><img src='img/vertical-line.png' /></div>";
+                                    chapterPage += "<div class='chapter-tree-line'><img src='resources/img/vertical-line.png' /></div>";
                                 } else if (mergedTree[i][j] == "L") {
-                                    chapterPage += "<div class='chapter-tree-line'><img src='img/long-vertical-line.png' /></div>";
+                                    chapterPage += "<div class='chapter-tree-line'><img src='resources/img/long-vertical-line.png' /></div>";
                                 } else if (mergedTree[i][j] == "*") {
-                                    chapterPage += "<div class='chapter-tree-line'><img src='img/dot.png' /></div>";
+                                    chapterPage += "<div class='chapter-tree-line'><img src='resources/img/dot.png' /></div>";
                                 } else {
                                     angular.forEach(chapterData.lessons, function (lesson, k) {
                                         if (lesson.id == mergedTree[i][j]) {
@@ -159,7 +159,7 @@ angular.module('SunExercise.directives', [])
                                                 '<div class="lesson-button-container font-size-small"' +
                                                 'ng-click="showLockDialogue(' + k + ')">' +
                                                 '<div class="lesson-button-icon-locked">' +
-                                                '<img src="img/lesson-button-icon-locked.png"/>' +
+                                                '<img src="resources/img/lesson-button-icon-locked.png"/>' +
                                                 '</div>' +
                                                 '<span class="lesson-button-title">' + lesson.title + '</span>' +
                                                 '</div>' +
@@ -171,7 +171,7 @@ angular.module('SunExercise.directives', [])
                                                 '<div class="modal-dialog">' +
                                                 '<div class="lesson-container modal-content">' +
                                                 '<div class="lesson-header-locked">' +
-                                                '<img class="lesson-icon" src="img/headerLocked.png"/>' +
+                                                '<img class="lesson-icon" src="resources/img/headerLocked.png"/>' +
                                                 '<span class="lesson-title font-size-big">' + lesson.title + '</span>' +
                                                 '</div>' +
                                                 '<div class="lesson-body-enter">' +
@@ -189,11 +189,11 @@ angular.module('SunExercise.directives', [])
                                     })
                                 }
                             } else if (mergedTree[i][j] == 1) {
-                                chapterPage += "<div class='chapter-tree-right-line'><img src='img/right-line.png' /></div>";
+                                chapterPage += "<div class='chapter-tree-right-line'><img src='resources/img/right-line.png' /></div>";
                             } else if (mergedTree[i][j] == 2) {
-                                chapterPage += "<div class='chapter-tree-left-line'><img src='img/left-line.png' /></div>";
+                                chapterPage += "<div class='chapter-tree-left-line'><img src='resources/img/left-line.png' /></div>";
                             } else if (mergedTree[i][j] == 3) {
-                                chapterPage += "<div class='chapter-tree-line'><img src='img/middle-line.png' /></div>";
+                                chapterPage += "<div class='chapter-tree-line'><img src='resources/img/middle-line.png' /></div>";
                             }
                             chapterPage += "</td>";
                         }
@@ -248,7 +248,7 @@ angular.module('SunExercise.directives', [])
                     var lessonUserdataPromise = lessonSandbox.getLessonUserdata($scope.lessonId);
 
                     //load the lesson template on the chapter page
-                    $http.get('partials/lesson.html', {cache: $templateCache}).success(function (contents) {
+                    $http.get('resources/partials/lesson.html', {cache: $templateCache}).success(function (contents) {
                         $element.html(contents);
                         $compile($element.contents())($scope);
                     });
@@ -539,7 +539,7 @@ angular.module('SunExercise.directives', [])
     .directive("review", function () {
         return {
             restrict: "E",
-            templateUrl: 'partials/_showAllActivities.html'
+            templateUrl: 'resources/partials/_showAllActivities.html'
         };
     })
 
@@ -974,7 +974,7 @@ angular.module('SunExercise.directives', [])
                 var parentActivityData = problemSandbox.getParentActivityData(currProblem.parent_id);
 
                 //render dynamic templateUrl
-                var templateUrl = 'partials/choiceTemplates/_' + currProblem.type + 'Template.html';
+                var templateUrl = 'resources/partials/choiceTemplates/_' + currProblem.type + 'Template.html';
                 $http.get(templateUrl, {cache: $templateCache}).success(function (contents) {
                     $element.html(contents);
                     $compile($element.contents())($scope);

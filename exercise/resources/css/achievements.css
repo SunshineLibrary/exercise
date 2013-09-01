@@ -1,97 +1,69 @@
 .loading-icon {
-    position: absolute;
-    top: 50%;
-    left: 50%;
+  position: absolute;
+  top: 50%;
+  left: 50%;
 }
-
 .header-wrapper {
-    position: fixed;
-    width: 100%;
-    left: 0;
-    text-align: center;
-    z-index: 99999;
+  position: fixed;
+  width: 100%;
+  left: 0;
+  text-align: center;
+  z-index: 99999;
 }
-
 .achievements-header {
-    background: #fd8b5e;
-    padding: 10px 0 16px 15px;
-    color: white;
-    height: 56px;
+  background: #fd8b5e;
+  padding: 10px 0 16px 15px;
+  color: white;
+  height: 56px;
 }
-
 .achievements-tab {
-    background-color: white;
-    height: 48px;
+  background-color: white;
+  height: 48px;
 }
-
 .achievements-back-button {
-    position: absolute;
+  position: absolute;
 }
-
 .achievements-container {
-    padding: 120px 20px 20px 20px;
-    background-color: #e5e5e5;
-    height: 100%;
-    overflow: scroll;
+  padding: 120px 20px 20px 20px;
+  background-color: #e5e5e5;
+  height: 100%;
+  overflow: scroll;
 }
-
 .badge-container {
-    height: 140px;
-    padding-bottom: 20px;
+  height: 140px;
+  padding-bottom: 20px;
 }
-
 .badge-icon {
-    background-color: #f2f2f2;
-    height: 100%;
-    padding: 10px 0 0 10px;
-    width: 120px;
-    float: left;
+  background-color: #f2f2f2;
+  height: 100%;
+  padding: 10px 0 0 10px;
+  width: 120px;
+  float: left;
 }
-
 .badge-content {
-    float: left;
-    width: 200px;
-    height: 100%;
-    padding: 15px;
+  float: left;
+  width: 175px;
+  height: 100%;
+  padding: 15px;
 }
-
 .badge-content-locked {
-    background-color: #f2f2f2;
-    float: left;
-    width: 200px;
-    height: 100%;
-    padding: 15px;
+  background-color: #f2f2f2;
+  float: left;
+  width: 175px;
+  height: 100%;
+  padding: 15px;
 }
-
 .badge-content-unlocked {
-    background-color: white;
-    float: left;
-    width: 200px;
-    height: 100%;
-    padding: 15px;
+  background-color: white;
+  float: left;
+  width: 175px;
+  height: 100%;
+  padding: 15px;
 }
-
 .badge-title {
-    color: #ff8b59;
-    display: block;
+  color: #ff8b59;
+  display: block;
 }
-
 .achievements-stat {
-    color: #999999;
-}
-
-.has-badge-true {
-    color: red;
-}
-
-.has-badge-false {
-    color: black;
-}
-
-.has-award-true {
-    color: red;
-}
-
-.has-award-false {
-    color: black;
+  color: #999999;
 }

@@ -6,7 +6,7 @@
 
             <div style="width: 50%" class="pull-left" ng-repeat="subject in subjects">
                 <div class="subject-container" ng-click="enterSubject(subject.id)">
-                    <img src="img/subjects-icon/subject-{{ subject.subject }}.png"/>
+                    <img src="resources/img/subjects-icon/subject-{{ subject.subject }}.png"/>
                     <span class="subject-title font-size-small">{{ subject.title }}</span>
                 </div>
             </div>
@@ -15,33 +15,37 @@
         <div class="page-wrap" style="width:100%; left:{{ offsetWidth }}">
             <header class="main-header" style="width:100%; left:{{ offsetWidth }}">
                 <a ng-click="showSubjectsNav()" class="open-menu">
-                    <img src="img/hamburg.png"/>
+                    <img src="resources/img/hamburg.png"/>
                 </a>
                 <span>{{ title }}</span>
 
                 <div class="achievements-button" ng-click="enterAchievementCenter()">
-                    <img src="img/achievements-icon.png"/>
+                    <img src="resources/img/achievements-icon.png"/>
                     <span class="font-size-small">成就陈列室</span>
                 </div>
             </header>
 
             <div class="subject-content">
-                <div ng-repeat="chapter in chapters">
-                    <div class="chapters-container col-md-3"
+                <div style="padding-top: 20px;" class="col-md-3" ng-repeat="chapter in chapters">
+                    <div class="chapters-container"
                          ng-click="enterChapter(chapter.id)">
                         {{ chapter.title }}
                         <div ng-hide="hasCached[chapter.id]" class="download-container">
-                        <span class="font-size-small" ng-hide="showProgress[chapter.id]">
-                            <img src="img/downloadChapter.png"/>&nbsp;&nbsp;下载
-                        </span>
+                            <div class="download-canvas">
+                                <span class="font-size-small" ng-hide="showProgress[chapter.id]">
+                                    <img src="resources/img/downloadChapter.png"/>&nbsp;&nbsp;下载
+                                </span>
 
-                            <div style="margin-top: 10px;" ng-show="showProgress[chapter.id]" class="progress">
-                                <div class="progress-bar progress-bar-info"
-                                     role="progressbar"
-                                     aria-valuenow="{{ loadProgress[chapter.id] }}"
-                                     aria-valuemin="0"
-                                     aria-valuemax="100"
-                                     style="width: {{ loadProgress[chapter.id] }}%">
+                                <div style="padding: 12px 8px 0 8px;" ng-show="showProgress[chapter.id]">
+                                    <div class="progress">
+                                        <div class="progress-bar progress-bar-info"
+                                             role="progressbar"
+                                             aria-valuenow="{{ loadProgress[chapter.id] }}"
+                                             aria-valuemin="0"
+                                             aria-valuemax="100"
+                                             style="width: {{ loadProgress[chapter.id] }}%">
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
