@@ -35,7 +35,8 @@
                 <div ng-repeat="badge in badges">
                     <div class="col-md-4 badge-container media">
                         <div class="badge-icon">
-                            <img class="media-object pull-left" src="resources/img/badge-icons/{{ badgeName[badge.id] }}.png"/>
+                            <img class="media-object pull-left"
+                                 src="resources/img/badge-icons/{{ badgeName[badge.id] }}.png"/>
                         </div>
                         <div class="badge-content-{{ badgeStatus[badge.id] }}">
                             <span class="badge-title">{{ badge.title }}</span>
@@ -48,7 +49,7 @@
 
             <div class="tab-pane fade" id="awards-tab">
                 <div ng-repeat="award in awards">
-                    <div class="media">
+                    <div class="media" ng-click="enterAward(award.id)">
                         <img class="media-object pull-left" src="resources/img/badge-icon.png"/>
 
                         <div class="media-body">

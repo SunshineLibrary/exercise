@@ -53,7 +53,7 @@ angular.module("SunExercise", ['SunExercise.controllers', 'SunExercise.directive
             })
             .when('/achievements/awards/:aid', {
                 controller: 'awardsCtrl',
-                templateUrl: 'partials/awards.html'
+                templateUrl: 'resources/partials/awards.html'
             })
     });
 
