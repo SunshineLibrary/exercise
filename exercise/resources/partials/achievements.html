@@ -48,16 +48,10 @@
             </div>
 
             <div class="tab-pane fade" id="awards-tab">
-                <div ng-repeat="award in awards">
-                    <div class="media" ng-click="enterAward(award.id)">
-                        <img class="media-object pull-left" src="resources/img/badge-icon.png"/>
-
-                        <div class="media-body">
-                            <h4 class="media-heading">{{ award.title }}</h4>
-                            <h5>{{ award.url }}</h5>
-
-                            <div>{{ award.desc }}</div>
-                        </div>
+                <div class="col-md-4" style="padding-bottom: 15px;" ng-repeat="award in awards">
+                    <div class="award-container" ng-click="enterAward(award.id)">
+                        <div>{{ award.title }}</div>
+                        <div class="font-size-small award-desc">{{ award.desc }}</div>
                     </div>
                 </div>
             </div>

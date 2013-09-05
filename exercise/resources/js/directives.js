@@ -790,8 +790,8 @@ angular.module('SunExercise.directives', [])
             restrict: "E",
             link: function ($scope, $element, $attrs) {
                 var template = "<video id='video' class='xvideo' src='" + APIProvider.getAPI("getFileResources", $routeParams.lid, "")
-                    + $attrs.src + "' controls></video>" +
-                    "<button class='xvideo-button' ng-click='playVideo()'>{{ playButtonMsg }}</button>";
+                    + $attrs.src + "' controls></video><br>" +
+                    "<button class='play-button' ng-click='playVideo()'>{{ playButtonMsg }}</button>";
                 $element.html(template);
                 $compile($element.contents())($scope);
 
