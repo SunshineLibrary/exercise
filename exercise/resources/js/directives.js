@@ -138,7 +138,7 @@ angular.module('SunExercise.directives', [])
             link: function ($scope, $element) {
                 var chapterData = treeSandbox.getChapterMaterial($routeParams.cid);
                 var mergedTree = chapterTreeDrawer.initChapterTree(chapterData);
-                var chapterPage = "<div class='chapter-tree-container'><table>";
+                var chapterPage = "<div class='chapter-tree-container'><table border='0' cellpadding='0' cellspacing='0'>";
                 angular.forEach(mergedTree, function (row, i) {
                     chapterPage += "<tr>";
                     angular.forEach(mergedTree[i], function (col, j) {
@@ -790,8 +790,8 @@ angular.module('SunExercise.directives', [])
             restrict: "E",
             link: function ($scope, $element, $attrs) {
                 var template = "<video id='video' class='xvideo' src='" + APIProvider.getAPI("getFileResources", $routeParams.lid, "")
-                    + $attrs.src + "' controls></video>" +
-                    "<button class='xvideo-button' ng-click='playVideo()'>{{ playButtonMsg }}</button>";
+                    + $attrs.src + "' controls></video><br>" +
+                    "<button class='play-button' ng-click='playVideo()'>{{ playButtonMsg }}</button>";
                 $element.html(template);
                 $compile($element.contents())($scope);
 
@@ -1256,6 +1256,9 @@ angular.module('SunExercise.directives', [])
                         $(this).tab('show');
                     })
 
+                    $scope.enterAward = function (id) {
+                        $location.path('/achievements/awards/' + id);
+                    }
                     $scope.returnToSubject = function () {
                         $location.path('/root');
                     }
@@ -1263,6 +1266,35 @@ angular.module('SunExercise.directives', [])
                 }, function (err) {
                     console.log("Error occurred while loading achievements resources: " + err);
                 });
+            }
+        }
+    })
+
+    .directive("award", function (SandboxProvider, APIProvider, $routeParams, $location) {
+
+        var awardSandbox = SandboxProvider.getSandbox();
+
+        return {
+            restrict: "E",
+            link: function ($scope) {
+                var awardId = $routeParams.aid;
+
+                var jsonPromise = awardSandbox.getAchievementsMaterial();
+                jsonPromise.then(function (achievementsData) {
+                    for (var i = 0; i < achievementsData.awards.length; i++) {
+                        if (achievementsData.awards[i].id == awardId) {
+                            $scope.title = achievementsData.awards[i].title;
+                            $scope.url = achievementsData.awards[i].url;
+                            break;
+                        }
+                    }
+                }, function (err) {
+                    console.log("Error occurred while loading achievments json: " + err);
+                })
+
+                $scope.returnToAchievements = function () {
+                    $location.path('/achievements');
+                }
             }
         }
     })
