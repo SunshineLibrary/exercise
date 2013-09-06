@@ -1,47 +1,55 @@
 .chapter-container {
-  height: 100%;
+    height: 100%;
 }
+
 .chapter-content {
-  padding: 76px 20px 20px 20px;
-  background-color: #e5e5e5;
-  height: 100%;
-  width: 100%;
-  overflow-y: scroll;
+    padding: 76px 20px 20px 20px;
+    background-color: #e5e5e5;
+    height: 100%;
+    width: 100%;
+    overflow-y: scroll;
 }
+
 .chapter-tree-container table {
-  width: 100%;
+    width: 100%;
 }
+
 .chapter-tree-container table tr td {
-  width: 480px;
+    width: 480px;
 }
+
 .chapter-tree-line {
-  text-align: center;
-  line-height: 0px;
-  width: 175px;
-  padding-right: 15px;
-  padding-left: 15px;
+    text-align: center;
+    line-height: 0px;
+    width: 175px;
+    padding-right: 15px;
+    padding-left: 15px;
 }
+
 .chapter-tree-left-line {
-  margin-left: -45px;
-  text-align: center;
-  line-height: 0px;
-  width: 175px;
-  padding-right: 15px;
-  padding-left: 15px;
+    margin-left: -45px;
+    text-align: center;
+    line-height: 0px;
+    width: 175px;
+    padding-right: 15px;
+    padding-left: 15px;
 }
+
 .chapter-tree-right-line {
-  margin-left: -50px;
-  text-align: center;
-  line-height: 0px;
-  width: 175px;
-  padding-right: 15px;
-  padding-left: 15px;
+    margin-left: -49px;
+    text-align: center;
+    line-height: 0px;
+    width: 175px;
+    padding-right: 15px;
+    padding-left: 15px;
 }
+
 .chapter-back-button {
-  position: absolute;
+    position: absolute;
 }
+
 .achievements-button {
-  position: absolute;
-  right: 20px;
-  top: 10px;
+    position: absolute;
+    right: 20px;
+    top: 10px;
 }

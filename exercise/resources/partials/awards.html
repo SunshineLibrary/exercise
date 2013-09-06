@@ -1,13 +1,15 @@
 <award>
     <header class="main-header">
         <div class="achievements-back-button" ng-click="returnToAchievements()">
-            <img src="img/back.png"/>
+            <img src="resources/img/back.png"/>
         </div>
         <span>{{ title }}</span>
     </header>
 
-    <div class="award-content">
-        <xvideo src="{{ url }}" controls>
-        </xvideo>
+    <div class="achievements-container">
+        <div class="award-video-container">
+            <xvideo src="{{ url }}" controls>
+            </xvideo>
+        </div>
     </div>
 </award>
