@@ -269,7 +269,7 @@ angular.module('SunExercise.services', [])
                     //if randomize choices, shuffle all the choices in all problems
                     if ((typeof Material.activities[j].randomize_choices != "undefined") &&
                         (Material.activities[j].randomize_choices)) {
-                        for (var k = 0; k < Material.activities[j].problems[k].choices.length; k++) {
+                        for (var k = 0; k < Material.activities[j].problems.length; k++) {
                             Material.activities[j].problems[k].choices = _.shuffle(Material.activities[j].problems[k].choices);
                         }
                     }
