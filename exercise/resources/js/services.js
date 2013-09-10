@@ -54,7 +54,7 @@ angular.module('SunExercise.services', [])
     })
 
     //core services of SunExercise app
-    .factory("ExerciseService", function ($q, $http, $timeout, APIProvider) {
+    .factory("ExerciseService", function ($q, $http, $timeout) {
 
         var emitEvent = function (eventName, scope, args) {
             scope.$emit(eventName, args);
@@ -127,9 +127,20 @@ angular.module('SunExercise.services', [])
             return getResourcesPromise;
         }
 
+        var showNotification = function (notifyContent, $scope) {
+            /*$scope.notificationContent = notifyContent;
+
+             $("#notify-modal").modal("toggle");
+             $timeout(function(){
+             $("#notify-modal").modal("hide");
+             $('.modal-backdrop').remove();
+             }, 2000);*/
+        };
+
         return {
             emitEvent: emitEvent,
-            getServerResources: getServerResources
+            getServerResources: getServerResources,
+            showNotification: showNotification
         };
     })
 
@@ -393,7 +404,7 @@ angular.module('SunExercise.services', [])
         }
     })
 
-    .factory("UserdataProvider", function (MaterialProvider, $q, $http, APIProvider) {
+    .factory("UserdataProvider", function (MaterialProvider, $q, $http, APIProvider, ExerciseService) {
         var userdataMap = {};
 
         var getLessonUserdata = function (lessonId) {
@@ -569,15 +580,17 @@ angular.module('SunExercise.services', [])
             $http.post(APIProvider.getAPI("postUserInfoUserdata", "", ""), "data=" + JSON.stringify(userdataMap['user_info']));
         }
 
-        var addAchievements = function (achievementType, achievementContent) {
+        var addAchievements = function (achievementType, achievementContent, $scope) {
             var userinfoUserdata = getUserinfoUserdata();
-            var is_new = (typeof userinfoUserdata.achievements[achievementType][achievementContent] == "undefined");
-            userinfoUserdata.achievements[achievementType][achievementContent] = {
+            var is_new = (typeof userinfoUserdata.achievements[achievementType][achievementContent.id] == "undefined");
+            userinfoUserdata.achievements[achievementType][achievementContent.id] = {
                 time: Date.now()
             };
             if (is_new) {
                 flushUserinfoUserdata();
             }
+
+            ExerciseService.showNotification(achievementContent.title, $scope);
         }
 
         return{

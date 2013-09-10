@@ -82,7 +82,7 @@ angular.module('SunExercise.directives', [])
     })
 
     //chapter module
-    .directive("chapter", function (SandboxProvider, $routeParams, $location, $http, $templateCache, $compile) {
+    .directive("chapter", function (SandboxProvider, $routeParams, $location) {
 
         //create the chapter sandbox
         var chapterSandbox = SandboxProvider.getSandbox();
@@ -361,7 +361,7 @@ angular.module('SunExercise.directives', [])
                                 //apply the userdata using the created grader
                                 if (lessonSandbox.createGrader(grader, userDataToGrade)) {
                                     //write the new badge in userinfo
-                                    lessonSandbox.addAchievements("badges", globalBadges[i].id);
+                                    lessonSandbox.addAchievements("badges", globalBadges[i], $scope);
                                 }
                             }
                         })
@@ -413,7 +413,7 @@ angular.module('SunExercise.directives', [])
                                                 (lessonSandbox.conditionParser(lessonData.achievements[i].condition, Infinity, 100)) :
                                                 (lessonSandbox.conditionParser(lessonData.achievements[i].condition,
                                                     lessonUserdata.summary.correct_count, lessonUserdata.summary.correct_percent))) {
-                                                lessonSandbox.addAchievements("awards", lessonData.achievements[i].id, Date.now());
+                                                lessonSandbox.addAchievements("awards", lessonData.achievements[i], $scope);
                                             }
                                         }
                                     }
@@ -506,7 +506,7 @@ angular.module('SunExercise.directives', [])
                                                         (lessonSandbox.conditionParser(lessonData.achievements[i].condition, Infinity, 100)) :
                                                         (lessonSandbox.conditionParser(lessonData.achievements[i].condition,
                                                             lessonUserdata.summary.correct_count, lessonUserdata.summary.correct_percent))) {
-                                                        lessonSandbox.addAchievements("awards", lessonData.achievements[i].id, Date.now());
+                                                        lessonSandbox.addAchievements("awards", lessonData.achievements[i], $scope);
                                                     }
                                                 }
                                             }
@@ -663,7 +663,7 @@ angular.module('SunExercise.directives', [])
                                             //apply the userdata using the created grader
                                             if (activitySandbox.createGrader(grader, userDataToGrade)) {
                                                 //write the new badge in userinfo
-                                                activitySandbox.addAchievements("badges", activityData.achievements[i].id);
+                                                activitySandbox.addAchievements("badges", activityData.achievements[i], $scope);
                                             }
                                         }
                                     }
@@ -739,7 +739,7 @@ angular.module('SunExercise.directives', [])
                                     //apply the userdata using the created grader
                                     if (activitySandbox.createGrader(grader, "")) {
                                         //write the new badge in userinfo
-                                        activitySandbox.addAchievements("badges", activityData.achievements[i].id, Date.now());
+                                        activitySandbox.addAchievements("badges", activityData.achievements[i], $scope);
                                     }
                                 }
                             }
