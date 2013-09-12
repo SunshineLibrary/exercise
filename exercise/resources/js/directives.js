@@ -393,11 +393,11 @@ angular.module('SunExercise.directives', [])
                         if (args.should_transition) {
                             //give student star if qualified
                             if (typeof lessonUserdata.summary.correct_percent != "undefined") {
-                                if (lessonUserdata.summary.correct_percent >= lessonData.star3) {
+                                if ((typeof lessonData.star3 == "undefined") || (lessonUserdata.summary.correct_percent >= lessonData.star3)) {
                                     lessonUserdata.summary.star = 3;
-                                } else if (lessonUserdata.summary.correct_percent >= lessonData.star2) {
+                                } else if ((typeof lessonData.star2 == "undefined") || (lessonUserdata.summary.correct_percent >= lessonData.star2)) {
                                     lessonUserdata.summary.star = 2;
-                                } else if (lessonUserdata.summary.correct_percent >= lessonData.star1) {
+                                } else if ((typeof lessonData.star2 == "undefined") || (lessonUserdata.summary.correct_percent >= lessonData.star1)) {
                                     lessonUserdata.summary.star = 1;
                                 }
                             }
@@ -486,11 +486,11 @@ angular.module('SunExercise.directives', [])
 
                                     //give student star if qualified
                                     if (typeof lessonUserdata.summary.correct_percent != "undefined") {
-                                        if (lessonUserdata.summary.correct_percent >= lessonData.star3) {
+                                        if ((typeof lessonData.star3 == "undefined") || (lessonUserdata.summary.correct_percent >= lessonData.star3)) {
                                             lessonUserdata.summary.star = 3;
-                                        } else if (lessonUserdata.summary.correct_percent >= lessonData.star2) {
+                                        } else if ((typeof lessonData.star2 == "undefined") || (lessonUserdata.summary.correct_percent >= lessonData.star2)) {
                                             lessonUserdata.summary.star = 2;
-                                        } else if (lessonUserdata.summary.correct_percent >= lessonData.star1) {
+                                        } else if ((typeof lessonData.star2 == "undefined") || (lessonUserdata.summary.correct_percent >= lessonData.star1)) {
                                             lessonUserdata.summary.star = 1;
                                         }
                                     }
@@ -518,6 +518,7 @@ angular.module('SunExercise.directives', [])
                                     lessonSandbox.flushUserdata(lessonData.id);
                                     console.log(lessonUserdata);
 
+                                    //lesson summary page
                                     $scope.hasFinalQuiz = (typeof lessonUserdata.summary.correct_count != "undefined");
                                     $scope.lessonCorrectPercent = lessonUserdata.summary.correct_percent;
                                     $scope.lessonStar = (typeof lessonUserdata.summary.star != "undefined") ?
