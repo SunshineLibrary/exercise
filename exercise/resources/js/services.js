@@ -9,7 +9,7 @@ angular.module('SunExercise.services', [])
 
     .factory("APIProvider", function () {
         //var HOST = "http://192.168.3.26:30000";
-        var HOST = "http://127.0.0.1:3000";
+        var HOST = "http://shuwu.sunshine-library.org";
         var getAPI = function (type, id, ts) {
             switch (type) {
                 case "getRoot" :
@@ -367,10 +367,12 @@ angular.module('SunExercise.services', [])
             var incompleteGlobalBadges = [];
             var achievementsMaterialPromise = getAchievementsMaterial();
             achievementsMaterialPromise.then(function (achievements) {
-                for (var i = 0; i < achievements.badges.length; i++) {
-                    if ((typeof achievements.badges[i].scope != "undefined") && (achievements.badges[i].scope == event.name) &&
-                        (typeof userinfo.achievements.badges[achievements.badges[i].id] == "undefined")) {
-                        incompleteGlobalBadges.push(achievements.badges[i]);
+                if (typeof achievements.badges != "undefined") {
+                    for (var i = 0; i < achievements.badges.length; i++) {
+                        if ((typeof achievements.badges[i].scope != "undefined") && (achievements.badges[i].scope == event.name) &&
+                            (typeof userinfo.achievements.badges[achievements.badges[i].id] == "undefined")) {
+                            incompleteGlobalBadges.push(achievements.badges[i]);
+                        }
                     }
                 }
                 deferred.resolve(incompleteGlobalBadges);
