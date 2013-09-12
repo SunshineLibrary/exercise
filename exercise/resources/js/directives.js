@@ -393,11 +393,11 @@ angular.module('SunExercise.directives', [])
                         if (args.should_transition) {
                             //give student star if qualified
                             if (typeof lessonUserdata.summary.correct_percent != "undefined") {
-                                if (lessonUserdata.summary.correct_percent >= lessonData.star3) {
+                                if ((typeof lessonData.star3 == "undefined") || (lessonUserdata.summary.correct_percent >= lessonData.star3)) {
                                     lessonUserdata.summary.star = 3;
-                                } else if (lessonUserdata.summary.correct_percent >= lessonData.star2) {
+                                } else if ((typeof lessonData.star2 == "undefined") || (lessonUserdata.summary.correct_percent >= lessonData.star2)) {
                                     lessonUserdata.summary.star = 2;
-                                } else if (lessonUserdata.summary.correct_percent >= lessonData.star1) {
+                                } else if ((typeof lessonData.star2 == "undefined") || (lessonUserdata.summary.correct_percent >= lessonData.star1)) {
                                     lessonUserdata.summary.star = 1;
                                 }
                             }
@@ -486,11 +486,11 @@ angular.module('SunExercise.directives', [])
 
                                     //give student star if qualified
                                     if (typeof lessonUserdata.summary.correct_percent != "undefined") {
-                                        if (lessonUserdata.summary.correct_percent >= lessonData.star3) {
+                                        if ((typeof lessonData.star3 == "undefined") || (lessonUserdata.summary.correct_percent >= lessonData.star3)) {
                                             lessonUserdata.summary.star = 3;
-                                        } else if (lessonUserdata.summary.correct_percent >= lessonData.star2) {
+                                        } else if ((typeof lessonData.star2 == "undefined") || (lessonUserdata.summary.correct_percent >= lessonData.star2)) {
                                             lessonUserdata.summary.star = 2;
-                                        } else if (lessonUserdata.summary.correct_percent >= lessonData.star1) {
+                                        } else if ((typeof lessonData.star2 == "undefined") || (lessonUserdata.summary.correct_percent >= lessonData.star1)) {
                                             lessonUserdata.summary.star = 1;
                                         }
                                     }
@@ -518,6 +518,7 @@ angular.module('SunExercise.directives', [])
                                     lessonSandbox.flushUserdata(lessonData.id);
                                     console.log(lessonUserdata);
 
+                                    //lesson summary page
                                     $scope.hasFinalQuiz = (typeof lessonUserdata.summary.correct_count != "undefined");
                                     $scope.lessonCorrectPercent = lessonUserdata.summary.correct_percent;
                                     $scope.lessonStar = (typeof lessonUserdata.summary.star != "undefined") ?
@@ -557,7 +558,7 @@ angular.module('SunExercise.directives', [])
                 var activityData = activitySandbox.getActivityMaterial($routeParams.aid, activityUserdata.seed);
                 var userinfoData = activitySandbox.getUserInfo();
 
-                $scope.title = activityData.title;
+                $scope.activityTitle = activityData.title;
                 var multimediaBody = "<div>" + activityData.body + "</div>";
                 $scope.body = $compile(multimediaBody)($scope);
                 //init math formula parser queue
@@ -745,10 +746,12 @@ angular.module('SunExercise.directives', [])
                             }
                         }
 
-                        if (typeof activityData.jump !== "undefined") {
-                            var jump = activityData.jump.split(':');
-                            if (jump[0] === 'force_to_activity') {
-                                activitySandbox.sendEvent("activityComplete_" + activityData.id, $scope, {activity: jump[1], should_transition: true});
+                        if (typeof activityData.jump != "undefined") {
+                            for (var i = 0; i < activityData.jump.length; i++) {
+                                var jump = activityData.jump[i].split(':');
+                                if (jump[0] == 'force_to_activity') {
+                                    activitySandbox.sendEvent("activityComplete_" + activityData.id, $scope, {activity: jump[1], should_transition: true});
+                                }
                             }
                         } else {
                             //send activity complete event to lesson directive
@@ -799,21 +802,18 @@ angular.module('SunExercise.directives', [])
                 var currentTime = 0;
                 //get video element and control bar elements
                 var video = $element.contents()[0];
-                /*var muteButton = document.getElementById("mute");
-                 var seekBar = document.getElementById("seek-bar");
-                 var volumeBar = document.getElementById("volume-bar");*/
 
                 // 在play上添加播放/暂停按钮
                 $scope.playButtonMsg = "播 放";
                 $scope.playVideo = function () {
                     if (video.paused == true) {
+                        $scope.playButtonMsg = "暂 停";
                         //send the activityStart event to activity to record the start_time
                         $scope.$emit("activityStart");
 
                         if (!start) {//第一次进来
                             toFullScreen(video);
                             video.play();
-                            $scope.playButtonMsg = "暂 停";
 
                             start = true;
                         } else {
@@ -822,8 +822,6 @@ angular.module('SunExercise.directives', [])
 
                             toFullScreen(video);
                             video.play();
-
-                            $scope.playButtonMsg = "暂 停";
                         }
                     } else {
                         video.pause();
