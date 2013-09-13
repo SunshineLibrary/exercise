@@ -272,7 +272,9 @@ var chapterTreeDrawer = (function () {
 
                 if (y1 == 0 && typeof merge[y][x] == 'string') {
 
-                    if (merge[y][x].indexOf('lesson') != -1)
+                    // TODO change to a REAL judge if it's a lesson
+                    // we know UUID is 36 long string
+                    if (merge[y][x].length == 36)
                         y1 = y - 2;
 
                 }
