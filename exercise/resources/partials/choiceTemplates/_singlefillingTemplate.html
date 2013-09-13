@@ -30,7 +30,7 @@
                     <img src="resources/img/answer.png"/>&nbsp;&nbsp;&nbsp;正确答案
                 </div>
                 <div class="explanation-content">{{ correct_answers }}</div>
-                <div class="explanation-title">
+                <div class="explanation-title" ng-show="hasExplanation()">
                     <img src="resources/img/explanation.png"/>&nbsp;&nbsp;&nbsp;题目解析
                 </div>
                 <div class="explanation-content">{{ explanation }}</div>

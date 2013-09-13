@@ -55,7 +55,11 @@ angular.module("SunExercise", ['SunExercise.controllers', 'SunExercise.directive
                 controller: 'awardsCtrl',
                 templateUrl: 'resources/partials/awards.html'
             })
-    });
+            .otherwise({redirectTo:'/root'})
+    })
+     .config(function ($routeProvider, $httpProvider) {
+                $httpProvider.defaults.headers.common['Access-Token'] = "31c561860fa3f5a4755987a880aaedf6d899b9181c53f4186a4ebcc5a6faf56b";
+            });
 
 
 

@@ -266,6 +266,9 @@ angular.module('SunExercise.directives', [])
                     lessonTotalData.userdata = userdata;
                 })
 
+                $scope.lessonState= "locked";
+                $scope.lessonIcon = $scope.lessonIconClass = "lesson-button-icon-locked";                
+
                 //continue logic after initResourcePromise, lessonMaterial and lessonUserdata have been loaded
                 var lessonPromise = $q.all([$scope.initResourcePromise, lessonMaterialPromise, lessonUserdataPromise]);
                 lessonPromise.then(function () {
@@ -1104,6 +1107,10 @@ angular.module('SunExercise.directives', [])
                     }
                     $scope.problemResult = "default";
                     $scope.writeAnswer = singleFilling;
+                }
+
+                $scope.hasExplanation = function() {
+                     return (typeof currProblem.explanation != "undefined");
                 }
 
                 //when the student complete the problem

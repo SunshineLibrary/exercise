@@ -9,7 +9,8 @@ angular.module('SunExercise.services', [])
 
     .factory("APIProvider", function () {
         //var HOST = "http://192.168.3.26:30000";
-        var HOST = "http://shuwu.sunshine-library.org";
+        var HOST = "http://192.168.3.100";
+        // var HOST = "http://shuwu.sunshine-library.org";
         var getAPI = function (type, id, ts) {
             switch (type) {
                 case "getRoot" :
@@ -40,7 +41,7 @@ angular.module('SunExercise.services', [])
                     return HOST + "/exercise/v1/user_data/lessons/" + id;
 
                 case "getUserInfo" :
-                    return HOST + "/exercise/v1/user_info?ts=" + ts + "&callback=JSON_CALLBACK";
+                    return HOST + "/exercise/v1/user_data/user_info?ts=" + ts + "&callback=JSON_CALLBACK";
 
                 case "postUserInfoUserdata" :
                     return HOST + "/exercise/v1/user_data/user_info";
