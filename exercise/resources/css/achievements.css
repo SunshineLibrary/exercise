@@ -57,6 +57,7 @@
 
 .badge-content-locked {
     background-color: #f2f2f2;
+    color: #cccccc;
     float: left;
     width: 175px;
     height: 100%;
@@ -71,7 +72,7 @@
     padding: 15px;
 }
 
-.badge-title {
+.badge-content-unlocked > .badge-title {
     color: #ff8b59;
     display: block;
 }
