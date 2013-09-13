@@ -171,6 +171,7 @@ ximage {
   background-repeat: repeat;
   height: 48px;
   padding: 7px 0 0 15px;
+  color: #999999;
 }
 .explanation-content {
   margin: 15px 0 15px 15px;
@@ -181,10 +182,10 @@ ximage {
 }
 .hint-btn {
   margin-left: 14px;
-  margin-top: 125px;
+  margin-top: 36px;
 }
 .continue-btn {
-  margin-top: 36px;
+  margin-top: 225px;
 }
 .activity-summary {
   text-align: center;
