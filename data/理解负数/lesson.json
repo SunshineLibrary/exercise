@@ -1,0 +1,274 @@
+{"id": "理解负数", "ts": 1378097574322, "requirements": ["初始判断"], "title": "3理解负数", "summary": "来看看负数是什么以及如何使用负数吧！", "pass_score": "3", "star1": 59, "star2": 79, "star3": 100, "keywords": ["极简", "草稿"], "objectives": ["学会如何判断负数", "理解负数的涵义和用法"], "intended_audience": ["全教材初一年级"], "level": "easy", "activities": [
+	{
+		"id": "初始判断",
+		"order": 0,
+		"parent_id": "3 理解负数",
+		"title": "选择你的学习路径",
+		"type": "quiz",
+		"show_answer": false,
+		"show_summary": false,
+		"redoable": false,
+		"level": "easy",
+		"jump": ["to_activity_if_correctness:最终测试:\u003d100%"],
+		"problems": [
+			{
+				"id": "3007c5f1-9758-41b9-979a-bd4e194579f3",
+				"order": 0,
+				"parent_id": "初始判断",
+				"title": "请根据你的学习状况做出选择",
+				"type": "singlechoice",
+				"body": "第一次学习该内容请选择--开始学习，已学此内容并且想直接进行测试请选择--最终测试",
+				"choices": [
+					{
+						"id": "d816b13b-29ff-4a53-8655-8c840fb85cc5",
+						"order": 0,
+						"body": "开始学习",
+						"is_correct": false
+					},
+					{
+						"id": "9fb74a73-647c-46cc-ad7c-aa2d5c3b232a",
+						"order": 1,
+						"body": "最终测试",
+						"is_correct": true
+					}
+				]
+			}
+		]
+	},
+	{
+		"id": "视频1",
+		"order": 1,
+		"parent_id": "3 理解负数",
+		"title": "理解负数讲解",
+		"type": "lecture",
+		"redoable": true,
+		"body": "\u003cxvideo src\u003d\u00273 理解负数 02.mp4\u0027\u003e\u003c/xvideo\u003e",
+		"level": "easy"
+	},
+	{
+		"id": "lesson终测",
+		"order": 3,
+		"parent_id": "3 理解负数",
+		"title": "本课最终测试",
+		"type": "quiz",
+		"show_answer": false,
+		"show_summary": true,
+		"redoable": true,
+		"level": "easy",
+		"jump": ["to_activity_if_correctness:6.最终判断:\u003c80%"],
+		"problems": [
+			{
+				"id": "d969821f-86f0-4d5c-b745-ff8cfc346ad0",
+				"order": 1,
+				"parent_id": "lesson终测",
+				"title": "单选题",
+				"type": "singlechoice",
+				"body": "比较`0`,`-0.01`,``-0.02`,`0.01`四个数的大小",
+				"choices": [
+					{
+						"id": "bf452e40-5ca5-45bb-a5c3-f8099f2c3ac5",
+						"order": 0,
+						"body": "`0.01\u003e0\u003e-0.01\u003e-0.02`",
+						"is_correct": true
+					},
+					{
+						"id": "f802ad36-6d1c-46d6-b59d-4f91112d8b65",
+						"order": 1,
+						"body": "`0.01\u003e0\u003e-0.02\u003e-0.01`",
+						"is_correct": false
+					}
+				]
+			},
+			{
+				"id": "f185a4da-e50f-4796-94c5-51b06ec1b3f9",
+				"order": 2,
+				"parent_id": "lesson终测",
+				"title": "单选题",
+				"type": "singlechoice",
+				"body": "气温从零下`5`度（即`-5`），又继续降低了`5`度，这个过程可以表示为_______",
+				"choices": [
+					{
+						"id": "e1eb2a3f-1d34-47cb-8a30-1ab04bc6b67f",
+						"order": 0,
+						"body": "`-5-5\u003d-10`",
+						"is_correct": true
+					},
+					{
+						"id": "fc3cfcc6-d9e8-4cc9-a8f4-6c735d1b446b",
+						"order": 1,
+						"body": "`-5+5\u003d-10`",
+						"is_correct": false
+					},
+					{
+						"id": "85efc01c-16d8-47c6-8cbd-77c945039291",
+						"order": 2,
+						"body": "`-5-5\u003d0`",
+						"is_correct": false
+					},
+					{
+						"id": "62d25b0c-dc28-49bb-b5f9-8eecf5f518d4",
+						"order": 3,
+						"body": "`-5-5\u003d-15`",
+						"is_correct": false
+					},
+					{
+						"id": "e675d155-092b-4449-83fb-311530f6820a",
+						"order": 4,
+						"body": "`5-5\u003d0`",
+						"is_correct": false
+					}
+				]
+			},
+			{
+				"id": "4036760b-2a2d-47de-a691-8493dc9597e9",
+				"order": 3,
+				"parent_id": "lesson终测",
+				"title": "单选题",
+				"type": "singlechoice",
+				"body": "如果`a`是正数，那么对于`-a`",
+				"choices": [
+					{
+						"id": "431ac996-69d3-49f8-b4c1-322d9220e10e",
+						"order": 0,
+						"body": "`-a\u003c0`",
+						"is_correct": true
+					},
+					{
+						"id": "328e3b04-4aec-4874-9e4c-252ba54bfe21",
+						"order": 1,
+						"body": "`-a\u003d0`",
+						"is_correct": false
+					},
+					{
+						"id": "405f6e49-969a-481c-ae05-c14e883c580c",
+						"order": 2,
+						"body": "`-a\u003e0`",
+						"is_correct": false
+					},
+					{
+						"id": "fc6f95fe-3277-42ac-a7b2-de779afecd29",
+						"order": 3,
+						"body": "`-a\u003c\u003d0`",
+						"is_correct": false
+					},
+					{
+						"id": "a13712be-1a72-4702-bf97-6cc6332c432b",
+						"order": 4,
+						"body": "`-a\u003e\u003d0`",
+						"is_correct": false
+					}
+				]
+			},
+			{
+				"id": "8efdaa4f-1946-4963-8112-82c25c4fea20",
+				"order": 4,
+				"parent_id": "lesson终测",
+				"title": "单选题",
+				"type": "singlechoice",
+				"body": "温度从零上`6`度下降了`10`度后的温度如何计算?",
+				"choices": [
+					{
+						"id": "673b1396-9e0a-4966-af11-ab7a83e7f5bb",
+						"order": 0,
+						"body": "`6-10\u003d-4`",
+						"is_correct": true
+					},
+					{
+						"id": "20c6334e-a705-4a54-bdba-e5b69a8eda2e",
+						"order": 1,
+						"body": "`6+10\u003d16`",
+						"is_correct": false
+					},
+					{
+						"id": "545d4831-eccf-4c2c-8a49-91f72b464333",
+						"order": 2,
+						"body": "`6-10\u003d-16`",
+						"is_correct": false
+					},
+					{
+						"id": "d63aad54-1701-4f73-9682-b48020dc1284",
+						"order": 3,
+						"body": "`6-10\u003d4`",
+						"is_correct": false
+					}
+				]
+			},
+			{
+				"id": "3b29bef7-06f8-43d3-9b2c-0a3f59a2b242",
+				"order": 5,
+				"parent_id": "lesson终测",
+				"title": "单选题",
+				"type": "singlechoice",
+				"body": "温度从零下`5`度上升了`8`度后的温度如何计算?",
+				"choices": [
+					{
+						"id": "460bc325-4aa2-415f-93dd-3afe325fd8ac",
+						"order": 0,
+						"body": "`-5+8\u003d3`",
+						"is_correct": true
+					},
+					{
+						"id": "81a7702b-806b-4dae-abb8-cba4259bd4e5",
+						"order": 1,
+						"body": "`-5+8\u003d-3`",
+						"is_correct": true
+					},
+					{
+						"id": "7d9ff67a-acf1-4ff8-94d1-edab0d8c5a37",
+						"order": 2,
+						"body": "`-5+8\u003d-13`",
+						"is_correct": true
+					},
+					{
+						"id": "98889083-745d-486d-be66-7ad521d3d89b",
+						"order": 3,
+						"body": "`-5+8\u003d13`",
+						"is_correct": true
+					},
+					{
+						"id": "4dd8266c-c74d-4c39-8281-29c7fa75e01d",
+						"order": 4,
+						"body": "`5+8\u003d13`",
+						"is_correct": false
+					}
+				]
+			}
+		]
+	},
+	{
+		"id": "最终判断",
+		"order": 4,
+		"parent_id": "3 理解负数",
+		"title": "根据学习结果做出选择",
+		"type": "quiz",
+		"show_answer": false,
+		"show_summary": false,
+		"redoable": false,
+		"level": "easy",
+		"jump": ["to_activity_if_correctness:视频1:\u003d100%"],
+		"problems": [
+			{
+				"id": "38f7a409-ae95-4f70-82f9-6f27bf553a15",
+				"order": 0,
+				"parent_id": "最终判断",
+				"title": "请根据学习情况作出选择",
+				"type": "singlechoice",
+				"body": "哎呦！你错的太多了哦！我们建议你再好好看看这些知识点",
+				"choices": [
+					{
+						"id": "9719fd68-d7b3-41d3-b242-6fda98bc1c80",
+						"order": 0,
+						"body": "等一下，我再学一遍就没问题了！",
+						"is_correct": true
+					},
+					{
+						"id": "da19aa2d-9726-451b-9907-aac6ee36751f",
+						"order": 1,
+						"body": "我下次再巩固这部分知识吧",
+						"is_correct": false
+					}
+				]
+			}
+		]
+	}
+]}
