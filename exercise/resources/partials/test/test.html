@@ -1,4 +1,24 @@
 <test>
     <span>填写lesson的id：</span><input ng-model="lessonId"/>
     <button ng-click="checkLesson()">开始检查</button>
+
+    <table class="table table-striped">
+        <thead>
+        <tr>
+            <th>Type</th>
+            <th>Scope</th>
+            <th>Element ID</th>
+            <th>Content</th>
+        </tr>
+        </thead>
+
+        <tbody>
+        <tr ng-repeat="error in errors">
+            <td>{{ error.type }}</td>
+            <td>{{ error.scope }}</td>
+            <td>{{ error.id }}</td>
+            <td>{{ error.content }}</td>
+        </tr>
+        </tbody>
+    </table>
 </test>

@@ -6,9 +6,9 @@ angular.module("SunExerciseTest", ['SunExerciseTest.controllers', 'SunExerciseTe
         var initResourcePromise = deferred.promise;
 
         MaterialProvider.getRoot().then(function () {
-            console.log("root: successful!");
+            deferred.resolve("root: successful!")
         }, function (data, err) {
-            console.log("Error occurred while loading root material: " + err);
+            deferred.reject("Error occurred while loading root material: " + err);
         });
 
         $rootScope.initResourcePromise = initResourcePromise;
