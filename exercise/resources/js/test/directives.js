@@ -16,9 +16,9 @@ angular.module('SunExerciseTest.directives', [])
             restrict: "E",
             link: function ($scope) {
                 $scope.checkLesson = function () {
-                    $scope.initResourcePromise.then(function(){
+                    $scope.initResourcePromise.then(function () {
                         var lessonMaterialPromise = testSandbox.getLessonMaterial($scope.lessonId);
-                        lessonMaterialPromise.then(function(lessonData){
+                        lessonMaterialPromise.then(function (lessonData) {
                             console.log(lessonData);
                         })
                     })

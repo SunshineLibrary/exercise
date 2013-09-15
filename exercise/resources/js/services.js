@@ -8,13 +8,15 @@
 angular.module('SunExercise.services', [])
 
     .factory("APIProvider", function () {
-        //var HOST = "http://192.168.3.26:30000";
-        var HOST = "http://192.168.3.100";
+        // var HOST = "http://192.168.3.12:5000";
+        // var HOST = "http://192.168.3.100";
         // var HOST = "http://shuwu.sunshine-library.org";
+//        var HOST = "http://127.0.0.1:8000";
+        var HOST = "";
         var getAPI = function (type, id, ts) {
             switch (type) {
                 case "getRoot" :
-                    return HOST + "/exercise/v1/root?callback=JSON_CALLBACK";
+                    return HOST + "/exercise/v1/root";
 
                 case "getInitResources" :
                     return HOST + "/exercise/v1/resources";
@@ -23,27 +25,25 @@ angular.module('SunExercise.services', [])
                     return HOST + "/exercise/v1/chapters/" + id;
 
                 case "getLessonJson" :
-                    return HOST + "/exercise/v1/lessons/" + id + "?ts=" + ts + "&callback=JSON_CALLBACK";
+                    return HOST + "/exercise/v1/lessons/" + id + "?ts=" + ts;
 
                 case "getFileResources" :
                     return HOST + "/exercise/v1/lessons/" + id + "/";
 
                 case "getAchievementsJson" :
-                    //return HOST + "/exercise/v1/achievements?ts=" + ts + "&callback=JSON_CALLBACK";
-                    return "http://127.0.0.1:3000/exercise/v1/achievements?callback=JSON_CALLBACK";
+                    return HOST + "/exercise/v1/achievements?ts=" + ts;
 
                 case "getAchievementsResources" :
                     return HOST + "/exercise/v1/achievements";
 
                 case "getLessonUserdata" :
-                    return HOST + "/exercise/v1/user_data/lessons/" + id + "?callback=JSON_CALLBACK";
+                    return HOST + "/exercise/v1/user_data/lessons/" + id;
 
                 case "postLessonUserdata" :
                     return HOST + "/exercise/v1/user_data/lessons/" + id;
 
                 case "getUserInfo" :
-                    //return HOST + "/exercise/v1/user_data/user_info?ts=" + ts + "&callback=JSON_CALLBACK";
-                    return "http://127.0.0.1:8000/exercise/v1/user_data/user_info?ts=" + ts + "&callback=JSON_CALLBACK";
+                    return HOST + "/exercise/v1/user_data/user_info?ts=" + ts;
 
                 case "postUserInfoUserdata" :
                     return HOST + "/exercise/v1/user_data/user_info";
@@ -68,7 +68,7 @@ angular.module('SunExercise.services', [])
             var loadingProgressPromise = deferred.promise;
 
             //send a request to get the current state
-            var currentStatePromise = $http.jsonp(apiUrl + "?ts=" + ts + "&act=status&callback=JSON_CALLBACK");
+            var currentStatePromise = $http.get(apiUrl + "?ts=" + ts + "&act=status");
             currentStatePromise.success(function (stateData) {
                 //check turtle server has finished the cache task
                 if (!stateData.is_cached) {
@@ -89,10 +89,10 @@ angular.module('SunExercise.services', [])
             var getResourcesPromise = deferred.promise;
 
             //check if turtle server has already cached the resources
-            var statusPromise = $http.jsonp(apiUrl + "?ts=" + timeStamp + "&act=status&callback=JSON_CALLBACK");
+            var statusPromise = $http.get(apiUrl + "?ts=" + timeStamp + "&act=status");
             statusPromise.success(function (status) {
                 if ((typeof status.is_cached == "undefined") || (typeof status.is_cached != "undefined" && !status.is_cached)) {
-                    var cachePromise = $http.jsonp(apiUrl + "?ts=" + timeStamp + "&act=cache&callback=JSON_CALLBACK");
+                    var cachePromise = $http.get(apiUrl + "?ts=" + timeStamp + "&act=cache");
                     cachePromise.success(function (response) {
                         //check if the turtle server is offline and no cache recorded
                         if (response == "506") {
@@ -130,13 +130,14 @@ angular.module('SunExercise.services', [])
             return getResourcesPromise;
         }
 
-        var showNotification = function (notifyType, notifyContent) {
-            toastr.options.positionClass = "toast-top-full-width";
-            if (notifyType == "success") {
-                toastr.success('恭喜你获得了 ' + notifyContent + ' 徽章！');
-            } else if (notifyType == "error") {
-                toastr.error("错误：" + notifyContent);
-            }
+        var showNotification = function (notifyContent, $scope) {
+            /*$scope.notificationContent = notifyContent;
+
+             $("#notify-modal").modal("toggle");
+             $timeout(function(){
+             $("#notify-modal").modal("hide");
+             $('.modal-backdrop').remove();
+             }, 2000);*/
         };
 
         return {
@@ -158,7 +159,7 @@ angular.module('SunExercise.services', [])
             var deferred = $q.defer();
             var getRootPromise = deferred.promise;
 
-            var promise = $http.jsonp(APIProvider.getAPI("getRoot", "", ""));
+            var promise = $http.get(APIProvider.getAPI("getRoot", "", ""));
             promise.success(function (data) {
                 rootMaterial = data;
                 for (var i = 0; i < rootMaterial.subjects.length; i++) {
@@ -192,23 +193,9 @@ angular.module('SunExercise.services', [])
             var deferred = $q.defer();
             var userInfoPromise = deferred.promise;
 
-            var promise = $http.jsonp(APIProvider.getAPI("getUserInfo", "", ts));
+            var promise = $http.get(APIProvider.getAPI("getUserInfo", "", ts));
             promise.success(function (UserInfo) {
                 userinfoMaterial = UserInfo;
-                if (typeof userinfoMaterial.achievements == "undefined") {
-                    userinfoMaterial = {
-                        achievements: {
-                            badges: {},
-                            awards: {}
-                        }
-                    }
-                } else if (typeof userinfoMaterial.achievements.badges == "undefined") {
-                    userinfoMaterial.achievements = {
-                        badges: {},
-                        awards: {}
-                    }
-                }
-
                 deferred.resolve("Loading user info successful!");
             });
             promise.error(function (error) {
@@ -231,8 +218,8 @@ angular.module('SunExercise.services', [])
             var getChapterStatusPromise = deferred.promise;
 
             var ts = materialMap[chapterId].ts;
-            var promise = $http.jsonp(APIProvider.getAPI("getChapterResources", chapterId, "") + "?ts=" + ts +
-                "&act=status&callback=JSON_CALLBACK");
+            var promise = $http.get(APIProvider.getAPI("getChapterResources", chapterId, "") + "?ts=" + ts +
+                "&act=status");
             promise.success(function (status) {
                 if ((typeof status.is_cached != "undefined") && (status.is_cached)) {
                     deferred.resolve(true);
@@ -272,7 +259,7 @@ angular.module('SunExercise.services', [])
             var getLessonPromise = deferred.promise;
 
             var ts = materialMap[lessonId].ts;
-            var promise = $http.jsonp(APIProvider.getAPI("getLessonJson", lessonId, ts));
+            var promise = $http.get(APIProvider.getAPI("getLessonJson", lessonId, ts));
 
             promise.success(function (data) {
                 Material = data;
@@ -348,7 +335,7 @@ angular.module('SunExercise.services', [])
             var deferred = $q.defer();
             var achievementsPromise = deferred.promise;
 
-            var promise = $http.jsonp(APIProvider.getAPI("getAchievementsJson", "", rootMaterial.achievements.ts));
+            var promise = $http.get(APIProvider.getAPI("getAchievementsJson", "", rootMaterial.achievements.ts));
             promise.success(function (achievementsJson) {
                 deferred.resolve(achievementsJson)
             });
@@ -435,7 +422,7 @@ angular.module('SunExercise.services', [])
                 return lessonPromise;
             }
             //the current userdata has not been cached
-            var userdataPromise = $http.jsonp(APIProvider.getAPI("getLessonUserdata", lessonId, ""));
+            var userdataPromise = $http.get(APIProvider.getAPI("getLessonUserdata", lessonId, ""));
             userdataPromise.success(function (userdata, status) {
                 if (typeof userdata.summary != "undefined") {
                     //update the local userdata ans re-write the userdata map
@@ -598,7 +585,7 @@ angular.module('SunExercise.services', [])
             $http.post(APIProvider.getAPI("postUserInfoUserdata", "", ""), "data=" + JSON.stringify(userdataMap['user_info']));
         }
 
-        var addAchievements = function (achievementType, achievementContent) {
+        var addAchievements = function (achievementType, achievementContent, $scope) {
             var userinfoUserdata = getUserinfoUserdata();
             var is_new = (typeof userinfoUserdata.achievements[achievementType][achievementContent.id] == "undefined");
             userinfoUserdata.achievements[achievementType][achievementContent.id] = {
@@ -608,7 +595,7 @@ angular.module('SunExercise.services', [])
                 flushUserinfoUserdata();
             }
 
-            ExerciseService.showNotification("success", achievementContent.title);
+            ExerciseService.showNotification(achievementContent.title, $scope);
         }
 
         return{
