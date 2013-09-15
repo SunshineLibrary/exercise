@@ -266,8 +266,8 @@ angular.module('SunExercise.directives', [])
                     lessonTotalData.userdata = userdata;
                 })
 
-                $scope.lessonState= "locked";
-                $scope.lessonIcon = $scope.lessonIconClass = "lesson-button-icon-locked";                
+                $scope.lessonState = "locked";
+                $scope.lessonIcon = $scope.lessonIconClass = "lesson-button-icon-locked";
 
                 //continue logic after initResourcePromise, lessonMaterial and lessonUserdata have been loaded
                 var lessonPromise = $q.all([$scope.initResourcePromise, lessonMaterialPromise, lessonUserdataPromise]);
@@ -364,7 +364,7 @@ angular.module('SunExercise.directives', [])
                                 //apply the userdata using the created grader
                                 if (lessonSandbox.createGrader(grader, userDataToGrade)) {
                                     //write the new badge in userinfo
-                                    lessonSandbox.addAchievements("badges", globalBadges[i], $scope);
+                                    lessonSandbox.addAchievements("badges", globalBadges[i]);
                                 }
                             }
                         })
@@ -416,7 +416,7 @@ angular.module('SunExercise.directives', [])
                                                 (lessonSandbox.conditionParser(lessonData.achievements[i].condition, Infinity, 100)) :
                                                 (lessonSandbox.conditionParser(lessonData.achievements[i].condition,
                                                     lessonUserdata.summary.correct_count, lessonUserdata.summary.correct_percent))) {
-                                                lessonSandbox.addAchievements("awards", lessonData.achievements[i], $scope);
+                                                lessonSandbox.addAchievements("awards", lessonData.achievements[i]);
                                             }
                                         }
                                     }
@@ -509,7 +509,7 @@ angular.module('SunExercise.directives', [])
                                                         (lessonSandbox.conditionParser(lessonData.achievements[i].condition, Infinity, 100)) :
                                                         (lessonSandbox.conditionParser(lessonData.achievements[i].condition,
                                                             lessonUserdata.summary.correct_count, lessonUserdata.summary.correct_percent))) {
-                                                        lessonSandbox.addAchievements("awards", lessonData.achievements[i], $scope);
+                                                        lessonSandbox.addAchievements("awards", lessonData.achievements[i]);
                                                     }
                                                 }
                                             }
@@ -667,7 +667,7 @@ angular.module('SunExercise.directives', [])
                                             //apply the userdata using the created grader
                                             if (activitySandbox.createGrader(grader, userDataToGrade)) {
                                                 //write the new badge in userinfo
-                                                activitySandbox.addAchievements("badges", activityData.achievements[i], $scope);
+                                                activitySandbox.addAchievements("badges", activityData.achievements[i]);
                                             }
                                         }
                                     }
@@ -743,7 +743,7 @@ angular.module('SunExercise.directives', [])
                                     //apply the userdata using the created grader
                                     if (activitySandbox.createGrader(grader, "")) {
                                         //write the new badge in userinfo
-                                        activitySandbox.addAchievements("badges", activityData.achievements[i], $scope);
+                                        activitySandbox.addAchievements("badges", activityData.achievements[i]);
                                     }
                                 }
                             }
@@ -1109,8 +1109,8 @@ angular.module('SunExercise.directives', [])
                     $scope.writeAnswer = singleFilling;
                 }
 
-                $scope.hasExplanation = function() {
-                     return (typeof currProblem.explanation != "undefined");
+                $scope.hasExplanation = function () {
+                    return (typeof currProblem.explanation != "undefined");
                 }
 
                 //when the student complete the problem
