@@ -16,7 +16,7 @@ angular.module('SunExercise.services', [])
         var getAPI = function (type, id, ts) {
             switch (type) {
                 case "getRoot" :
-                    return HOST + "/exercise/v1/root?callback=JSON_CALLBACK";
+                    return HOST + "/exercise/v1/root";
 
                 case "getInitResources" :
                     return HOST + "/exercise/v1/resources";
@@ -25,25 +25,25 @@ angular.module('SunExercise.services', [])
                     return HOST + "/exercise/v1/chapters/" + id;
 
                 case "getLessonJson" :
-                    return HOST + "/exercise/v1/lessons/" + id + "?ts=" + ts + "&callback=JSON_CALLBACK";
+                    return HOST + "/exercise/v1/lessons/" + id + "?ts=" + ts ;
 
                 case "getFileResources" :
                     return HOST + "/exercise/v1/lessons/" + id + "/";
 
                 case "getAchievementsJson" :
-                    return HOST + "/exercise/v1/achievements?ts=" + ts + "&callback=JSON_CALLBACK";
+                    return HOST + "/exercise/v1/achievements?ts=" + ts ;
 
                 case "getAchievementsResources" :
                     return HOST + "/exercise/v1/achievements";
 
                 case "getLessonUserdata" :
-                    return HOST + "/exercise/v1/user_data/lessons/" + id + "?callback=JSON_CALLBACK";
+                    return HOST + "/exercise/v1/user_data/lessons/" + id;
 
                 case "postLessonUserdata" :
                     return HOST + "/exercise/v1/user_data/lessons/" + id;
 
                 case "getUserInfo" :
-                    return HOST + "/exercise/v1/user_data/user_info?ts=" + ts + "&callback=JSON_CALLBACK";
+                    return HOST + "/exercise/v1/user_data/user_info?ts=" + ts ;
 
                 case "postUserInfoUserdata" :
                     return HOST + "/exercise/v1/user_data/user_info";
@@ -68,7 +68,7 @@ angular.module('SunExercise.services', [])
             var loadingProgressPromise = deferred.promise;
 
             //send a request to get the current state
-            var currentStatePromise = $http.jsonp(apiUrl + "?ts=" + ts + "&act=status&callback=JSON_CALLBACK");
+            var currentStatePromise = $http.get(apiUrl + "?ts=" + ts + "&act=status");
             currentStatePromise.success(function (stateData) {
                 //check turtle server has finished the cache task
                 if (!stateData.is_cached) {
@@ -89,10 +89,10 @@ angular.module('SunExercise.services', [])
             var getResourcesPromise = deferred.promise;
 
             //check if turtle server has already cached the resources
-            var statusPromise = $http.jsonp(apiUrl + "?ts=" + timeStamp + "&act=status&callback=JSON_CALLBACK");
+            var statusPromise = $http.get(apiUrl + "?ts=" + timeStamp + "&act=status");
             statusPromise.success(function (status) {
                 if ((typeof status.is_cached == "undefined") || (typeof status.is_cached != "undefined" && !status.is_cached)) {
-                    var cachePromise = $http.jsonp(apiUrl + "?ts=" + timeStamp + "&act=cache&callback=JSON_CALLBACK");
+                    var cachePromise = $http.get(apiUrl + "?ts=" + timeStamp + "&act=cache");
                     cachePromise.success(function (response) {
                         //check if the turtle server is offline and no cache recorded
                         if (response == "506") {
@@ -159,7 +159,7 @@ angular.module('SunExercise.services', [])
             var deferred = $q.defer();
             var getRootPromise = deferred.promise;
 
-            var promise = $http.jsonp(APIProvider.getAPI("getRoot", "", ""));
+            var promise = $http.get(APIProvider.getAPI("getRoot", "", ""));
             promise.success(function (data) {
                 rootMaterial = data;
                 for (var i = 0; i < rootMaterial.subjects.length; i++) {
@@ -193,7 +193,7 @@ angular.module('SunExercise.services', [])
             var deferred = $q.defer();
             var userInfoPromise = deferred.promise;
 
-            var promise = $http.jsonp(APIProvider.getAPI("getUserInfo", "", ts));
+            var promise = $http.get(APIProvider.getAPI("getUserInfo", "", ts));
             promise.success(function (UserInfo) {
                 userinfoMaterial = UserInfo;
                 deferred.resolve("Loading user info successful!");
@@ -218,8 +218,8 @@ angular.module('SunExercise.services', [])
             var getChapterStatusPromise = deferred.promise;
 
             var ts = materialMap[chapterId].ts;
-            var promise = $http.jsonp(APIProvider.getAPI("getChapterResources", chapterId, "") + "?ts=" + ts +
-                "&act=status&callback=JSON_CALLBACK");
+            var promise = $http.get(APIProvider.getAPI("getChapterResources", chapterId, "") + "?ts=" + ts +
+                "&act=status");
             promise.success(function (status) {
                 if ((typeof status.is_cached != "undefined") && (status.is_cached)) {
                     deferred.resolve(true);
@@ -259,7 +259,7 @@ angular.module('SunExercise.services', [])
             var getLessonPromise = deferred.promise;
 
             var ts = materialMap[lessonId].ts;
-            var promise = $http.jsonp(APIProvider.getAPI("getLessonJson", lessonId, ts));
+            var promise = $http.get(APIProvider.getAPI("getLessonJson", lessonId, ts));
 
             promise.success(function (data) {
                 Material = data;
@@ -335,7 +335,7 @@ angular.module('SunExercise.services', [])
             var deferred = $q.defer();
             var achievementsPromise = deferred.promise;
 
-            var promise = $http.jsonp(APIProvider.getAPI("getAchievementsJson", "", rootMaterial.achievements.ts));
+            var promise = $http.get(APIProvider.getAPI("getAchievementsJson", "", rootMaterial.achievements.ts));
             promise.success(function (achievementsJson) {
                 deferred.resolve(achievementsJson)
             });
@@ -422,7 +422,7 @@ angular.module('SunExercise.services', [])
                 return lessonPromise;
             }
             //the current userdata has not been cached
-            var userdataPromise = $http.jsonp(APIProvider.getAPI("getLessonUserdata", lessonId, ""));
+            var userdataPromise = $http.get(APIProvider.getAPI("getLessonUserdata", lessonId, ""));
             userdataPromise.success(function (userdata, status) {
                 if (typeof userdata.summary != "undefined") {
                     //update the local userdata ans re-write the userdata map
