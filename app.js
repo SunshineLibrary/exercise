@@ -27,38 +27,38 @@ app.use('/app/exercise/', express.static(__dirname + '/exercise'));
 
 // In real server, it looks like http://192.168.3.100/web_apps/exercise/bootstrap
 app.get('/app/exercise/bootstrap', function (req, res) {
-	res.redirect("/app/exercise/index.html");
+    res.redirect("/app/exercise/index.html");
 });
 
 app.get('/exercise/v1/user_data/*', function (req, res) {
-	console.log("get userdata," + req.originalUrl);
-	if (PROD_USER_DATA_MODE) {
-		request.get("http://shuwu.sunshine-library.org" + req.originalUrl, req.body).pipe(res);
-	} else {
-		res.send(local_user_data[req.originalUrl]);
-	}
+    console.log("get userdata," + req.originalUrl);
+    if (PROD_USER_DATA_MODE) {
+        request.get("http://shuwu.sunshine-library.org" + req.originalUrl, req.body).pipe(res);
+    } else {
+        res.send(local_user_data[req.originalUrl]);
+    }
 });
 
 app.get('/exercise/*', function (req, res) {
-	console.log("proxy," + req.originalUrl);
-	request.get(SERVER_IP + req.originalUrl).pipe(res);
+    console.log("proxy," + req.originalUrl);
+    request.get(SERVER_IP + req.originalUrl).pipe(res);
 });
 
 var local_user_data = {};
 
 app.post('*', express.bodyParser(), function (req, res) {
-	var mode = (PROD_USER_DATA_MODE) ? "PROD" : "MOCK";
-	console.log("post[" + mode + "]," + req.originalUrl + "," + JSON.stringify(req.body.data));
-	if ("delete_all" == req.body.action) {
-		local_user_data = {};
-		console.log("all mock user_data deleted");
-	}
-	if (PROD_USER_DATA_MODE) {
-		request.post("http://shuwu.sunshine-library.org" + req.originalUrl, req.body).pipe(res);
-	} else {
-		local_user_data[req.originalUrl] = req.body.data;
-		res.send(req.body);
-	}
+    var mode = (PROD_USER_DATA_MODE) ? "PROD" : "MOCK";
+    console.log("post[" + mode + "]," + req.originalUrl + "," + JSON.stringify(req.body.data));
+    if ("delete_all" == req.body.action) {
+        local_user_data = {};
+        console.log("all mock user_data deleted");
+    }
+    if (PROD_USER_DATA_MODE) {
+        request.post("http://shuwu.sunshine-library.org" + req.originalUrl, req.body).pipe(res);
+    } else {
+        local_user_data[req.originalUrl] = req.body.data;
+        res.send(req.body);
+    }
 });
 
 /*

@@ -25,13 +25,13 @@ angular.module('SunExercise.services', [])
                     return HOST + "/exercise/v1/chapters/" + id;
 
                 case "getLessonJson" :
-                    return HOST + "/exercise/v1/lessons/" + id + "?ts=" + ts ;
+                    return HOST + "/exercise/v1/lessons/" + id + "?ts=" + ts;
 
                 case "getFileResources" :
                     return HOST + "/exercise/v1/lessons/" + id + "/";
 
                 case "getAchievementsJson" :
-                    return HOST + "/exercise/v1/achievements?ts=" + ts ;
+                    return HOST + "/exercise/v1/achievements?ts=" + ts;
 
                 case "getAchievementsResources" :
                     return HOST + "/exercise/v1/achievements";
@@ -43,7 +43,7 @@ angular.module('SunExercise.services', [])
                     return HOST + "/exercise/v1/user_data/lessons/" + id;
 
                 case "getUserInfo" :
-                    return HOST + "/exercise/v1/user_data/user_info?ts=" + ts ;
+                    return HOST + "/exercise/v1/user_data/user_info?ts=" + ts;
 
                 case "postUserInfoUserdata" :
                     return HOST + "/exercise/v1/user_data/user_info";
