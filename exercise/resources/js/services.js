@@ -8,9 +8,11 @@
 angular.module('SunExercise.services', [])
 
     .factory("APIProvider", function () {
-        //var HOST = "http://192.168.3.26:30000";
-        var HOST = "http://192.168.3.100";
+        // var HOST = "http://192.168.3.12:5000";
+        // var HOST = "http://192.168.3.100";
         // var HOST = "http://shuwu.sunshine-library.org";
+//        var HOST = "http://127.0.0.1:8000";
+        var HOST = "";
         var getAPI = function (type, id, ts) {
             switch (type) {
                 case "getRoot" :

@@ -3,24 +3,32 @@ This is a mock and test server for turtle-server
 */
 var express = require('express');
 var fs = require('fs');
-var validator = require('express-validator');
+var request = require('request');
 var http = require('http');
 var app = express();
+var r = request.defaults({'proxy':'http://192.168.3.100'})
 
 app.use(app.router);
 app.use(express.methodOverride());
 app.use(express.bodyParser());
 
 // App
-app.use('/app/exercise/', express.static(__dirname + '/app/exercise'));
+app.use('/app/exercise/', express.static(__dirname + '/exercise'));
 
 // In real server, it looks like http://192.168.3.100/web_apps/exercise/bootstrap
-app.get('/web_apps/exercise/bootstrap', function (req, res) {
+app.get('/app/exercise/bootstrap', function (req, res) {
 	res.redirect("/app/exercise/index.html");
 });
 
+app.get('/exercise/*', function(req,res) {
+	console.log("proxy,"+req.originalUrl);
+	r.get('http://192.168.3.100/'+req.originalUrl).pipe(res);
+});	
+
+/*
 // For heartbeat
 app.get('/ping', function (req, res) {
+	console.log("ping");
 	res.send({ping: true});
 });
 
@@ -206,7 +214,7 @@ app.post('/userinfo', express.bodyParser(), function (req, res) {
 });
 
 app.use('/media', express.static(__dirname + '/data/media'));
-
+*/
 app.listen(8000);
 console.log("Yep. I'm listening on port 8000");
 
