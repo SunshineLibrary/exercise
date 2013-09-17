@@ -20,7 +20,7 @@
                     <div class="lecture-body" ng-bind-html-unsafe="body"></div>
                 </div>
                 <div class="col-md-2 ctrlBar">
-                    <div ng-hide="hideContinueButton"
+                    <div class="continue-btn" ng-hide="hideContinueButton"
                          ng-click='continueActivity()'>
                         <img src="resources/img/next.png"/>
                     </div>
@@ -37,18 +37,21 @@
                 </div>
 
                 <div class="activity-summary" ng-show="showQuizSummary">
-                    <span class="activity-summary-label">正确率</span>
-                    <span class="activity-summary-percent">{{ quizCorrectPercent }}</span>
-                    <hr style="border:1px solid #aaa; width:40%"/>
-                    <span class="activity-summary-label">答对
-                        <span class="activity-summary-count">{{ quizCorrectCount }}</span>题
-                    </span>
-                    <span class="activity-summary-label">共
-                        <span class="activity-summary-count">{{ totalProblemsNum }}</span>题
-                    </span>
-
+                    <div class="col-md-8 col-md-offset-2">
+                        <span class="activity-summary-label">正确率</span>
+                        <span class="activity-summary-percent">{{ quizCorrectPercent }}</span>
+                        <hr style="border:1px solid #aaa; width:40%"/>
+                        <span class="activity-summary-label">答对
+                            <span class="activity-summary-count">{{ quizCorrectCount }}</span>题
+                        </span>
+                        <span class="activity-summary-label">共
+                            <span class="activity-summary-count">{{ totalProblemsNum }}</span>题
+                        </span>
+                    </div>
                     <div class="col-md-2 ctrlBar" ng-click="nextActivity()">
-                        <img src="resources/img/next.png"/>
+                        <div class="continue-btn">
+                            <img src="resources/img/next.png"/>
+                        </div>
                     </div>
                     </dl>
                 </div>
