@@ -4,14 +4,13 @@
 var express = require('express');
 var fs = require('fs');
 var request = require('request');
-var http = require('http');
-var app = express();
+var app = express.createServer();
 
 var SERVER_IP = (typeof process.env['SERVER_IP'] == "undefined") ? "http://shuwu.sunshine-library.org" : process.env['SERVER_IP'];
 var PROD_USER_DATA_MODE = (typeof process.env['PROD_USER_DATA'] != "undefined");
 
 console.log("use `SERVER_IP='http://shuwu.sunshine-library.org' node app.js` to start a server with specified server");
-console.log("use `PROD_USERDATA_MODE=true node app.js` to start a server sending user_data to server");
+console.log("use `PROD_USER_DATA=true node app.js` to start a server sending user_data to server");
 console.log("SERVER_IP\t\t" + SERVER_IP);
 console.log("PROD_USERDATA_MODE\t" + PROD_USER_DATA_MODE);
 
@@ -20,45 +19,63 @@ app.use(express.methodOverride());
 app.use(express.bodyParser());
 
 // Access token for test
-request.headers = {"Access-Token": "0c906ba0167db96f1fa211fccf4decbcb43e5a102d6c34f19e6b472c72718a59"};
+request = request.defaults({'headers': {"Access-Token": "0c906ba0167db96f1fa211fccf4decbcb43e5a102d6c34f19e6b472c72718a59"}})
 
-// App
+// Develop LocalApp (files in exercise/), use /app/exercise/index.html or /app/exercise/bootstrap
+// Test shuwu server (files on server), use /web_apps/exercise
+// Entry points
+app.get('/web_apps/exercise', function (req, res) {
+	console.log("shuwu entry");
+	request.get(
+		{url: "http://shuwu.sunshine-library.org" + req.originalUrl, followRedirect: false},
+		function (e, r) {
+			var redirect = r.headers["location"].slice("http://shuwu.sunshine-library.org".length);
+			console.log("Redirect," + redirect);
+			res.redirect(redirect);
+		});
+});
+app.get('/app/exercise/bootstrap', function (req, res) {
+	res.redirect("/app/exercise/index.html");
+});
 app.use('/app/exercise/', express.static(__dirname + '/exercise'));
 
-// In real server, it looks like http://192.168.3.100/web_apps/exercise/bootstrap
-app.get('/app/exercise/bootstrap', function (req, res) {
-    res.redirect("/app/exercise/index.html");
+// url start with /system/web_apps/ must be resources on remote server
+// for shuwu test
+app.get('/system/web_apps/*', function (req, res) {
+	console.log("proxy," + req.originalUrl);
+	request.get(SERVER_IP + req.originalUrl).pipe(res);
 });
 
+// APIs
 app.get('/exercise/v1/user_data/*', function (req, res) {
-    console.log("get userdata," + req.originalUrl);
-    if (PROD_USER_DATA_MODE) {
-        request.get("http://shuwu.sunshine-library.org" + req.originalUrl, req.body).pipe(res);
-    } else {
-        res.send(local_user_data[req.originalUrl]);
-    }
+	console.log("get userdata," + req.originalUrl);
+	if (PROD_USER_DATA_MODE) {
+		request.get("http://shuwu.sunshine-library.org" + req.originalUrl).pipe(res);
+	} else {
+		res.send(local_user_data[req.originalUrl]);
+	}
 });
 
 app.get('/exercise/*', function (req, res) {
-    console.log("proxy," + req.originalUrl);
-    request.get(SERVER_IP + req.originalUrl).pipe(res);
+	console.log("proxy," + req.originalUrl);
+	request.get(SERVER_IP + req.originalUrl).pipe(res);
 });
 
 var local_user_data = {};
 
 app.post('*', express.bodyParser(), function (req, res) {
-    var mode = (PROD_USER_DATA_MODE) ? "PROD" : "MOCK";
-    console.log("post[" + mode + "]," + req.originalUrl + "," + JSON.stringify(req.body.data));
-    if ("delete_all" == req.body.action) {
-        local_user_data = {};
-        console.log("all mock user_data deleted");
-    }
-    if (PROD_USER_DATA_MODE) {
-        request.post("http://shuwu.sunshine-library.org" + req.originalUrl, req.body).pipe(res);
-    } else {
-        local_user_data[req.originalUrl] = req.body.data;
-        res.send(req.body);
-    }
+	var mode = (PROD_USER_DATA_MODE) ? "PROD" : "MOCK";
+	console.log("post[" + mode + "]," + req.originalUrl + "," + JSON.stringify(req.body));
+	if ("delete_all" == req.body.action) {
+		local_user_data = {};
+		console.log("all mock user_data deleted");
+	}
+	if (PROD_USER_DATA_MODE) {
+		request.post("http://shuwu.sunshine-library.org" + req.originalUrl, req.body).pipe(res);
+	} else {
+		local_user_data[req.originalUrl] = req.body;
+		res.send(req.body);
+	}
 });
 
 /*
