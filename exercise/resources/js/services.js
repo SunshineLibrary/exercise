@@ -130,14 +130,13 @@ angular.module('SunExercise.services', [])
             return getResourcesPromise;
         }
 
-        var showNotification = function (notifyContent, $scope) {
-            /*$scope.notificationContent = notifyContent;
-
-             $("#notify-modal").modal("toggle");
-             $timeout(function(){
-             $("#notify-modal").modal("hide");
-             $('.modal-backdrop').remove();
-             }, 2000);*/
+        var showNotification = function (notifyType, notifyContent) {
+            toastr.options.positionClass = "toast-top-full-width";
+            if (notifyType == "success") {
+                toastr.success('恭喜你获得了 ' + notifyContent + ' 徽章！');
+            } else if (notifyType == "error") {
+                toastr.error("错误：" + notifyContent);
+            }
         };
 
         return {
@@ -193,9 +192,23 @@ angular.module('SunExercise.services', [])
             var deferred = $q.defer();
             var userInfoPromise = deferred.promise;
 
-            var promise = $http.get(APIProvider.getAPI("getUserInfo", "", ts));
+            var promise = $http.jsonp(APIProvider.getAPI("getUserInfo", "", ts));
             promise.success(function (UserInfo) {
                 userinfoMaterial = UserInfo;
+                if (typeof userinfoMaterial.achievements == "undefined") {
+                    userinfoMaterial = {
+                        achievements: {
+                            badges: {},
+                            awards: {}
+                        }
+                    }
+                } else if (typeof userinfoMaterial.achievements.badges == "undefined") {
+                    userinfoMaterial.achievements = {
+                        badges: {},
+                        awards: {}
+                    }
+                }
+
                 deferred.resolve("Loading user info successful!");
             });
             promise.error(function (error) {
@@ -585,7 +598,7 @@ angular.module('SunExercise.services', [])
             $http.post(APIProvider.getAPI("postUserInfoUserdata", "", ""), "data=" + JSON.stringify(userdataMap['user_info']));
         }
 
-        var addAchievements = function (achievementType, achievementContent, $scope) {
+        var addAchievements = function (achievementType, achievementContent) {
             var userinfoUserdata = getUserinfoUserdata();
             var is_new = (typeof userinfoUserdata.achievements[achievementType][achievementContent.id] == "undefined");
             userinfoUserdata.achievements[achievementType][achievementContent.id] = {
@@ -595,7 +608,7 @@ angular.module('SunExercise.services', [])
                 flushUserinfoUserdata();
             }
 
-            ExerciseService.showNotification(achievementContent.title, $scope);
+            ExerciseService.showNotification("success", achievementContent.title);
         }
 
         return{
