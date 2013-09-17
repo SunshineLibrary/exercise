@@ -192,7 +192,7 @@ angular.module('SunExercise.services', [])
             var deferred = $q.defer();
             var userInfoPromise = deferred.promise;
 
-            var promise = $http.jsonp(APIProvider.getAPI("getUserInfo", "", ts));
+            var promise = $http.get(APIProvider.getAPI("getUserInfo", "", ts));
             promise.success(function (UserInfo) {
                 userinfoMaterial = UserInfo;
                 if (typeof userinfoMaterial.achievements == "undefined") {
