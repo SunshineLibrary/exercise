@@ -6,7 +6,7 @@
 
             <div style="width: 50%" class="pull-left" ng-repeat="subject in subjects">
                 <div class="subject-container" ng-click="enterSubject(subject.id)">
-                    <img src="resources/img/subjects-icon/subject-{{ subject.subject }}.png"/>
+                    <img ng-src="resources/img/subjects-icon/subject-{{ subject.subject }}.png"/>
                     <span class="subject-title font-size-small">{{ subject.title }}</span>
                 </div>
             </div>

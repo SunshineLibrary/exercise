@@ -3,7 +3,7 @@
     <div class="lesson-button-container font-size-small"
          ng-click="showLessonDialogue()">
         <div class="{{ lessonIconClass }}">
-            <img src="resources/img/{{ lessonIcon }}.png"/>
+            <img ng-src="resources/img/{{ lessonIcon }}.png"/>
         </div>
         <span class="lesson-button-title">{{ title }}</span>
     </div>
@@ -17,7 +17,7 @@
         <div class="modal-dialog">
             <div class="lesson-container modal-content">
                 <div class="lesson-header-{{ lessonState }}">
-                    <img class="lesson-icon" src="resources/img/{{ lessonStateIcon }}.png"/>
+                    <img class="lesson-icon" ng-src="resources/img/{{ lessonStateIcon }}.png"/>
                     <span class="lesson-title font-size-big">{{ title }}</span>
                 </div>
                 <div class="lesson-body-enter" ng-show="startLesson">

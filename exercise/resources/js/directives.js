@@ -1229,7 +1229,7 @@ angular.module('SunExercise.directives', [])
                     $scope.badgeName = {};
                     $scope.badgeStatus = {};
                     $scope.awardName = {};
-                    if (typeof userinfoData.achievements.badges != "null") {
+                    if (typeof userinfoData.achievements.badges != "undefined") {
                         var currentBadges = 0;
                         for (var i = 0; i < $scope.badges.length; i++) {
                             if (typeof userinfoData.achievements.badges[$scope.badges[i].id] != "undefined") {
@@ -1243,7 +1243,7 @@ angular.module('SunExercise.directives', [])
                         }
                         $scope.currentBadges = currentBadges;
                     }
-                    if (typeof userinfoData.achievements.awards != "null") {
+                    if (typeof userinfoData.achievements.awards != "undefined") {
                         var currentAwards = 0;
                         for (i = 0; i < $scope.awards.length; i++) {
                             if (typeof userinfoData.achievements.awards[$scope.awards[i].id] != "undefined") {
