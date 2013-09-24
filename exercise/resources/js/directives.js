@@ -726,7 +726,6 @@ angular.module('SunExercise.directives', [])
                         //set is_complete to true for later reviewing
                         activityUserdata.is_complete = true;
 
-                        activitySandbox.playSoundEffects("sound-effects/click.wav");
                         //check if the student achieves certain achievements
                         if (typeof activityData.achievements != "undefined") {
                             for (var i = 0; i < activityData.achievements.length; i++) {
@@ -1128,6 +1127,11 @@ angular.module('SunExercise.directives', [])
                         //multi-choice question grader
                         if (currProblem.type === "multichoice") {
                             problemUserdata.is_correct = problemSandbox.problemGrader(currProblem, $scope.answer);
+                            if (problemUserdata.is_correct) {
+                                problemSandbox.playSoundEffects("correct");
+                            } else {
+                                problemSandbox.playSoundEffects("wrong");
+                            }
                             for (var i = 0; i < currProblem.choices.length; i++) {
                                 if ((typeof $scope.answer[currProblem.choices[i].id] !== "undefined") &&
                                     ($scope.answer[currProblem.choices[i].id])) {
@@ -1138,6 +1142,11 @@ angular.module('SunExercise.directives', [])
                         } else {
                             if (typeof $scope.answer[currProblem.id] !== "undefined") {
                                 problemUserdata.is_correct = problemSandbox.problemGrader(currProblem, $scope.answer);
+                                if (problemUserdata.is_correct) {
+                                    problemSandbox.playSoundEffects("correct");
+                                } else {
+                                    problemSandbox.playSoundEffects("wrong");
+                                }
                                 problemUserdata.answer.push($scope.answer[currProblem.id]);
                             }
                         }
