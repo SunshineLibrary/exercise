@@ -140,15 +140,16 @@
 }
 
 .lesson-body-review tr {
-    line-height: 48px;
+ /*   line-height: 48px;*/
     display: block;
     width: 100%;
     margin-bottom: 1px;
+    border-bottom : 1px solid #f2f2f2;
 }
 
 .lesson-body-review tr td {
-    border-left: 10px solid #cccccc;
-    padding-left: 30px;
+
+    /*padding-left: 30px;*/
 }
 
 .lesson-footer {
