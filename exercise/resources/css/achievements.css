@@ -61,7 +61,7 @@
     float: left;
     width: 175px;
     height: 100%;
-    padding: 15px;
+    padding: 6px;
 }
 
 .badge-content-unlocked {
@@ -69,7 +69,7 @@
     float: left;
     width: 175px;
     height: 100%;
-    padding: 15px;
+    padding: 6px;
 }
 
 .badge-content-unlocked > .badge-title {

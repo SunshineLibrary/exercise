@@ -6,7 +6,8 @@ var fs = require('fs');
 var request = require('request');
 var app = express.createServer();
 
-var SERVER_IP = (typeof process.env['SERVER_IP'] == "undefined") ? "http://shuwu.sunshine-library.org" : process.env['SERVER_IP'];
+//var SERVER_IP = (typeof process.env['SERVER_IP'] == "undefined") ? "http://shuwu.sunshine-library.org" : process.env['SERVER_IP'];
+var SERVER_IP = (typeof process.env['SERVER_IP'] == "undefined") ? "http://192.168.3.100" : process.env['SERVER_IP'];
 var PROD_USER_DATA_MODE = (typeof process.env['PROD_USER_DATA'] != "undefined");
 
 console.log("use `SERVER_IP='http://shuwu.sunshine-library.org' node app.js` to start a server with specified server");
