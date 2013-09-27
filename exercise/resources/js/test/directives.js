@@ -7,6 +7,29 @@
  */
 
 angular.module('SunExerciseTest.directives', [])
+	.directive("fastClick", function () {
+		return function ($scope, $element, $attributes) {
+			var tapped;
+			tapped = false;
+			$element.bind("click", function () {
+				if (!tapped) {
+					return $scope.$apply($attributes["fastClick"]);
+				}
+			});
+			$element.bind("touchstart", function (event) {
+				return tapped = true;
+			});
+			$element.bind("touchmove", function (event) {
+				tapped = false;
+				return event.stopImmediatePropagation();
+			});
+			return $element.bind("touchend", function () {
+				if (tapped) {
+					return $scope.$apply($attributes["fastClick"]);
+				}
+			});
+		};
+	})
 	.directive("test", function (SandboxProvider) {
 
 		var testSandbox = SandboxProvider.getSandbox();
@@ -30,6 +53,7 @@ angular.module('SunExerciseTest.directives', [])
 						addError("object-not-found", "chapter", $scope.chapterId, "找不到该chapter");
 						return;
 					}
+					$scope.chapterJSON = chapterData;
 					$scope.lessons = chapterData.lessons;
 					console.log("checking chapter," + JSON.stringify(chapterData));
 					if (typeof chapterData.enter_lesson == "undefined" || chapterData.enter_lesson.length < 10) {
@@ -41,14 +65,14 @@ angular.module('SunExerciseTest.directives', [])
 							addError("lack-component", "lesson", lesson.id, "lesson没有id");
 							continue;
 						}
-						lessonMap[lesson.id] = lesson;
-					}
-					if ((typeof lesson.requirements == "undefined") ^ (typeof lesson.requirements == "undefined")) {
-						addError("convert-error", "chapter", lesson.id, "lesson(" + lesson.title + ")的requirement转换失败");
-					} else {
-						if (lesson.requirements.length != lesson.requirement_titles.length) {
-							addError("convert-error", "chapter", lesson.id, "lesson(" + lesson.title + ")的requirement转换失败，数量不一致");
+						if ((typeof lesson.requirements == "undefined") ^ (typeof lesson.requirements == "undefined")) {
+							addError("convert-error", "chapter", lesson.id, "lesson(" + lesson.title + ")的requirement转换失败");
+						} else {
+							if (lesson.requirements.length != lesson.requirement_titles.length) {
+								addError("convert-error", "chapter", lesson.id, "lesson(" + lesson.title + ")的requirement转换失败，数量不一致");
+							}
 						}
+						lessonMap[lesson.id] = lesson;
 					}
 
 					for (var j = 0; j < lesson.requirements.length; j++) {

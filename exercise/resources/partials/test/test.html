@@ -2,7 +2,7 @@
     <test>
         <div>
             <span>chapter id：</span><input ng-model="chapterId"/>
-            <button ng-click="checkChapter()">开始检查</button>
+            <button fast-click="checkChapter()">开始检查</button>
         </div>
 
         <table class="table table-striped">
@@ -19,7 +19,7 @@
                 <td>{{ lesson.id }}</td>
                 <td>{{ lesson.title }}</td>
                 <td>
-                    <button ng-click="check('{{lesson.id}}')">检查</button>
+                    <button fast-click="check('{{lesson.id}}')">检查</button>
                 </td>
             </tr>
             </tbody>
@@ -27,7 +27,7 @@
 
         <div>
             <span>填写lesson的id：</span><input ng-model="lessonId"/>
-            <button ng-click="checkLesson()">开始检查</button>
+            <button fast-click="checkLesson()">开始检查</button>
         </div>
 
         <table class="table table-striped">
@@ -51,5 +51,8 @@
         </table>
         <div>Lesson json:</div>
         <pre>{{ lessonJSON | json }}</pre>
+
+        <div>Chapter json:</div>
+        <pre>{{ chapterJSON | json }}</pre>
     </test>
 </subject>
