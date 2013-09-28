@@ -4,15 +4,16 @@
             <!--<span>第&nbsp;{{ $index+1 }}&nbsp;题&nbsp;/&nbsp;共&nbsp;{{ total }}&nbsp;题&nbsp;{{ problem.parent_id }}</span><br> -->
             <span>{{ problemIndex+$index+1 }}.&nbsp;<span class="question-type">({{ type }})</span></span>
             <span>{{ problem.title }}</span><br>
-            <span ng-bind-html-unsafe="body"></span><br>
+            <span mathjax-bind="body"></span><br>
         </div>
 
         <div ng-repeat='choice in problem.choices' class="col-md-{{ colNum }}" choices>
             <div id='problem{{$parent.$index}}_choice{{$index}}'
                  class="choice-layout-{{ layout }}-state-{{ checked[$index] }}"
                  ng-click='chooseOption(choice.id, $index)'>
-                {{ calcChoiceNum($index) }}&nbsp;&nbsp;<span class="choice-content"
-                                                             ng-bind-html-unsafe="choiceBody[choice.id]"></span>
+                {{ calcChoiceNum($index) }}&nbsp;&nbsp;
+                <div class="choice-content"
+                     mathjax-bind="choiceBody[choice.id]"></div>
             </div>
         </div>
 
@@ -32,7 +33,7 @@
                 <div class="explanation-title" ng-show="hasExplanation()">
                     <img src="resources/img/explanation.png"/>&nbsp;&nbsp;&nbsp;题目解析
                 </div>
-                <div class="explanation-content">{{ explanation }}</div>
+                <div class="explanation-content" mathjax-bind="explanation"></div>
             </div>
         </div>
     </div>

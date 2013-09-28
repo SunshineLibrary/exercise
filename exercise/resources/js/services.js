@@ -133,7 +133,8 @@ angular.module('SunExercise.services', [])
         var showNotification = function (notifyType, notifyContent) {
             toastr.options.positionClass = "toast-top-full-width";
             if (notifyType == "success") {
-                toastr.success('恭喜你获得了 ' + notifyContent + ' 徽章！');
+                toastr.success('<img src="resources/img/badge-icons/' + notifyContent.id + '.png"/> 恭喜你获得了 ' +
+                    notifyContent.title + ' 徽章！');
             } else if (notifyType == "error") {
                 toastr.error("错误：" + notifyContent);
             }
@@ -609,7 +610,7 @@ angular.module('SunExercise.services', [])
                 flushUserinfoUserdata();
             }
 
-            ExerciseService.showNotification("success", achievementContent.title);
+            ExerciseService.showNotification("success", achievementContent);
         }
 
         return{
@@ -787,6 +788,10 @@ angular.module('SunExercise.services', [])
                 ExerciseService.emitEvent(eventName, scope, args);
             }
 
+            Sandbox.prototype.showNotification = function (notifyType, notifyContent) {
+                ExerciseService.showNotification(notifyType, notifyContent);
+            }
+
             //a parser for lesson complete logic
             Sandbox.prototype.parseCompleteCondition = function (pass_score, summary) {
                 var target_score = 0;
@@ -928,8 +933,8 @@ angular.module('SunExercise.services', [])
                 }
             }
 
-            Sandbox.prototype.playSoundEffects = function (soundUrl) {
-                var soundEffect = new Audio(soundUrl);
+            Sandbox.prototype.playSoundEffects = function (soundName) {
+                var soundEffect = new Audio("resources/sound/" + soundName + ".mp3");
                 soundEffect.play();
             }
 

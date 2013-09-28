@@ -137,6 +137,16 @@ angular.module('SunExercise.directives', [])
             restrict: "E",
             link: function ($scope, $element) {
                 var chapterData = treeSandbox.getChapterMaterial($routeParams.cid);
+                //error identification
+                for (var i = 0; i < chapterData.lessons.length; i++) {
+                    if (chapterData.lessons[i].id == chapterData.enter_lesson) {
+                        break;
+                    }
+                }
+                if (i >= chapterData.lessons.length) {
+                    treeSandbox.showNotification("error", "根据enter_lesson找不到对应的lesson");
+                }
+
                 var mergedTree = chapterTreeDrawer.initChapterTree(chapterData);
                 var chapterPage = "<div class='chapter-tree-container'><table border='0' cellpadding='0' cellspacing='0'>";
                 angular.forEach(mergedTree, function (row, i) {
@@ -726,7 +736,6 @@ angular.module('SunExercise.directives', [])
                         //set is_complete to true for later reviewing
                         activityUserdata.is_complete = true;
 
-                        activitySandbox.playSoundEffects("sound-effects/click.wav");
                         //check if the student achieves certain achievements
                         if (typeof activityData.achievements != "undefined") {
                             for (var i = 0; i < activityData.achievements.length; i++) {
@@ -1128,6 +1137,11 @@ angular.module('SunExercise.directives', [])
                         //multi-choice question grader
                         if (currProblem.type === "multichoice") {
                             problemUserdata.is_correct = problemSandbox.problemGrader(currProblem, $scope.answer);
+                            if (problemUserdata.is_correct) {
+                                problemSandbox.playSoundEffects("correct");
+                            } else {
+                                problemSandbox.playSoundEffects("wrong");
+                            }
                             for (var i = 0; i < currProblem.choices.length; i++) {
                                 if ((typeof $scope.answer[currProblem.choices[i].id] !== "undefined") &&
                                     ($scope.answer[currProblem.choices[i].id])) {
@@ -1138,6 +1152,11 @@ angular.module('SunExercise.directives', [])
                         } else {
                             if (typeof $scope.answer[currProblem.id] !== "undefined") {
                                 problemUserdata.is_correct = problemSandbox.problemGrader(currProblem, $scope.answer);
+                                if (problemUserdata.is_correct) {
+                                    problemSandbox.playSoundEffects("correct");
+                                } else {
+                                    problemSandbox.playSoundEffects("wrong");
+                                }
                                 problemUserdata.answer.push($scope.answer[currProblem.id]);
                             }
                         }
@@ -1183,6 +1202,20 @@ angular.module('SunExercise.directives', [])
                 }
             }
         }
+    })
+
+    //math formula rendered
+    .directive("mathjaxBind", function () {
+        return {
+            restrict: "A",
+            controller: ["$scope", "$element", "$attrs",
+                function ($scope, $element, $attrs) {
+                    $scope.$watch($attrs.mathjaxBind, function (value) {
+                        $element.html(value == undefined ? "" : value);
+                        MathJax.Hub.Queue(["Typeset", MathJax.Hub, $element[0]]);
+                    });
+                }]
+        };
     })
 
     .directive("achievements", function (SandboxProvider, $q, $location) {
