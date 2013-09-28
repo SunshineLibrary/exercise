@@ -575,8 +575,9 @@ angular.module('SunExercise.services', [])
             $http({
                 method: "POST",
                 url: APIProvider.getAPI("postLessonUserdata", lessonId, ""),
-                headers: {'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8'},
-                data: "data=" + JSON.stringify(userdataMap[lessonId])
+//                headers: {'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8'},
+                headers: {'Content-Type': 'application/json;charset=UTF-8'},
+                data: JSON.stringify(userdataMap[lessonId])
             });
         }
 
@@ -596,7 +597,7 @@ angular.module('SunExercise.services', [])
         }
 
         var flushUserinfoUserdata = function () {
-            $http.post(APIProvider.getAPI("postUserInfoUserdata", "", ""), "data=" + JSON.stringify(userdataMap['user_info']));
+            $http.post(APIProvider.getAPI("postUserInfoUserdata", "", ""), JSON.stringify(userdataMap['user_info']));
         }
 
         var addAchievements = function (achievementType, achievementContent) {

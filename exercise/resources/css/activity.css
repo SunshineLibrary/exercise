@@ -7,6 +7,7 @@
 .ctrlBar {
   position: fixed;
   right: 0;
+  text-align: left;
 }
 ._progress-bar {
   background-color: #f2f2f2;
@@ -42,6 +43,7 @@ ximage {
 }
 .question-content {
   padding-left: 15px;
+  line-height: 1.75em;
 }
 .question-type {
   color: #aaaaaa;
