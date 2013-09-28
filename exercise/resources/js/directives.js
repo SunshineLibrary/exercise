@@ -137,6 +137,16 @@ angular.module('SunExercise.directives', [])
             restrict: "E",
             link: function ($scope, $element) {
                 var chapterData = treeSandbox.getChapterMaterial($routeParams.cid);
+                //error identification
+                for (var i = 0; i < chapterData.lessons.length; i++) {
+                    if (chapterData.lessons[i].id == chapterData.enter_lesson) {
+                        break;
+                    }
+                }
+                if (i >= chapterData.lessons.length) {
+                    treeSandbox.showNotification("error", "根据enter_lesson找不到对应的lesson");
+                }
+
                 var mergedTree = chapterTreeDrawer.initChapterTree(chapterData);
                 var chapterPage = "<div class='chapter-tree-container'><table border='0' cellpadding='0' cellspacing='0'>";
                 angular.forEach(mergedTree, function (row, i) {
@@ -1192,6 +1202,20 @@ angular.module('SunExercise.directives', [])
                 }
             }
         }
+    })
+
+    //math formula rendered
+    .directive("mathjaxBind", function () {
+        return {
+            restrict: "A",
+            controller: ["$scope", "$element", "$attrs",
+                function ($scope, $element, $attrs) {
+                    $scope.$watch($attrs.mathjaxBind, function (value) {
+                        $element.html(value == undefined ? "" : value);
+                        MathJax.Hub.Queue(["Typeset", MathJax.Hub, $element[0]]);
+                    });
+                }]
+        };
     })
 
     .directive("achievements", function (SandboxProvider, $q, $location) {

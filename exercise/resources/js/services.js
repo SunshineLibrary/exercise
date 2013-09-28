@@ -787,6 +787,10 @@ angular.module('SunExercise.services', [])
                 ExerciseService.emitEvent(eventName, scope, args);
             }
 
+            Sandbox.prototype.showNotification = function (notifyType, notifyContent) {
+                ExerciseService.showNotification(notifyType, notifyContent);
+            }
+
             //a parser for lesson complete logic
             Sandbox.prototype.parseCompleteCondition = function (pass_score, summary) {
                 var target_score = 0;
