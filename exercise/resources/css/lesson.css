@@ -1,8 +1,11 @@
 .lesson-button-container {
     width: 175px;
-    height: 120px;
+    height: 132px;
     padding-left: 15px;
     padding-right: 15px;
+}
+.lesson-button-container:active .lesson-button-title{
+    background-color: #f2f2f2;
 }
 
 .lesson-button-icon {
@@ -56,6 +59,7 @@
 
 .lesson-button-icon-locked img {
     margin-top: 6px;
+    opacity: 0.5;
 }
 
 .lesson-button-title {
@@ -177,6 +181,9 @@
     border-width: 0 0 4px 0;
     height: 64px;
 }
+.lesson-enter-button-unlocked:active {
+    background-color: #cc6f47;
+}
 
 .lesson-enter-button-review {
     color: black;
@@ -184,6 +191,10 @@
     border-bottom: 4px solid #cccccc;
     border-width: 0 0 4px 0;
     height: 64px;
+}
+.lesson-enter-button-review :active{
+    background-color: #e5e5e5;
+    border-bottom: 4px solid #999999;
 }
 
 /* lesson summary page */
