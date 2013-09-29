@@ -1,10 +1,14 @@
 .subjects-container {
   height: 100%;
 }
+
 .subject-container {
   width: 128px;
   text-align: center;
   margin-top: 20px;
+}
+.subject-container:active {
+  opacity: .5;
 }
 .subject-title {
   display: block;
@@ -55,6 +59,10 @@
 .open-menu {
   display: block;
 }
+.open-menu:active {
+  display: block;
+  opacity: .5;
+}
 .subject-content {
   padding: 76px 20px 20px 20px;
   background-color: #e5e5e5;
@@ -66,6 +74,10 @@
   height: 120px;
   padding: 15px 0 0 15px;
 }
+.chapters-container:active {
+  background-color: #f2f2f2;
+}
+
 .download-container {
   position: absolute;
   bottom: 0;
