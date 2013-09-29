@@ -47,9 +47,15 @@
 .chapter-back-button {
     position: absolute;
 }
+.chapter-back-button:active {
+    opacity: .5;
+}
 
 .achievements-button {
     position: absolute;
     right: 20px;
     top: 10px;
+}
+.achievements-button:active {
+    opacity: .5;
 }
